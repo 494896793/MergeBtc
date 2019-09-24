@@ -1,0 +1,71 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 13:44
+ * Description :
+ */
+
+public class EntrustSellListEntity implements MarketCenterData {
+    private List<EntrustEntity> minList = new ArrayList<>();
+    private List<EntrustEntity> maxList = new ArrayList<>();
+
+    @Override
+    public MarketCenterType getType() {
+        return MarketCenterType.ENTRUST_SELL;
+    }
+
+    @Override
+    public boolean parseFromJson(JSONObject json) {
+        try {
+            JSONArray min = json.getJSONArray("min");
+            for(int i = 0; i < min.length(); i++){
+                EntrustEntity item = new EntrustEntity(min.getJSONObject(i));
+                minList.add(item);
+            }
+            JSONArray max = json.getJSONArray("max");
+            for(int i = 0; i < max.length(); i++){
+                EntrustEntity item = new EntrustEntity(max.getJSONObject(i));
+                maxList.add(item);
+            }
+            return true;
+        } catch (Exception ignore){
+        }
+        return false;
+    }
+
+    public List<EntrustEntity> getMinList() {
+        return minList;
+    }
+
+    public List<EntrustEntity> getMaxList() {
+        return maxList;
+    }
+
+    public static class EntrustEntity {
+        private String price;
+        private String num;
+
+        public EntrustEntity(JSONObject json) {
+            try {
+                price = json.getString("price");
+                num = json.getString("num");
+            } catch (Exception ignore){
+            }
+        }
+
+        public String getPrice() {
+            return price;
+        }
+
+        public String getNum() {
+            return num;
+        }
+    }
+}

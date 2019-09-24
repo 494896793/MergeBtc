@@ -1,0 +1,285 @@
+package com.bochat.app.business.main.bill;
+
+import android.content.Intent;
+import android.text.TextUtils;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.view.MessageDialog;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.common.contract.bill.QuickExchangeContract;
+import com.bochat.app.common.model.IIMModel;
+import com.bochat.app.common.model.ISpeedConverModel;
+import com.bochat.app.common.model.ITokenAssetModel;
+import com.bochat.app.common.util.ALog;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.model.bean.SendSpeedEntity;
+import com.bochat.app.model.bean.SpeedConverStatusEntity;
+import com.bochat.app.model.bean.UserCurrencyDataEntity;
+import com.bochat.app.model.bean.UserCurrencyEntity;
+import com.bochat.app.model.greendao.DBManager;
+import com.bochat.app.mvp.presenter.BasePresenter;
+import com.bochat.app.mvp.view.ResultTipsType;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+import static com.bochat.app.app.RouteExtra.ConversationIsGroup;
+import static com.bochat.app.app.RouteExtra.ConversationReceiveId;
+import static com.bochat.app.app.RouteExtra.FROM_PAGE;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/05/12 11:33
+ * Description :
+ */
+
+public class QuickExchangePresenter extends BasePresenter<QuickExchangeContract.View> implements QuickExchangeContract.Presenter{
+
+    @Inject
+    ISpeedConverModel speedConverModel;
+
+
+    @Inject
+    ITokenAssetModel tokenAssetModel;
+
+    @Inject
+    IIMModel iimModel;
+    
+    private UserCurrencyDataEntity userCurrencyDataEntity;
+    
+    private UserCurrencyEntity pay;
+    private UserCurrencyEntity exchange;
+    private String payCount;
+    private String exchangeCount;
+    
+    private String password;
+    private boolean isSync;
+    private boolean isGroup;
+    private long relevanceId;
+    private SendSpeedEntity sendSpeedEntity;
+    private String from;
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        Intent viewIntent = getView().getViewIntent();
+        from=viewIntent.getStringExtra(FROM_PAGE);
+        isGroup=viewIntent.getBooleanExtra(ConversationIsGroup,false);
+        relevanceId=viewIntent.getLongExtra(ConversationReceiveId,0);
+        
+        ALog.d("relevanceId is " + relevanceId);
+        
+        if(viewIntent.hasExtra(RouteExtra.FriendEntity)){
+            final FriendEntity friendEntity = (FriendEntity) viewIntent.getSerializableExtra(RouteExtra.FriendEntity);
+            MessageDialog messageDialog = new MessageDialog(getView().getViewContext(),
+                    "闪兑", "发送闪兑给" + friendEntity.getNickname() + "？");
+            messageDialog.setOnChooseListener(new MessageDialog.OnChooseListener() {
+                @Override
+                public void onEnter() {
+                    sendQuickExchange(false, friendEntity.getId(),new Consumer<SendSpeedEntity>() {
+                        @Override
+                        public void accept(SendSpeedEntity entity) throws Exception {
+                            sendSpeedEntity=entity;
+                            Disposable subscribe = Observable.create(new ObservableOnSubscribe<Boolean>() {
+                                @Override
+                                public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
+                                    boolean isRight=iimModel.sendSpeedConver(friendEntity.getId()+"",QuickExchangePresenter.this.pay.getBid(),QuickExchangePresenter.this.exchange.getBid(),sendSpeedEntity,false);
+                                    emitter.onNext(isRight);
+                                }
+                            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Boolean>() {
+                                @Override
+                                public void accept(Boolean entity) throws Exception {
+                                    if(entity){
+                                        from=null;
+                                        getView().hideLoading("发送成功");
+                                        getView().finish();
+                                    } else {
+                                        getView().showTips(new ResultTipsType("发送失败", false));
+                                    }
+                                }
+                            });
+                            getView().showLoading(subscribe);
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancel() {
+                }
+            });
+            messageDialog.showPopupWindow();
+        } else if (viewIntent.hasExtra(RouteExtra.GroupEntity)){
+
+            final GroupEntity groupEntity = (GroupEntity) viewIntent.getSerializableExtra(RouteExtra.GroupEntity);
+            MessageDialog messageDialog = new MessageDialog(getView().getViewContext(),
+                    "闪兑", "发送闪兑到" + groupEntity.getGroup_name() + "？");
+            messageDialog.setOnChooseListener(new MessageDialog.OnChooseListener() {
+                @Override
+                public void onEnter() {
+                    
+                    ALog.d("onEnter");
+                    
+                    sendQuickExchange(true, groupEntity.getGroup_id(),new Consumer<SendSpeedEntity>() {
+                        @Override
+                        public void accept(SendSpeedEntity entity) throws Exception {
+                            sendSpeedEntity=entity;
+                            Disposable subscribe = Observable.create(new ObservableOnSubscribe<Boolean>() {
+                                @Override
+                                public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
+                                    boolean isRight=iimModel.sendSpeedConver(groupEntity.getGroup_id()+"",QuickExchangePresenter.this.pay.getBid(),QuickExchangePresenter.this.exchange.getBid(),sendSpeedEntity,true);
+                                    emitter.onNext(isRight);
+                                }
+                            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Boolean>() {
+                                @Override
+                                public void accept(Boolean entity) throws Exception {
+                                    if(entity){
+                                        from=null;
+                                        getView().hideLoading("发送成功");
+                                        getView().finish();
+                                    } else {
+                                        getView().showTips(new ResultTipsType("发送失败", false));
+                                    }
+                                }
+                            });
+                            getView().showLoading(subscribe);
+                        }
+                    });
+
+                }
+
+                @Override
+                public void onCancel() {
+
+                }
+            });
+            messageDialog.showPopupWindow();
+
+        } else if (viewIntent.hasExtra(RouteExtra.UserCurrencyDataEntity)) {
+            userCurrencyDataEntity = (UserCurrencyDataEntity) viewIntent.getSerializableExtra(RouteExtra.UserCurrencyDataEntity);
+            getView().updateCoinList(userCurrencyDataEntity.getData());
+        } else if (userCurrencyDataEntity == null){
+            Disposable subscribe = Observable.create(new ObservableOnSubscribe<CodeEntity>() {
+                @Override
+                public void subscribe(ObservableEmitter<CodeEntity> emitter) throws Exception {
+                    try {
+                        userCurrencyDataEntity = tokenAssetModel.listUserCurrency();
+                        if(userCurrencyDataEntity.getRetcode() != 0){
+                            emitter.onError(new RxErrorThrowable(userCurrencyDataEntity));
+                            return;
+                        }
+                        emitter.onNext(userCurrencyDataEntity);
+                        emitter.onComplete();
+                    } catch (Exception e) {
+                        emitter.onError(e);
+                        e.printStackTrace();
+                    }
+                }
+            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<CodeEntity>() {
+                @Override
+                public void accept(CodeEntity entity) throws Exception {
+                    getView().updateCoinList(userCurrencyDataEntity.getData());
+
+                }
+            }, new RxErrorConsumer<Throwable>(this)  {
+                @Override
+                public void acceptError(Throwable object) {
+                }
+            });
+        }
+    }
+
+    private void sendQuickExchange(final boolean isGroup, final long conversationId,Consumer consumer){
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<SendSpeedEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<SendSpeedEntity> emitter) throws Exception {
+                try {
+                    int site=0;
+                    if(isGroup){
+                        site=2;
+                    }else{
+                        site=1;
+                    }
+                    SendSpeedEntity entity = speedConverModel.sendSpeedConver(Integer.valueOf(pay.getBid()), Integer.valueOf(exchange.getBid()),
+                            Double.valueOf(payCount), Double.valueOf(exchangeCount),
+                            site, isSync ? 2 : 1, password, conversationId);
+                    if (entity.getRetcode() != 0) {
+                        emitter.onError(new RxErrorThrowable(entity));
+                        return;
+                    }
+                    SpeedConverStatusEntity speedConverStatusEntity=new SpeedConverStatusEntity();
+                    speedConverStatusEntity.setId(entity.getId());
+                    speedConverStatusEntity.setStatus(1);
+                    DBManager.getInstance().saveOrUpdateSpeedConverStatu(speedConverStatusEntity);
+                    emitter.onNext(entity);
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(consumer, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("");
+            }
+        });
+        getView().showLoading(subscribe);
+    }
+    
+    @Override
+    public void onEnter(UserCurrencyEntity pay, UserCurrencyEntity exchange, String payCount, String exchangeCount, String password, boolean isSync) {
+        this.pay = pay;
+        this.exchange = exchange;
+        this.payCount = payCount;
+        this.exchangeCount = exchangeCount;
+        this.password = password;
+        this.isSync = isSync;
+
+        if (TextUtils.isEmpty(from)){
+            ARouter.getInstance().build(RouteTable.MINE_SEARCH_ADDRESS_BOOK).withString(RouteExtra.ReturnUrl, RouteTable.MINE_QUICK_EXCHANGE).navigation();
+        } else {
+            sendQuickExchange(isGroup, relevanceId,new Consumer<SendSpeedEntity>() {
+                @Override
+                public void accept(SendSpeedEntity entity) throws Exception {
+                    sendSpeedEntity=entity;
+                    Disposable subscribe = Observable.create(new ObservableOnSubscribe<Boolean>() {
+                        @Override
+                        public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
+                            boolean isRight=iimModel.sendSpeedConver(relevanceId+"",QuickExchangePresenter.this.pay.getBid(),QuickExchangePresenter.this.exchange.getBid(),sendSpeedEntity,isGroup);
+                            emitter.onNext(isRight);
+                        }
+                    }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Boolean>() {
+                        @Override
+                        public void accept(Boolean entity) throws Exception {
+                            if(entity){
+                                from=null;
+                                getView().hideLoading("发送成功");
+                                getView().finish();
+                            } else {
+                                getView().showTips(new ResultTipsType("发送失败", false));
+                            }
+                        }
+                    });
+                    getView().showLoading(subscribe);
+                }
+            });
+        }
+    }
+}

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+    <RelativeLayout
+        android:layout_width="@dimen/dp_118"
+        android:layout_height="@dimen/dp_65">
+        <TextView
+            android:layout_centerInParent="true"
+            android:id="@+id/item_trade_type_name"
+            android:layout_width="@dimen/dp_80"
+            android:layout_height="@dimen/dp_40"
+            android:background="@drawable/shape_button_5dp"
+            android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:text="零钱"
+            android:minWidth="@dimen/dp_32"
+            android:textSize="@dimen/dp_16"/>
+    </RelativeLayout>
+</RelativeLayout>

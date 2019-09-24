@@ -1,0 +1,28 @@
+package com.bochat.app.business.main.conversation;
+
+import com.bochat.app.common.contract.conversation.GroupManageForbiddenContract;
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/26 10:52
+ * Description :
+ */
+
+public class GroupManageForbiddenPresenter extends BasePresenter<GroupManageForbiddenContract.View> implements GroupManageForbiddenContract.Presenter{
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onChangeGlobalForbiddenSwitch(boolean isGlobalForbidden) {
+        
+    }
+
+    @Override
+    public void onItemClick(FriendEntity closeForbidden) {
+
+    }
+}

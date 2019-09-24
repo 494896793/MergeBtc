@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#F2F2F2"
+    android:orientation="vertical">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_titleText="编辑资料"
+        app:top_hasBackBtn="true"
+        app:top_background="#FFFFFF"/>
+    
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_150"
+        android:focusable="true"
+        android:clickable="true"
+        android:background="@mipmap/bg_cv_group_manage_edit_banner">
+        <RelativeLayout
+            android:id="@+id/cv_group_manage_edit_icon_layout"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+            <ImageView
+                android:id="@+id/cv_group_manage_edit_icon_btn"
+                android:layout_width="@dimen/dp_60"
+                android:layout_centerInParent="true"
+                android:scaleType="fitXY"
+                android:layout_height="@dimen/dp_60"/>
+            <ImageView
+                android:id="@+id/cv_group_manage_edit_camera"
+                android:layout_width="@dimen/dp_28"
+                android:layout_height="@dimen/dp_27"
+                android:src="@mipmap/ic_cv_group_manage_edit_camera"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="点击更换群头像"
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/dp_14"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/cv_group_manage_edit_icon_layout"
+            android:layout_marginTop="@dimen/dp_8"
+            />
+    </RelativeLayout>
+
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/cv_group_manage_edit_name"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_text="群名称"/>
+    <com.bochat.app.app.view.BoChatItemView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_text="群介绍"
+        app:item_hasRightBtn="false"
+        android:layout_marginTop="@dimen/dp_10"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_155"
+        android:background="#FFFFFF">
+        
+        <fj.edittextcount.lib.FJEditTextCount
+            android:id="@+id/cv_group_manage_edit_description"
+            android:layout_width="@dimen/dp_345"
+            android:layout_height="@dimen/dp_140"
+            android:layout_centerHorizontal="true"
+            android:background="#DFDFDF"
+            android:paddingLeft="@dimen/dp_10"
+            app:etHint="点击填写群介绍，让大家更了解你的群。"
+            app:etLineColor="#00000000"
+            app:etMaxLength="900"
+            app:etMinHeight="@dimen/dp_140"
+            app:etPromptTextColor="#999999"
+            app:etPromptTextSize="@dimen/dp_14"
+            app:etTextColor="#000000"
+            app:etTextSize="@dimen/dp_14"
+            app:etType="percentage" />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/cv_group_manage_edit_enter_btn"
+            android:layout_width="@dimen/dp_345"
+            android:layout_height="@dimen/dp_44"
+            android:background="@drawable/shape_login_btn"
+            android:layout_centerHorizontal="true"
+            android:text="提交"
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/dp_17"/>
+        
+    </RelativeLayout>
+</LinearLayout>

@@ -1,0 +1,114 @@
+package com.bochat.app.business.main.dynamic;
+
+import android.content.Intent;
+
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.common.contract.dynamic.FastSpeedContract;
+import com.bochat.app.common.model.ITokenAssetModel;
+import com.bochat.app.model.bean.UserCurrencyDataEntity;
+import com.bochat.app.model.bean.UserCurrencyEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+/**
+ * 2019/6/5
+ * Author LDL
+ **/
+public class FastSpeedPresenter extends BasePresenter<FastSpeedContract.View> implements FastSpeedContract.Presenter {
+    
+    private List<UserCurrencyEntity> list;
+    
+    private int startPosition;
+    private int convertPosition;
+    
+    private double startAmount;
+    private double convertAmount;
+    private double rate = 1.0f;
+    
+    @Inject
+    ITokenAssetModel tokenAssetModel;
+
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        Intent viewIntent=getView().getViewIntent();
+        UserCurrencyDataEntity userCurrencyDataEntity = null;
+        if (viewIntent.hasExtra(RouteExtra.UserCurrencyDataEntity)) {
+            userCurrencyDataEntity = (UserCurrencyDataEntity) viewIntent.getSerializableExtra(RouteExtra.UserCurrencyDataEntity);
+            list = userCurrencyDataEntity.getData();
+        } 
+        if (userCurrencyDataEntity == null){
+            Disposable subscribe = Observable.create(new ObservableOnSubscribe<List<UserCurrencyEntity>>() {
+                @Override
+                public void subscribe(ObservableEmitter<List<UserCurrencyEntity>> emitter) throws Exception {
+                    try {
+                        UserCurrencyDataEntity userCurrencyDataEntity = tokenAssetModel.listUserCurrency();
+                        if(userCurrencyDataEntity.getRetcode() != 0){
+                            emitter.onError(new RxErrorThrowable(userCurrencyDataEntity));
+                            return;
+                        }
+                        
+                        emitter.onNext(userCurrencyDataEntity.getData());
+                        emitter.onComplete();
+                    } catch (Exception e) {
+                        emitter.onError(e);
+                        e.printStackTrace();
+                    }
+                }
+            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<UserCurrencyEntity>>() {
+                @Override
+                public void accept(List<UserCurrencyEntity> entity) throws Exception {
+                    list = entity;
+                }
+            }, new RxErrorConsumer<Throwable>(this)  {
+                @Override
+                public void acceptError(Throwable object) {
+                }
+            });
+        }
+    }
+    
+    @Override
+    public void onStartAmountChange(String amount) {
+        startAmount = Double.valueOf(amount);
+        convertAmount = startAmount * rate;
+        getView().setExchangeAmount(String.valueOf(startAmount));
+    }
+
+    @Override
+    public void onExchangeClick() {
+        int temp = convertPosition;
+        convertPosition = startPosition;
+        startPosition = temp;
+        startAmount = convertAmount;
+        //TODO rate
+        convertAmount = startAmount * rate;
+        getView().setStartCurrency(list.get(startPosition));
+        getView().setConvertCurrency(list.get(convertPosition));
+        getView().setStartAmount(String.valueOf(startAmount));
+        getView().setExchangeAmount(String.valueOf(convertAmount));
+    }
+
+    @Override
+    public void onEnterClick(String payPassword) {
+        
+    }
+}

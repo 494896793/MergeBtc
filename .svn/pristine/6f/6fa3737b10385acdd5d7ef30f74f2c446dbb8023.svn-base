@@ -1,0 +1,74 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import org.json.JSONObject;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 13:42
+ * Description :
+ */
+
+public class TransactionEntity {
+
+    private String sellerId;
+    private String buyerId;
+    private String sellerName;
+    private String buyerName;
+    private String totalNum;
+    private String currentPrice;
+    private String upToLow;
+    private String RMB;
+    private String marketId;
+
+    public TransactionEntity(JSONObject json) {
+        try {
+            sellerId = json.getString("sellerCurrencyId");
+            buyerId = json.getString("buyerCurrencyId");
+            sellerName = json.getString("sellerCurrencyName");
+            buyerName = json.getString("buyerCurrencyName");
+            totalNum = json.getString("num");
+            RMB = json.getString("RMB");
+            currentPrice = json.getString("currentprice");
+            upToLow = json.getString("uptolow");
+            marketId = json.getString("marketId");
+        } catch (Exception ignored) {
+        }
+    }
+    
+    public String getSellerId() {
+        return sellerId;
+    }
+
+    public String getBuyerId() {
+        return buyerId;
+    }
+
+    public String getSellerName() {
+        return sellerName;
+    }
+
+    public String getBuyerName() {
+        return buyerName;
+    }
+
+    public String getTotalNum() {
+        return totalNum;
+    }
+
+    public String getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public String getUpToLow() {
+        return upToLow;
+    }
+
+    public String getMarketId() {
+        return marketId;
+    }
+
+    public String getRMB() {
+        return RMB;
+    }
+
+}

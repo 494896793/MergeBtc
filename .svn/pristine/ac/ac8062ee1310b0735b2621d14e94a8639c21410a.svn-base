@@ -1,0 +1,12 @@
+package com.bochat.app.model.event;
+
+/**
+ * 2019/4/23
+ * Author LDL
+ **/
+public class FriendApplyEvent {
+
+
+
+
+}

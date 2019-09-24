@@ -1,0 +1,126 @@
+package com.bochat.app.business.main.mine;
+
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.business.provider.RealNameInfoProvider;
+import com.bochat.app.common.contract.mine.AddBankCardContract;
+import com.bochat.app.common.model.ISettingModule;
+import com.bochat.app.common.model.IUserModel;
+import com.bochat.app.common.router.Router;
+import com.bochat.app.common.router.RouterBankCardAdd;
+import com.bochat.app.common.router.RouterBankCardList;
+import com.bochat.app.model.bean.BankCard;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.RealNameAuthEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/05/13 19:28
+ * Description :
+ */
+
+public class BankCardAddPresenter extends BasePresenter<AddBankCardContract.View> implements AddBankCardContract.Presenter {
+    
+    @Inject
+    IUserModel userModel;
+    
+    @Inject
+    ISettingModule settingModule;
+    
+    private RealNameInfoProvider provider;
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        
+        if(provider == null){
+            provider = new RealNameInfoProvider(settingModule);
+        }
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<RealNameAuthEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<RealNameAuthEntity> emitter) throws Exception {
+                try {
+                    RealNameAuthEntity entity = provider.getRealNameInfo();
+                    if(entity.getRetcode() != 0){
+                        emitter.onError(new RxErrorThrowable(entity));
+                    }
+                    emitter.onNext(entity);
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<RealNameAuthEntity>() {
+            @Override
+            public void accept(RealNameAuthEntity entity) throws Exception {
+                getView().hideLoading("");
+                getView().updateUserName(entity.getReal_name());
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("");
+            }
+        });
+        getView().showLoading(subscribe);
+        RouterBankCardAdd extra = getExtra(RouterBankCardAdd.class);
+        if(extra.getBankCard() != null){
+            getView().updateBank(extra.getBankCard());
+        }
+    }
+
+    @Override
+    public void onAddBankCardEnter(final BankCard bank, final String branch, final String cardId) {
+        if(bank == null){
+            getView().showTips("请选择银行");
+            return;
+        }
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<CodeEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<CodeEntity> emitter) throws Exception {
+                try {
+                    CodeEntity entity = userModel.bindBank(bank.getId(), cardId , branch);
+                    if(entity.getRetcode() != 0){
+                        emitter.onError(new RxErrorThrowable(entity));
+                    } else {
+                        emitter.onNext(entity);
+                    }
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<CodeEntity>() {
+            @Override
+            public void accept(CodeEntity entity) throws Exception {
+                getView().hideLoading("添加成功");
+                Router.navigation(new RouterBankCardList());
+                getView().finish();
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("");
+            }
+        });
+        getView().showLoading(subscribe);
+    }
+}

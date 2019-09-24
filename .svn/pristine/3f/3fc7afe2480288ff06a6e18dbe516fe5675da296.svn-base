@@ -1,0 +1,142 @@
+package com.bochat.app.app.activity;
+
+import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.ListAppAdapter;
+import com.bochat.app.app.adapter.ListAppTopGridAdapter;
+import com.bochat.app.app.fragment.ListAppFragment;
+import com.bochat.app.app.util.ResourceUtils;
+import com.bochat.app.common.contract.dynamic.ListAppActivityContract;
+import com.bochat.app.common.router.Router;
+import com.bochat.app.common.router.RouterDynamitAppList;
+import com.bochat.app.common.router.RouterListAppDetail;
+import com.bochat.app.common.router.RouterSearchApp;
+import com.bochat.app.common.util.ULog;
+import com.bochat.app.model.bean.DynamicShopGameEntity;
+import com.bochat.app.model.bean.DynamicShopTypeEntity;
+import com.bochat.app.model.bean.DynamicShopTypeListEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bumptech.glide.load.engine.Resource;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * 2019/5/8
+ * Author LDL
+ **/
+@Route(path = RouterDynamitAppList.PATH)
+public class ListAppActivity extends BaseActivity<ListAppActivityContract.Presenter> implements ListAppActivityContract.View {
+
+    @Inject
+    ListAppActivityContract.Presenter presenter;
+
+    @BindView(R.id.list_app_top_grid)
+    RecyclerView mListAppTopGrid;
+
+    @BindView(R.id.list_app_bottom_grid)
+    RecyclerView mListAppBottomGrid;
+
+
+    private int[] top_icons = {R.mipmap.ic_application_selected,
+            R.mipmap.ic_application_game,
+            R.mipmap.ic_application_life,
+            R.mipmap.ic_application_finance,
+            R.mipmap.ic_application_social_contact,
+            R.mipmap.ic_application_media,
+            R.mipmap.ic_application_tool,
+            R.mipmap.ic_application_other};
+    private String[] top_names = {"精选", "游戏", "生活", "金融", "社交", "媒体", "工具", "其他"};
+    private ListAppTopGridAdapter mListAppTopGridAdapter;
+
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected ListAppActivityContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_listapp);
+    }
+
+    @Override
+    protected void initWidget() {
+
+        mListAppTopGridAdapter = new ListAppTopGridAdapter(this);
+        mListAppTopGridAdapter.setOnItemClickListener(new ListAppTopGridAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, DynamicShopTypeEntity entity) {
+                RouterListAppDetail detailRouter = new RouterListAppDetail();
+                detailRouter.setEntity(entity);
+                Router.navigation(detailRouter);
+            }
+        });
+//        List<ListAppTopGridAdapter.TestItem> topGridTest = new ArrayList<>();
+
+//        for (int i = 0; i < top_icons.length; i++)
+//            topGridTest.add(new ListAppTopGridAdapter.TestItem(top_icons[i], top_names[i]));
+        setRecyclerViewConfiguration(mListAppTopGrid, mListAppTopGridAdapter, 4);
+
+        List<DynamicShopGameEntity> bottomGridItems = new ArrayList<>();
+
+        for (int i = 0; i < 4; i++) {
+            DynamicShopGameEntity test = new DynamicShopGameEntity();
+            test.setName("名称名称");
+            test.setDescribes("BoChat-区块链社交平...");
+//            test.setImage("http://image.baidu.com/search/detail?ct=503316480&z=undefined&tn=baiduimagedetail&ipn=d&word=%E5%9B%BE%E6%A0%87&step_word=&ie=utf-8&in=&cl=2&lm=-1&st=undefined&hd=undefined&latest=undefined&copyright=undefined&cs=3374920701,1917294980&os=3606446910,1574727546&simid=0,0&pn=6&rn=1&di=93280&ln=1324&fr=&fmq=1561347658533_R&fm=&ic=undefined&s=undefined&se=&sme=&tab=0&width=undefined&height=undefined&face=undefined&is=0,0&istype=0&ist=&jit=&bdtype=0&spn=0&pi=0&gsm=0&objurl=http%3A%2F%2Fku.90sjimg.com%2Felement_origin_min_pic%2F00%2F11%2F92%2F9856a98d34cc109.jpg&rpstart=0&rpnum=0&adpicid=0&force=undefined");
+            bottomGridItems.add(test);
+        }
+
+        ListAppAdapter adapter = new ListAppAdapter(bottomGridItems, this);
+        mListAppBottomGrid.addItemDecoration(new ListAppFragment.SpacesItemDecoration(ResourceUtils.dip2px(this, R.dimen.dp_13)));
+        setRecyclerViewConfiguration(mListAppBottomGrid, adapter, 2);
+
+        presenter.getAppStoreType();
+    }
+
+    void setRecyclerViewConfiguration(RecyclerView view, RecyclerView.Adapter adapter, int spanCount) {
+        view.setLayoutManager(new GridLayoutManager(this, spanCount));
+        view.setItemAnimator(new DefaultItemAnimator());
+        view.setAdapter(adapter);
+    }
+
+    @OnClick({R.id.list_app_back_menu, R.id.list_app_scan_layout, R.id.list_app_search_layout})
+    @Override
+    protected void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.list_app_back_menu:
+                finish();
+                break;
+            case R.id.list_app_scan_layout:
+
+                break;
+            case R.id.list_app_search_layout:
+                Router.navigation(new RouterSearchApp());
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void getType(DynamicShopTypeListEntity entity) {
+        mListAppTopGridAdapter.notifyData(entity.getData());
+    }
+}

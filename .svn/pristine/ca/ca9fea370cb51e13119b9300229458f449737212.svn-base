@@ -1,0 +1,34 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import org.json.JSONObject;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 13:48
+ * Description :
+ */
+
+public class EntrustBuyCommand implements MarketCenterCommand {
+
+    private String marketId;
+
+    public EntrustBuyCommand(String marketId) {
+        this.marketId = marketId;
+    }
+
+    @Override
+    public MarketCenterType getType() {
+        return MarketCenterType.ENTRUST_BUY;
+    }
+
+    @Override
+    public JSONObject convertToJson() {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("marketId", marketId);
+            return json;
+        } catch (Exception ignore){
+        }
+        return null;
+    }
+}

@@ -1,0 +1,21 @@
+package com.bochat.app.common.router;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/13 14:34
+ * Description :
+ */
+
+import java.io.Serializable;
+
+public abstract class AbstractRouter implements Serializable {
+
+    public static final String TAG = "ROUTER";
+
+    
+    public abstract String getPath();
+
+    public String getTAG(){
+        return TAG;
+    }
+}

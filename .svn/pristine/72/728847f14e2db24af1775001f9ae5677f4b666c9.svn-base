@@ -1,0 +1,28 @@
+package com.bochat.app.model.bean;
+
+import java.io.Serializable;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/06 16:32
+ * Description :
+ */
+
+public class TokenAmountEntity extends CodeEntity implements Serializable {
+    private double data;
+
+    public double getData() {
+        return data;
+    }
+
+    public void setData(double data) {
+        this.data = data;
+    }
+
+    @Override
+    public String toString() {
+        return "TokenRateEntity{" +
+                "data=" + data +
+                '}';
+    }
+}

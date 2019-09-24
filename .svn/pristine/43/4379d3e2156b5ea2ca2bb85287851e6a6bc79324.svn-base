@@ -1,0 +1,46 @@
+package com.bochat.app.business.main.conversation;
+
+import android.content.Intent;
+import android.text.TextUtils;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.common.contract.conversation.GroupManageEditNameContract;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/26 10:52
+ * Description :
+ */
+
+public class GroupManageEditNamePresenter extends BasePresenter<GroupManageEditNameContract.View> implements GroupManageEditNameContract.Presenter{
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        Intent intent = getView().getViewIntent();
+        if(intent.hasExtra(RouteExtra.GroupName_String)){
+            String groupName = intent.getStringExtra(RouteExtra.GroupName_String);
+            getView().onRefresh(groupName);
+        }
+    }
+
+    @Override
+    public void onEnterClick(String name) {
+        if(TextUtils.isEmpty(name)){
+            getView().showTips("群名称不能为空");
+            return;
+        }
+        if(isActive()){
+            ARouter.getInstance().build(RouteTable.CONVERSATION_GROUP_MANAGE_EDIT)
+                    .withString(RouteExtra.GroupName_String, name).navigation();
+        }
+    }
+}

@@ -1,0 +1,116 @@
+package com.bochat.app.app.activity.bill;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ListView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.common.contract.bill.TokenTransferSelectCoinContract;
+import com.bochat.app.common.util.ALog;
+import com.bochat.app.model.bean.UserCurrencyEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bumptech.glide.Glide;
+import com.zhy.adapter.abslistview.CommonAdapter;
+import com.zhy.adapter.abslistview.ViewHolder;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/4/26  17:40
+ * Description : 选择资产
+ */
+@Route(path = RouteTable.MINE_TOKEN_TRANSFER_SELECT_COIN)
+public class TokenTransferSelectCoinActivity extends BaseActivity<TokenTransferSelectCoinContract.Presenter> implements TokenTransferSelectCoinContract.View {
+    
+    @Inject
+    TokenTransferSelectCoinContract.Presenter presenter;
+
+    @BindView(R.id.mine_token_transfer_coin_list)
+    ListView listView;
+    
+    private ArrayList<SelectToken> list = new ArrayList<>();
+    
+    private CommonAdapter<SelectToken> adapter;
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected TokenTransferSelectCoinContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_mine_token_transfer_select_coin);
+    }
+    
+    @Override
+    public void updateList(List<UserCurrencyEntity> data, UserCurrencyEntity selection) {
+        list.clear();
+        if(data != null && !data.isEmpty()){
+            for(int i = 0; i < data.size(); i++){
+                list.add(new SelectToken(data.get(i).getBid().equals(selection.getBid()), data.get(i)));
+            }
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    private class SelectToken{
+        private boolean isSelect;
+        private UserCurrencyEntity token;
+
+        public SelectToken(boolean isSelect, UserCurrencyEntity token) {
+            this.isSelect = isSelect;
+            this.token = token;
+        }
+
+        public boolean isSelect() {
+            return isSelect;
+        }
+
+        public void setSelect(boolean select) {
+            isSelect = select;
+        }
+
+        public UserCurrencyEntity getToken() {
+            return token;
+        }
+
+        public void setToken(UserCurrencyEntity token) {
+            this.token = token;
+        }
+    }
+    
+    @Override
+    protected void initWidget() {
+        adapter = new CommonAdapter<SelectToken>(this, R.layout.item_mine_token_transfer_coin_tye, list) {
+            @Override
+            protected void convert(ViewHolder viewHolder, SelectToken item, int position) {
+                viewHolder.setText(R.id.item_mine_token_transfer_coin_name, item.getToken().getbName());
+                ImageView imageView = viewHolder.getView(R.id.item_mine_token_transfer_coin_icon);
+                Glide.with(TokenTransferSelectCoinActivity.this).load(item.getToken().getbIamge()).into(imageView);
+                viewHolder.setVisible(R.id.item_mine_token_transfer_coin_select, item.isSelect());
+            }
+        };
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                presenter.onItemClick(list.get(position).getToken());
+            }
+        });
+    }
+}

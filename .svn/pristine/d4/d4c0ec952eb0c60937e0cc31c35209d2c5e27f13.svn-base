@@ -1,0 +1,112 @@
+package com.bochat.app.app.fragment.bill;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+import com.bochat.app.app.view.SpImageView;
+import com.bochat.app.common.contract.mine.MineContract;
+import com.bochat.app.model.bean.UserEntity;
+import com.bochat.app.mvp.view.BaseFragment;
+import com.bumptech.glide.Glide;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+import static com.bochat.app.app.view.SpImageView.TYPE_ROUND;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/5/12 下午 12:15
+ * Description :    
+ */
+public class MineFragment extends BaseFragment<MineContract.Presenter> implements MineContract.View {
+
+    @Inject
+    MineContract.Presenter presenter;
+
+    @BindView(R.id.mine_main_icon)
+    SpImageView icon;
+    @BindView(R.id.mine_main_name)
+    TextView name;
+    @BindView(R.id.mine_main_id)
+    TextView id;
+    @BindView(R.id.mine_main_code)
+    ImageView code;
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+        icon.setType(TYPE_ROUND);
+        icon.setRoundRadius(getResources().getDimensionPixelSize(R.dimen.dp_10));
+    }
+
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected MineContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_mine, container, false);
+        return view;
+    }
+
+    @OnClick({R.id.mine_main_wallet, R.id.mine_main_bill,R.id.mine_main_bank_card,R.id.mine_main_invite,
+            R.id.mine_main_user_information,R.id.mine_main_real_name_auth,R.id.mine_main_settings, R.id.mine_top_area, R.id.mine_code_area})
+    @Override
+    protected void onViewClicked(View view) {
+        super.onViewClicked(view);
+        switch (view.getId()) {
+            case R.id.mine_top_area:
+                presenter.onUserInformationClick();
+                break;
+            case R.id.mine_main_wallet:
+                presenter.onWalletClick();
+            break;
+            case R.id.mine_main_bill:
+                presenter.onBillClick();
+            break;
+            case R.id.mine_main_bank_card:
+                presenter.onBankCardClick();
+            break;
+            case R.id.mine_main_invite:
+                presenter.onInviteClick();
+            break;
+            case R.id.mine_main_user_information:
+                presenter.onUserInformationClick();
+            break;
+            case R.id.mine_main_real_name_auth:
+                presenter.onRealNameAuthClick();
+            break;
+            case R.id.mine_main_settings:
+                presenter.onSettingClick();
+            break;
+            case R.id.mine_code_area:
+                presenter.onQRCodeClick();
+                break;
+            
+            default:
+                break;
+        }
+    }
+    
+
+    @Override
+    public void updateUserInfo(UserEntity userInfo) {
+        Glide.with(this).load(userInfo.getHeadImg()).error(R.mipmap.default_head).into(icon);
+        id.setText("ID: " + String.valueOf(userInfo.getId()));
+        name.setText(userInfo.getNickname().replaceAll("\n", ""));
+    }
+}

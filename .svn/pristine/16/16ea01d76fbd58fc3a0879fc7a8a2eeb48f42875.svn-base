@@ -1,0 +1,34 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import org.json.JSONObject;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 13:47
+ * Description :
+ */
+
+public class TransactionCommand implements MarketCenterCommand {
+
+    private String partition;
+
+    public TransactionCommand(String partition) {
+        this.partition = partition;
+    }
+
+    @Override
+    public MarketCenterType getType() {
+        return MarketCenterType.TRANSACTION;
+    }
+
+    @Override
+    public JSONObject convertToJson() {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("partition", partition);
+            return json;
+        } catch (Exception ignore){
+        }
+        return null;
+    }
+}

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center_horizontal">
+    
+    <com.bochat.app.app.view.BoChatTopBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_hasBackBtn="true"
+        android:background="#F2F2F2"
+        app:top_titleText="金币专用码"/>
+    
+    <RelativeLayout
+        android:background="@mipmap/ic_mine_special_code_bg"
+        android:layout_marginTop="@dimen/dp_41"
+        android:layout_width="@dimen/dp_345"
+        android:layout_height="@dimen/dp_472">
+
+        <ImageView
+            android:id="@+id/iv_code_reception"
+            android:layout_marginTop="@dimen/dp_27"
+            android:layout_marginLeft="@dimen/dp_35"
+            android:src="@mipmap/ic_mine_code_reception"
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24" />
+
+        <TextView
+            android:layout_toRightOf="@+id/iv_code_reception"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="@dimen/dp_5"
+            android:layout_marginTop="@dimen/dp_28"
+            android:layout_height="@dimen/dp_22"
+            android:text="二维码接收"
+            android:textColor="#ff4f5a7b"
+            android:textSize="@dimen/dp_16" />
+
+        <ImageView
+            android:id="@+id/iv_bochat_logo"
+            android:layout_marginTop="@dimen/dp_81"
+            android:layout_marginLeft="@dimen/dp_98"
+            android:src="@mipmap/ic_mine_code_bochat_logo"
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24" />
+
+        <TextView
+            android:layout_toRightOf="@+id/iv_bochat_logo"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="@dimen/dp_5"
+            android:layout_marginTop="@dimen/dp_82"
+            android:layout_height="@dimen/dp_22"
+            android:text="欢迎使用BoChat"
+            android:textColor="#ff4f5a7b"
+            android:textSize="@dimen/dp_16" />
+
+        <ImageView
+            android:layout_width="@dimen/dp_200"
+            android:id="@+id/iv_code"
+            android:layout_height="@dimen/dp_200"
+            android:layout_marginLeft="@dimen/dp_73"
+            android:layout_marginTop="@dimen/dp_133"
+            android:layout_marginRight="@dimen/dp_73" />
+
+        <ImageView
+            android:layout_width="@dimen/dp_36"
+            android:layout_height="@dimen/dp_36"
+            android:layout_marginLeft="@dimen/dp_155"
+            android:layout_marginTop="@dimen/dp_215"
+            android:layout_marginRight="@dimen/dp_155"/>
+
+        <TextView
+            android:layout_marginTop="@dimen/dp_18"
+            android:layout_below="@+id/iv_code"
+            android:layout_centerInParent="true"
+            android:layout_width="@dimen/dp_126"
+            android:layout_height="@dimen/dp_20"
+            android:text="扫一扫向我划转金币"
+            android:textColor="#999999"
+            android:textSize="@dimen/dp_14" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_below="@+id/iv_code"
+            android:layout_centerInParent="true"
+            android:layout_height="@dimen/dp_22"
+            android:text="保存二维码"
+            android:layout_marginTop="@dimen/dp_73"
+            android:textColor="#4F5A7B"
+            android:textSize="@dimen/dp_16"
+            />
+
+    </RelativeLayout>
+
+
+</LinearLayout>

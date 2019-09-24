@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#F2F2F2"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_titleText="添加银行卡"
+        android:background="#FFFFFF"
+        app:top_hasBackBtn="true"/>
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/mine_bank_card_add_select"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_content="请选择开户银行"
+        app:item_hasLeftContent="true"
+        app:item_text="开户银行"/>
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/mine_bank_card_add_input"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_hasEditText="true"
+        app:item_text="开户支行"
+        app:item_hasRightBtn="false"
+        app:item_editTextHint="请选择开户支行"/>
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/mine_bank_card_add_name_input"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:layout_marginTop="@dimen/dp_10"
+        app:item_hasEditText="true"
+        app:item_editTextEnable="false"
+        app:item_text="持卡人"
+        app:item_hasRightBtn="false"
+        app:item_editTextHint=""/>
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/mine_bank_card_add_id_input"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_hasEditText="true"
+        app:item_text="银行卡号"
+        app:item_hasRightBtn="false"
+        app:item_editTextHint="请输入银行卡号"/>
+
+    <Button
+        android:id="@+id/mine_bank_card_add_enter_btn"
+        android:layout_width="@dimen/dp_345"
+        android:layout_height="@dimen/dp_44"
+        android:background="@drawable/shape_button_5dp"
+        android:text="添加银行卡"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="@dimen/dp_111"
+        android:textSize="@dimen/dp_17"
+        />
+
+</LinearLayout>

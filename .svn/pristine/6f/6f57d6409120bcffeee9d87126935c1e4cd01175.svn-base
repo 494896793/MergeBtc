@@ -1,0 +1,23 @@
+package com.bochat.app.common.contract.book;
+
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.mvp.presenter.IBasePresenter;
+import com.bochat.app.mvp.view.IBaseView;
+
+import java.util.List;
+
+/**
+ * 2019/4/19
+ * Author LDL
+ **/
+public interface AddressUserContract {
+
+    interface View extends IBaseView<AddressUserContract.Presenter>{
+        void onViewRefresh(List<FriendEntity> friendListEntity);
+    }
+
+    interface Presenter extends IBasePresenter<AddressUserContract.View>{
+        void requestFriendList();
+        void onFriendItemClick(FriendEntity item);
+    }
+}

@@ -1,0 +1,113 @@
+package com.bochat.app.business.main.bill;
+
+
+import android.content.Intent;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.business.DaggerBusinessComponent;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.common.contract.bill.TokenDetailContract;
+import com.bochat.app.common.model.ITokenAssetModel;
+import com.bochat.app.common.util.CopyUtil;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.CurrencyDetailDataEntity;
+import com.bochat.app.model.bean.CurrencyTradingDataEntity;
+import com.bochat.app.model.bean.UserCurrencyEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+
+/**
+ *
+ */
+public class TokenDetailPresenter extends BasePresenter<TokenDetailContract.View> implements TokenDetailContract.Presenter {
+
+    @Inject
+    ITokenAssetModel tokenAssetModel;
+
+    UserCurrencyEntity userCurrencyEntity;
+
+    CurrencyDetailDataEntity currencyDetailDataEntity;
+    CurrencyTradingDataEntity currencyTradingDataEntity;
+    @Override
+    public void initInjector() {
+        DaggerBusinessComponent.create().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        Intent intent = getView().getViewIntent();
+        if(intent.hasExtra(RouteExtra.UserCurrencyEntity)){
+            userCurrencyEntity = (UserCurrencyEntity)intent.getSerializableExtra(RouteExtra.UserCurrencyEntity);
+            Disposable subscribe = Observable.create(new ObservableOnSubscribe<CodeEntity>() {
+                @Override
+                public void subscribe(ObservableEmitter<CodeEntity> emitter) throws Exception {
+                    try {
+                        currencyDetailDataEntity = tokenAssetModel.getUserCurrencyDetails(Integer.valueOf(userCurrencyEntity.getBid()));
+                        if(currencyDetailDataEntity.getRetcode() != 0){
+                            emitter.onError(new RxErrorThrowable(currencyDetailDataEntity));
+                            return;
+                        }
+                        currencyTradingDataEntity = tokenAssetModel.getUserCurrencyTrading(1, 1000, Integer.valueOf(userCurrencyEntity.getBid()));
+                        if(currencyTradingDataEntity.getRetcode() != 0){
+                            emitter.onError(new RxErrorThrowable(currencyTradingDataEntity));
+                            return;
+                        }
+                        emitter.onNext(currencyTradingDataEntity);
+                        emitter.onComplete();
+                    } catch (Exception e) {
+                        emitter.onError(e);
+                        e.printStackTrace();
+                    }
+                }
+            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<CodeEntity>() {
+                @Override
+                public void accept(CodeEntity entity) throws Exception {
+                    if(isActive()){
+                        getView().hideLoading("");
+                        getView().updateInfo(currencyDetailDataEntity);
+                        getView().updateTradeList(currencyTradingDataEntity);
+                    }
+                }
+            }, new RxErrorConsumer<Throwable>(this)  {
+                @Override
+                public void acceptError(Throwable object) {
+                    getView().hideLoading("");
+                }
+            });
+            getView().showLoading(subscribe);
+        }
+    }
+
+    @Override
+    public void onCopyClick(String content) {
+        if(CopyUtil.copy(getView().getViewContext(), content)){
+            getView().showTips("复制成功");
+        } else {
+            getView().showTips("复制失败");
+        }
+    }
+
+    @Override
+    public void onTransferClick() {
+        ARouter.getInstance().build(RouteTable.MINE_TOKEN_TRANSFER).withSerializable(RouteExtra.UserCurrencyEntity, userCurrencyEntity).navigation();
+    }
+
+    @Override
+    public void onReceiveClick() {
+        ARouter.getInstance().build(RouteTable.MINE_TOKEN_TRANSFER_RECEIVE).withSerializable(RouteExtra.UserCurrencyEntity, userCurrencyEntity).navigation();
+    }
+}

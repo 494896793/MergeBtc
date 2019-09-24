@@ -1,0 +1,99 @@
+package com.bochat.app.common.router;
+
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.model.bean.GroupMemberEntity;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/13 16:38
+ * Description :
+ */
+
+public class RouterFriendDetail extends AbstractRouter{
+    public static final String PATH ="/path/RouterFriendDetail";
+
+    public static final int ROLE_NONE = 0;
+    public static final int ROLE_MEMEBER = 1;
+    public static final int ROLE_MANAGER = 2;
+    public static final int ROLE_OWNER = 3;
+    
+    private FriendEntity friendEntity;
+    private String friendId;
+    private int userRoleInGroup;
+    private int friendRoleInGroup;
+    private String targetId;
+
+
+
+
+
+    public RouterFriendDetail(FriendEntity friendEntity) {
+        this.friendEntity = friendEntity;
+        this.targetId = targetId;
+
+    }
+
+    public RouterFriendDetail(String friendId) {
+        this.friendId = friendId;
+    }
+    public RouterFriendDetail(String friendId,String targetId) {
+        this.friendId = friendId;
+        this.targetId = targetId;
+    }
+
+    public RouterFriendDetail(String friendId,String groudId, int userRoleInGroup, int friendRoleInGroup) {
+        this.friendId = friendId;
+        this.userRoleInGroup = userRoleInGroup;
+        this.friendRoleInGroup = friendRoleInGroup;
+        this.targetId = groudId;
+    }
+
+    public FriendEntity getFriendEntity() {
+        return friendEntity;
+    }
+
+    public void setFriendEntity(FriendEntity friendEntity) {
+        this.friendEntity = friendEntity;
+    }
+
+    public String getFriendId() {
+        return friendId;
+    }
+
+    public void setFriendId(String friendId) {
+        this.friendId = friendId;
+    }
+
+    public int getUserRoleInGroup() {
+        return userRoleInGroup;
+    }
+
+    public void setUserRoleInGroup(int userRoleInGroup) {
+        this.userRoleInGroup = userRoleInGroup;
+    }
+
+    public int getFriendRoleInGroup() {
+        return friendRoleInGroup;
+    }
+
+    public void setFriendRoleInGroup(int friendRoleInGroup) {
+        this.friendRoleInGroup = friendRoleInGroup;
+    }
+    
+    @Override
+    public String getPath() {
+        return PATH;
+    }
+    public String getTargetId() {
+        return targetId;
+    }
+
+    public void setTargetId(String targetId) {
+        this.targetId = targetId;
+    }
+
+
+
+
+}

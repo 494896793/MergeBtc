@@ -1,0 +1,93 @@
+package com.bochat.app.app.adapter;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+import com.bochat.app.model.bean.DynamicShopGameEntity;
+import com.bumptech.glide.Glide;
+
+import java.util.List;
+
+/**
+ * 2019/5/8
+ * Author LDL
+ **/
+public class ListAppAdapter extends RecyclerView.Adapter<ListAppAdapter.ListAppViewHolder> {
+
+    private List<DynamicShopGameEntity> items;
+    private Context mContext;
+    private OnItemClickListenner onItemClickListenner;
+
+
+    public void setOnItemClickListenner(OnItemClickListenner onItemClickListenner){
+        this.onItemClickListenner=onItemClickListenner;
+    }
+
+    public ListAppAdapter(List<DynamicShopGameEntity> items,Context mContext){
+        this.items=items;
+        this.mContext=mContext;
+    }
+
+    @NonNull
+    @Override
+    public ListAppViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view= LayoutInflater.from(mContext).inflate(R.layout.card_view,null);
+        return new ListAppViewHolder(view);
+    }
+
+    public void onRefresh(List<DynamicShopGameEntity> items){
+        this.items=items;
+        notifyDataSetChanged();
+    }
+
+    public void onLoad(List<DynamicShopGameEntity> items){
+        this.items.addAll(items);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ListAppViewHolder holder, int position) {
+        holder.declare_text.setText(items.get(position).getDescribes());
+        holder.label_text.setText(items.get(position).getName());
+        Glide.with(mContext).load(items.get(position).getImage()).into(holder.icon);
+    }
+
+    @Override
+    public int getItemCount() {
+        return items.size();
+    }
+
+    class ListAppViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        ImageView icon;
+        TextView label_text;
+        TextView declare_text;
+
+        public ListAppViewHolder(View itemView) {
+            super(itemView);
+            itemView.setOnClickListener(this);
+            icon=itemView.findViewById(R.id.icon);
+            label_text=itemView.findViewById(R.id.label_text);
+            declare_text=itemView.findViewById(R.id.declare_text);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if(onItemClickListenner!=null){
+                onItemClickListenner.onItemClick(getPosition(),items.get(getPosition()));
+            }
+        }
+    }
+
+    public interface OnItemClickListenner{
+        void onItemClick(int position,DynamicShopGameEntity entity);
+    }
+
+}

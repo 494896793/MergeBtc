@@ -1,0 +1,224 @@
+package com.bochat.app.app.adapter;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+import com.bochat.app.app.fragment.dynamic.MarketQuotationOptionalFragment;
+import com.bochat.app.app.util.DecimalFormatter;
+import com.bochat.app.model.bean.DynamicMQEntity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.OnClick;
+
+public class MarketQuotationOptionalAdapter extends RecyclerView.Adapter implements View.OnClickListener {
+
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_NORMAL = 1;
+
+    private OnMarketQuotationHeaderClickListener mMarketQuotationHeaderClickListener;
+    private OnMarketQuotationItemClickListener mMarketQuotationItemClickListener;
+
+    private Context mContext;
+    private List<DynamicMQEntity> mData = new ArrayList<>();
+
+    private View mHeaderView;
+
+    public MarketQuotationOptionalAdapter(Context context) {
+        mContext = context;
+    }
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (mHeaderView != null && viewType == TYPE_HEADER) {
+            mHeaderView = LayoutInflater.from(mContext).inflate(R.layout.market_quotation_optional_header_view, parent, false);
+            return new DynamicOptionsHeaderViewHolder(mHeaderView);
+        }
+        View itemView = LayoutInflater.from(mContext).inflate(R.layout.market_quotation_optional_item, parent, false);
+        return new DynamicOptionsViewHolder(itemView);
+
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (getItemViewType(position) == TYPE_HEADER) {
+            DynamicOptionsHeaderViewHolder headerViewHolder = (DynamicOptionsHeaderViewHolder) holder;
+            headerViewHolder.mDefaultSort.setOnClickListener(this);
+            headerViewHolder.mNewPrice.setOnClickListener(this);
+            headerViewHolder.mStockIndex.setOnClickListener(this);
+            return;
+        }
+
+        final int pos = getRealPosition(holder);
+        final DynamicMQEntity dynamicMKEntity = mData.get(pos);
+        DynamicOptionsViewHolder itemViewHolder = (DynamicOptionsViewHolder) holder;
+        itemViewHolder.mDynamicMKItemName.setText(dynamicMKEntity.name);
+        itemViewHolder.mDynamicMKItemCount.setText(mContext.getString(
+                R.string.market_quotation_number_count_fmt,
+                DecimalFormatter.newInstance().format("##,####",
+                        Double.parseDouble(String.valueOf(dynamicMKEntity.numberCount)
+                        ))));
+        itemViewHolder.mDynamicMKItemNewPrice.setText(dynamicMKEntity.newPrice);
+        itemViewHolder.mDynamicMKItemExChange.setText(mContext.getString(R.string.market_quotation_exchange_fmt, dynamicMKEntity.exchange));
+
+        itemViewHolder.mDynamicMKItemStockIndex.setBackgroundResource(dynamicMKEntity.isUp > 0 ? R.drawable.shape_up_red : R.drawable.shape_down_green);
+        itemViewHolder.mDynamicMKItemStockIndex.setText(mContext.getString(
+                dynamicMKEntity.isUp > 0 ?
+                        R.string.market_quotation_stock_index_up_str_fmt :
+                        R.string.market_quotation_stock_index_down_str_fmt,
+                dynamicMKEntity.stockIndex, "%"));
+    }
+
+    public void setHeaderView(View headerView) {
+        mHeaderView = headerView;
+        notifyItemInserted(0);
+    }
+
+    public View getHeaderView() {
+        return mHeaderView;
+    }
+
+    public void notifyData(List<DynamicMQEntity> data) {
+        mData.addAll(data);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemCount() {
+        return mData != null ? mHeaderView != null ? mData.size() + 1 : mData.size() : 0;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (mHeaderView == null) return TYPE_NORMAL;
+        if (position == 0) return TYPE_HEADER;
+        return TYPE_NORMAL;
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        RecyclerView.LayoutManager manager = recyclerView.getLayoutManager();
+        if (manager instanceof GridLayoutManager) {
+            final GridLayoutManager gridManager = ((GridLayoutManager) manager);
+            gridManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    return getItemViewType(position) == TYPE_HEADER
+                            ? gridManager.getSpanCount() : 1;
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
+        if (lp instanceof StaggeredGridLayoutManager.LayoutParams) {
+            StaggeredGridLayoutManager.LayoutParams p = (StaggeredGridLayoutManager.LayoutParams) lp;
+            p.setFullSpan(holder.getLayoutPosition() == 0);
+        }
+    }
+
+    private int getRealPosition(RecyclerView.ViewHolder holder) {
+        int position = holder.getLayoutPosition();
+        return mHeaderView == null ? position : position - 1;
+    }
+
+
+    public void setMarketQuotationHeaderClickListener(OnMarketQuotationHeaderClickListener listenter) {
+        mMarketQuotationHeaderClickListener = listenter;
+    }
+
+    public void setOnMarketQuotationItemClickListener(OnMarketQuotationItemClickListener listener) {
+        mMarketQuotationItemClickListener = listener;
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.dynamic_mk_header_default_sort:
+                if (mMarketQuotationHeaderClickListener != null)
+                    mMarketQuotationHeaderClickListener.onClickSort(view);
+                break;
+            case R.id.dynamic_mk_header_new_price:
+                if (mMarketQuotationHeaderClickListener != null)
+                    mMarketQuotationHeaderClickListener.onClickNewPrice(view);
+                break;
+            case R.id.dynamic_mk_header_stock_index:
+                if (mMarketQuotationHeaderClickListener != null)
+                    mMarketQuotationHeaderClickListener.onClickUpAndDown(view);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public class DynamicOptionsHeaderViewHolder extends RecyclerView.ViewHolder {
+
+        View mDefaultSort;
+        View mNewPrice;
+        View mStockIndex;
+
+        public DynamicOptionsHeaderViewHolder(View itemView) {
+            super(itemView);
+            mDefaultSort = itemView.findViewById(R.id.dynamic_mk_header_default_sort);
+            mNewPrice = itemView.findViewById(R.id.dynamic_mk_header_new_price);
+            mStockIndex = itemView.findViewById(R.id.dynamic_mk_header_stock_index);
+        }
+
+    }
+
+    public class DynamicOptionsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        LinearLayout mDynamicMKItem;
+        TextView mDynamicMKItemName;
+        TextView mDynamicMKItemCount;
+        TextView mDynamicMKItemNewPrice;
+        TextView mDynamicMKItemExChange;
+        Button mDynamicMKItemStockIndex;
+
+        DynamicOptionsViewHolder(View itemView) {
+            super(itemView);
+            mDynamicMKItem = itemView.findViewById(R.id.dynamic_mk_item);
+            mDynamicMKItemName = itemView.findViewById(R.id.dynamic_mk_item_name);
+            mDynamicMKItemCount = itemView.findViewById(R.id.dynamic_mk_item_count);
+            mDynamicMKItemNewPrice = itemView.findViewById(R.id.dynamic_mk_item_new_price);
+            mDynamicMKItemExChange = itemView.findViewById(R.id.dynamic_mk_item_exchange);
+            mDynamicMKItemStockIndex = itemView.findViewById(R.id.dynamic_mk_item_stock_index);
+            mDynamicMKItem.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (mMarketQuotationItemClickListener != null) {
+                mMarketQuotationItemClickListener.onItemClick(v, mData.get(getAdapterPosition()));
+            }
+        }
+    }
+
+    public interface OnMarketQuotationItemClickListener {
+        void onItemClick(View view, DynamicMQEntity entity);
+    }
+
+    public interface OnMarketQuotationHeaderClickListener {
+        void onClickSort(View view);
+
+        void onClickNewPrice(View view);
+
+        void onClickUpAndDown(View view);
+    }
+}

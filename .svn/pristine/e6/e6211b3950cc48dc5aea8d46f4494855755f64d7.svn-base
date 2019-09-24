@@ -1,0 +1,77 @@
+package com.bochat.app.model.bean;
+
+import java.io.Serializable;
+
+/**
+ * 2019/5/6
+ * Author LDL
+ **/
+public class DynamicNoticeEntity extends CodeEntity implements Serializable {
+
+    private String title;
+    private String content;
+    private int id;
+    private String releaseTime;
+    private String returnUrl;
+    private String source;
+
+    @Override
+    public String toString() {
+        return "DynamicNoticeEntity{" +
+                "title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", id=" + id +
+                ", releaseTime='" + releaseTime + '\'' +
+                ", returnUrl='" + returnUrl + '\'' +
+                ", source='" + source + '\'' +
+                '}';
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getReleaseTime() {
+        return releaseTime;
+    }
+
+    public void setReleaseTime(String releaseTime) {
+        this.releaseTime = releaseTime;
+    }
+
+    public String getReturnUrl() {
+        return returnUrl;
+    }
+
+    public void setReturnUrl(String returnUrl) {
+        this.returnUrl = returnUrl;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+}

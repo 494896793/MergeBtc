@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:background="@drawable/origin_second_shape"
+        android:layout_width="@dimen/dp_130"
+        android:layout_height="@dimen/dp_60">
+        <LinearLayout
+            android:layout_centerInParent="true"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/name_label"
+                android:textSize="@dimen/dp_16"
+                android:text="1元"
+                android:textColor="#FF8D03"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/desc_label"
+                android:textColor="#FF8D03"
+                android:text="7天体验"
+                android:textSize="@dimen/dp_12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/choose_img"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:src="@mipmap/vip_sel"
+            android:layout_width="@dimen/dp_23"
+            android:layout_height="@dimen/dp_23" />
+    </RelativeLayout>
+</RelativeLayout>

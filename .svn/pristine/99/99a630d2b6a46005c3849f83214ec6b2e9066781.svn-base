@@ -1,0 +1,23 @@
+package com.bochat.app.common.model;
+
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.RedPacketEntity;
+import com.bochat.app.model.bean.RedPacketPeopleEntity;
+import com.bochat.app.model.bean.RedPacketRecordEntity;
+import com.bochat.app.model.bean.RedPacketRecordListEntity;
+
+import java.math.BigDecimal;
+
+/**
+ * 2019/5/5
+ * Author LDL
+ **/
+public interface IRedPacketModel {
+
+    RedPacketEntity sendWelfare(double money, int count, int type, String text, String password, int groupId, int coin);
+
+    RedPacketPeopleEntity getWelfare(int welfareId,String userName);
+
+    RedPacketRecordListEntity queryTakeRecord(int rewardId, int start, int offset);
+
+}

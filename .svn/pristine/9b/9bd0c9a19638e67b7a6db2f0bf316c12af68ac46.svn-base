@@ -1,0 +1,138 @@
+package com.bochat.app.app.activity;
+
+import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.adapter.RedPacketDetailAdapter;
+import com.bochat.app.common.contract.readpacket.RedPacketDetailContract;
+import com.bochat.app.model.bean.RedPacketPeopleEntity;
+import com.bochat.app.model.bean.RedPacketRecordListEntity;
+import com.bochat.app.model.bean.RedPacketStatuEntity;
+import com.bochat.app.model.bean.UserEntity;
+import com.bochat.app.model.rong.RedPacketMessage;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bumptech.glide.Glide;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+import static com.bochat.app.app.RouteTable.CONVERSATION_READ_PACKET_DETAIL;
+
+/**
+ * 2019/5/13
+ * Author LDL
+ **/
+@Route(path = CONVERSATION_READ_PACKET_DETAIL)
+public class RedPacketDetailActivity extends BaseActivity<RedPacketDetailContract.Presenter> implements RedPacketDetailContract.View{
+
+    @BindView(R.id.head_img)
+    ImageView head_img;
+
+    @BindView(R.id.title_text)
+    TextView title_text;
+
+    @BindView(R.id.notice_text)
+    TextView notice_text;
+
+    @BindView(R.id.value_person)
+    TextView value_person;
+
+    @BindView(R.id.receive_notice_text)
+    TextView receive_notice_text;
+
+    @BindView(R.id.recycler)
+    RecyclerView recycler;
+
+    @Inject
+    RedPacketDetailContract.Presenter presenter;
+
+    private RedPacketMessage message;
+    private String redPacketId;
+    private RedPacketDetailAdapter adapter;
+    private UserEntity userEntity;
+    private String text;
+    private int type;
+    private String money;
+    private String bitName;
+    private RedPacketStatuEntity redPacketStatuEntity;
+    private RedPacketPeopleEntity packetPeopleEntity;
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected RedPacketDetailContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_redpacketdetail);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(getIntent().getSerializableExtra(RouteExtra.REDPACKET_STATU_ENTITY)!=null){
+            redPacketStatuEntity= (RedPacketStatuEntity) getIntent().getSerializableExtra(RouteExtra.REDPACKET_STATU_ENTITY);
+        }
+        if(getIntent().getSerializableExtra(RouteExtra.UserEntity)!=null){
+            userEntity= (UserEntity) getIntent().getSerializableExtra(RouteExtra.UserEntity);
+        }
+        if(getIntent().getParcelableExtra(RouteExtra.REDPACKET_MESSAGE)!=null){
+            message=(RedPacketMessage)getIntent().getParcelableExtra(RouteExtra.REDPACKET_MESSAGE);
+        }
+        if(getIntent().getSerializableExtra(RouteExtra.RedPacketPeopleEntity)!=null){
+            packetPeopleEntity= (RedPacketPeopleEntity) getIntent().getSerializableExtra(RouteExtra.RedPacketPeopleEntity);
+        }
+        if(message!=null&&userEntity!=null&&redPacketStatuEntity!=null){
+            receive_notice_text.setText("已领取"+redPacketStatuEntity.getReadyGet()+"/"+(int)redPacketStatuEntity.getCount()+"个，剩余"+(int)(redPacketStatuEntity.getCount()-redPacketStatuEntity.getReadyGet())+"个");
+            Glide.with(this).load(userEntity.getHeadImg()).into(head_img);
+            title_text.setText(userEntity.getNickname()+"的红包");
+            if(packetPeopleEntity!=null){
+                money=packetPeopleEntity.getReceive_money().toString();
+            }else{
+                money=message.getMoney();
+            }
+            bitName=message.getbName();
+            type=message.getType();
+            text=message.getText();
+            redPacketId=message.getPacketID();
+            recycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
+            notice_text.setText(text);
+            if(type==1){        //糖果
+                value_person.setText(money+bitName);
+            }else{
+                value_person.setText("￥"+money);
+            }
+            presenter.queryTakeRecord(Integer.valueOf(redPacketId),1,10);
+        }
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+    }
+
+    @Override
+    public void queryTakeRecordSuccess(RedPacketRecordListEntity entity) {
+        if(entity!=null&&entity.getItems()!=null){
+            adapter=new RedPacketDetailAdapter(entity.getItems(),this);
+            recycler.setAdapter(adapter);
+        }
+    }
+
+    @Override
+    public void queryTakeRecordFailed(String msg) {
+        showTips(msg);
+    }
+}

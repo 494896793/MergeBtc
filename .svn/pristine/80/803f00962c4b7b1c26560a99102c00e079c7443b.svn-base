@@ -1,0 +1,11 @@
+package com.bochat.app.common.router;
+
+public class RouterMarketQuotation extends AbstractRouter {
+
+    public static final String PATH = "/path/RouterMarketQuotation";
+
+    @Override
+    public String getPath() {
+        return PATH;
+    }
+}

@@ -1,0 +1,56 @@
+package com.bochat.app.app.adapter;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.bochat.app.R;
+
+/**
+ * 2019/6/12
+ * Author LDL
+ **/
+public class ShakyCenterAdapter extends RecyclerView.Adapter<ShakyCenterAdapter.ShakyCenterViewHolder> {
+
+    private Context mContext;
+
+    public ShakyCenterAdapter(Context mContext){
+        this.mContext=mContext;
+    }
+
+    @NonNull
+    @Override
+    public ShakyCenterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view= LayoutInflater.from(mContext).inflate(R.layout.activity_shakycenter_item,null);
+        return new ShakyCenterViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ShakyCenterViewHolder holder, int position) {
+
+    }
+
+    public void refreshData(){
+
+    }
+
+    public void loadData(){
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return 2;
+    }
+
+    class ShakyCenterViewHolder extends RecyclerView.ViewHolder{
+
+        public ShakyCenterViewHolder(View itemView) {
+            super(itemView);
+        }
+    }
+
+}

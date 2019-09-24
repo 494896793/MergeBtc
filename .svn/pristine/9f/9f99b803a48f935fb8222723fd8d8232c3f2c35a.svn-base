@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/bochat_topbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_background="@color/white"
+        app:top_extButtonSrc="@null"
+        app:top_hasBackBtn="true"
+        app:top_hasExt2Btn="false"
+        app:top_hasExtBtn="false"
+        app:top_titleText="我的特权" />
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/privilege_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/bochat_topbar"
+        android:paddingStart="@dimen/dp_15"
+        android:paddingEnd="@dimen/dp_15" />
+    <!--<com.scwang.smartrefresh.layout.SmartRefreshLayout-->
+    <!--android:id="@+id/privilege_refresh_layout"-->
+    <!--android:layout_below="@id/bochat_topbar"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+
+    <!--<com.scwang.smartrefresh.layout.header.ClassicsHeader-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content" />-->
+
+    <!--<android.support.v7.widget.RecyclerView-->
+    <!--android:id="@+id/privilege_list"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:paddingStart="@dimen/dp_15"-->
+    <!--android:paddingEnd="@dimen/dp_15"/>-->
+
+    <!--<com.scwang.smartrefresh.layout.footer.ClassicsFooter-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content" />-->
+
+    <!--</com.scwang.smartrefresh.layout.SmartRefreshLayout>-->
+
+
+    <LinearLayout
+        android:id="@+id/no_privilege"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/dp_37"
+        android:layout_below="@id/bochat_topbar"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:contentDescription="@null"
+            android:src="@mipmap/ic_privilege_default" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_13"
+            android:layout_marginBottom="@dimen/dp_13"
+            android:text="@string/privilege_no_granted"
+            android:textColor="@color/color_999999"
+            android:textSize="@dimen/dp_14" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="21dp"
+            android:text="@string/privilege_more_attention"
+            android:textColor="@color/color_999999"
+            android:textSize="@dimen/dp_12" />
+
+        <Button
+            android:id="@+id/privilege_go_activities"
+            android:layout_width="264dp"
+            android:layout_height="44dp"
+            android:background="@drawable/privilege_go_activities_button_shape"
+            android:text="@string/privilege_go_center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/dp_18" />
+    </LinearLayout>
+
+</RelativeLayout>

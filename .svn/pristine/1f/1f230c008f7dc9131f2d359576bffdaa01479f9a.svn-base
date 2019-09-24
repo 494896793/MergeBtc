@@ -1,0 +1,81 @@
+package com.bochat.app.business.main.dynamic;
+
+import android.util.Log;
+
+import com.bochat.app.common.contract.dynamic.KChatContract;
+import com.bochat.app.common.model.IMarketCenterModel;
+import com.bochat.app.common.util.ALog;
+import com.bochat.app.model.modelImpl.MarketCenter.KLineCommand;
+import com.bochat.app.model.modelImpl.MarketCenter.KLineEntity;
+import com.bochat.app.model.modelImpl.MarketCenter.MarketCenterObserver;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import javax.inject.Inject;
+
+/**
+ * 2019/6/19
+ * Author LDL
+ **/
+public class KChatPresenter extends BasePresenter<KChatContract.View> implements KChatContract.Presenter,MarketCenterObserver<KLineEntity> {
+
+    @Inject
+    IMarketCenterModel marketCenterModel;
+
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    private MarketCenterObserver<KLineEntity> observer;
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        marketCenterModel.addObserver(KLineEntity.class, this);
+        get5MINData("37");
+    }
+
+    @Override
+    public void getData() {
+    }
+    
+    private void sendKLineCommon(String marketId, KLineCommand.KLineType type){
+        KLineCommand kLineCommand=new KLineCommand(marketId, type, 0, 100);
+        marketCenterModel.sendCommand(kLineCommand, new IMarketCenterModel.SendCommandCallback() {
+            @Override
+            public void onComplete(IMarketCenterModel.SendCommandResult result) {
+                ALog.d("send " + result);
+            }
+        });
+    }
+
+    @Override
+    public void get5MINData(String marketId) {
+        sendKLineCommon(marketId,KLineCommand.KLineType.MIN5);
+    }
+
+    @Override
+    public void get30MINData(String marketId) {
+        sendKLineCommon(marketId,KLineCommand.KLineType.MIN30);
+    }
+
+    @Override
+    public void getHOURData(String marketId) {
+        sendKLineCommon(marketId,KLineCommand.KLineType.HOUR);
+    }
+
+    @Override
+    public void getDAYData(String marketId) {
+        sendKLineCommon(marketId,KLineCommand.KLineType.DAY);
+    }
+
+    @Override
+    public void getWEEKData(String marketId) {
+        sendKLineCommon(marketId,KLineCommand.KLineType.WEEK);
+    }
+
+    @Override
+    public void onReceive(KLineEntity entity) {
+        Log.i("=====","======");
+    }
+}

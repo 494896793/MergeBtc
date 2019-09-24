@@ -1,0 +1,56 @@
+package com.bochat.app.common.router;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/19 17:32
+ * Description :
+ */
+
+public class RouterDynamicWebView extends AbstractRouter {
+    public static final String PATH ="/path/RouterDynamicWebView";
+    
+    private boolean isShare;
+    private String url;
+    private String title;
+
+
+    public RouterDynamicWebView(String url, boolean isShare) {
+        this.isShare = isShare;
+        this.url = url;
+    }
+
+    public RouterDynamicWebView(String url, boolean isShare, String title) {
+        this.isShare = isShare;
+        this.url = url;
+        this.title = title;
+    }
+
+    public boolean isShare() {
+        return isShare;
+    }
+
+    public void setShare(boolean share) {
+        isShare = share;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @Override
+    public String getPath() {
+        return PATH;
+    }
+}

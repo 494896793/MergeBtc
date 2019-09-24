@@ -1,0 +1,42 @@
+package com.bochat.app.business.main.book;
+
+import android.content.Intent;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.common.contract.book.SearchAddressBookContract;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/15 18:43
+ * Description :
+ */
+
+public class SearchAddressBookPresenter extends BasePresenter<SearchAddressBookContract.View> implements SearchAddressBookContract.Presenter{
+
+    String returnUrl;
+    
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        Intent intent = getView().getViewIntent();
+        if(intent.hasExtra(RouteExtra.ReturnUrl)){
+            returnUrl = intent.getStringExtra(RouteExtra.ReturnUrl);
+        }
+    }
+
+    @Override
+    public void onSearchBarClick() {
+        ARouter.getInstance().build(RouteTable.CONVERSATION_SEARCH_FRIEND)
+                .withBoolean(RouteExtra.IsSearchFriend_Boolean, true)
+                .withBoolean(RouteExtra.IsSearchLocal_Boolean, true)
+                .withString(RouteExtra.ReturnUrl, returnUrl).navigation();
+    }
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+}

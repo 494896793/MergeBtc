@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#F2F2F2">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/cv_group_member_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_hasBackBtn="true"
+        app:top_titleText="群聊"
+        app:top_background="#F2F2F2"/>
+
+    <RelativeLayout
+        android:id="@+id/cv_group_member_search_layout"
+        android:layout_width="@dimen/dp_345"
+        android:layout_height="@dimen/dp_36"
+        android:background="@drawable/shape_search"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dp_11"
+        android:layout_below="@id/cv_group_member_top_bar">
+
+        <TextView
+            android:id="@+id/bochat_search_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@mipmap/ic_bochat_search"
+            android:drawablePadding="@dimen/dp_6"
+            android:text="@string/conversation_search_str"
+            android:textAlignment="center"
+            android:layout_centerInParent="true"
+            android:textColor="@color/colorFontColorForDark"
+            android:textSize="@dimen/dp_14"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/cv_group_member_top_div"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_0_1"
+        android:background="#DFDFDF"
+        android:layout_below="@id/cv_group_member_search_layout"
+        android:layout_marginTop="@dimen/dp_11"
+        />
+
+    <com.liaoinstan.springview.widget.SpringView
+        android:id="@+id/springView"
+        android:layout_below="@id/cv_group_member_top_div"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ListView
+            android:id="@+id/cv_group_member_list"
+            android:divider="@null"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </com.liaoinstan.springview.widget.SpringView>
+    
+</RelativeLayout>

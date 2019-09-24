@@ -1,0 +1,94 @@
+package com.bochat.app.common.bean;
+
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.model.bean.GroupEntity;
+
+import java.io.Serializable;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/05/18 14:44
+ * Description :
+ */
+
+public class SearchedEntity implements Serializable {
+    
+    public static int TYPE_FRIEND = 1;
+    public static int TYPE_GROUP = 2;
+    
+    private String name;
+    private String description;
+    private String icon;
+    private String extra;
+    private Object object;
+    private int type;
+    
+    public SearchedEntity(){
+    }
+    
+    public SearchedEntity(FriendEntity friendEntity){
+        type = TYPE_FRIEND;
+        object = friendEntity;
+        setName(friendEntity.getNickname());
+        setIcon(friendEntity.getHead_img());
+        setDescription(friendEntity.getSignature());
+        setExtra("");
+    }
+    
+    public SearchedEntity(GroupEntity groupEntity){
+        type = TYPE_GROUP;
+        object = groupEntity;
+        setName(groupEntity.getGroup_name());
+        setIcon(groupEntity.getGroup_head());
+        setDescription(groupEntity.getIntroduce());
+        setExtra(groupEntity.getLevel_num() + "人");
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public String getExtra() {
+        return extra;
+    }
+
+    public void setExtra(String extra) {
+        this.extra = extra;
+    }
+
+    public Object getObject() {
+        return object;
+    }
+
+    public void setObject(Object object) {
+        this.object = object;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+}

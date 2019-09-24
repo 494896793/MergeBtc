@@ -1,0 +1,155 @@
+package com.bochat.app.business.main.bill;
+
+import android.content.Intent;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.business.DaggerBusinessComponent;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.common.contract.bill.TokenTransferContract;
+import com.bochat.app.common.model.ITokenAssetModel;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.OutPromptDataEntity;
+import com.bochat.app.model.bean.UserCurrencyDataEntity;
+import com.bochat.app.model.bean.UserCurrencyEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/4/26 0026 16:15
+ * Description :
+ */
+public class TokenTransferPresenter extends BasePresenter<TokenTransferContract.View> implements TokenTransferContract.Presenter {
+
+    @Inject
+    ITokenAssetModel tokenAssetModel;
+    
+    private UserCurrencyDataEntity userCurrencyDataEntity;
+
+    private UserCurrencyEntity userCurrencyEntity;
+    
+    private OutPromptDataEntity outPromptDataEntity;
+    
+    @Override
+    public void initInjector() {
+        DaggerBusinessComponent.create().inject(this);
+    }
+    
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        
+        Intent viewIntent = getView().getViewIntent();
+        if(viewIntent.hasExtra(RouteExtra.QRCodeResult)){
+            String stringExtra = viewIntent.getStringExtra(RouteExtra.QRCodeResult);
+            if(stringExtra != null){
+                getView().setAddress(stringExtra);
+            }
+        }
+        if (viewIntent.hasExtra(RouteExtra.UserCurrencyDataEntity)) {
+            userCurrencyDataEntity = (UserCurrencyDataEntity) viewIntent.getSerializableExtra(RouteExtra.UserCurrencyDataEntity);
+        }
+        if(viewIntent.hasExtra(RouteExtra.UserCurrencyEntity)){
+            userCurrencyEntity = (UserCurrencyEntity)viewIntent.getSerializableExtra(RouteExtra.UserCurrencyEntity);
+        }
+        if(userCurrencyEntity == null){
+            if(userCurrencyDataEntity == null || userCurrencyDataEntity.getData() == null || userCurrencyDataEntity.getData().isEmpty()){
+                return;
+            }
+            userCurrencyEntity = userCurrencyDataEntity.getData().get(0);
+        }
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<OutPromptDataEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<OutPromptDataEntity> emitter) throws Exception {
+                try {
+                    OutPromptDataEntity entity = tokenAssetModel.getOutPrompt(Integer.valueOf(userCurrencyEntity.getBid()));
+                    if(entity.getRetcode() != 0){
+                        emitter.onError(new RxErrorThrowable(entity));
+                        return;
+                    }
+                    emitter.onNext(entity);
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<OutPromptDataEntity>() {
+            @Override
+            public void accept(OutPromptDataEntity entity) throws Exception {
+                outPromptDataEntity = entity;
+                getView().hideLoading("");
+                getView().updateList(userCurrencyEntity, outPromptDataEntity);
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("");
+            }
+        });
+        getView().showLoading(subscribe);
+    }
+
+
+    @Override
+    public void onChooseClick() {
+        if(userCurrencyDataEntity != null && !userCurrencyDataEntity.isEmpty()){
+            ARouter.getInstance().build(RouteTable.MINE_TOKEN_TRANSFER_SELECT_COIN)
+                    .withString(RouteExtra.ReturnUrl, RouteTable.MINE_TOKEN_TRANSFER)
+                    .withSerializable(RouteExtra.UserCurrencyEntity, userCurrencyEntity)
+                    .withSerializable(RouteExtra.UserCurrencyDataEntity, userCurrencyDataEntity).navigation();
+        }
+    }
+
+    @Override
+    public void onMaxAmountClick() {
+        getView().setSendAmount(String.valueOf(outPromptDataEntity.getData().getResidueAmount()));
+    }
+
+    @Override
+    public void onEnterClick(final String num, final String address, final String password, final int bid) {
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<CodeEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<CodeEntity> emitter) throws Exception {
+                try {
+                    CodeEntity entity = tokenAssetModel.addTrunOut(Double.valueOf(num), address, password, bid);
+                    if(entity.getRetcode() != 0){
+                        emitter.onError(new RxErrorThrowable(entity));
+                        return;
+                    }
+                    emitter.onNext(entity);
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<CodeEntity>() {
+            @Override
+            public void accept(CodeEntity entity) throws Exception {
+                getView().hideLoading("发送成功");
+                ARouter.getInstance().build(RouteTable.MINE_WALLET).navigation();
+                getView().finish();
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("");
+            }
+        });
+        getView().showLoading(subscribe);
+    }
+}

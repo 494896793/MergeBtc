@@ -1,0 +1,47 @@
+package com.bochat.app.model.bean;
+
+import java.io.Serializable;
+
+/**
+ * 2019/4/15
+ * Author ZZW
+ **/
+public class GroupManagerEntity   extends CodeEntity implements Serializable {
+
+    private int group_id;
+    private String groupToken;
+    private int targetId;
+    private String targetToken;
+
+    public int getGroup_id() {
+        return group_id;
+    }
+
+    public void setGroup_id(int group_id) {
+        this.group_id = group_id;
+    }
+
+    public String getGroupToken() {
+        return groupToken;
+    }
+
+    public void setGroupToken(String groupToken) {
+        this.groupToken = groupToken;
+    }
+
+    public int getTargetId() {
+        return targetId;
+    }
+
+    public void setTargetId(int targetId) {
+        this.targetId = targetId;
+    }
+
+    public String getTargetToken() {
+        return targetToken;
+    }
+
+    public void setTargetToken(String targetToken) {
+        this.targetToken = targetToken;
+    }
+}

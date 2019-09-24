@@ -1,0 +1,348 @@
+package com.bochat.app.app.activity.mine;
+
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bigkoo.pickerview.builder.OptionsPickerBuilder;
+import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
+import com.bigkoo.pickerview.view.OptionsPickerView;
+import com.bochat.app.BuildConfig;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.util.UriUtil;
+import com.bochat.app.app.view.BoChatItemView;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.app.view.Glide4Engine;
+import com.bochat.app.app.view.NoticeAppDialog;
+import com.bochat.app.app.view.SpImageView;
+import com.bochat.app.common.contract.mine.EditUserInfoContract;
+import com.bochat.app.common.util.ALog;
+import com.bochat.app.model.bean.AddressItem;
+import com.bochat.app.model.bean.ChildrenItem;
+import com.bochat.app.model.bean.UserEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bochat.app.mvp.view.ResultTipsType;
+import com.bumptech.glide.Glide;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+import fj.edittextcount.lib.FJEditTextCount;
+
+import static com.bochat.app.app.view.SpImageView.TYPE_ROUND;
+import static com.bochat.app.model.constant.Constan.USE_CAMERA;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/24 17:55
+ * Description :
+ */
+
+@Route(path = RouteTable.MINE_USER_INFO)
+public class EditUserInfoActivity extends BaseActivity<EditUserInfoContract.Presenter> implements EditUserInfoContract.View {
+    
+    @Inject
+    EditUserInfoContract.Presenter presenter;
+
+    private String headImage;
+
+    @BindView(R.id.mine_edit_user_top_bar)
+    BoChatTopBar boChatTopBar;
+    
+    @BindView(R.id.mine_edit_user_icon_btn)
+    SpImageView iconBtn;
+    @BindView(R.id.mine_edit_user_name)
+    EditText userName;
+
+    @BindView(R.id.mine_edit_user_icon_camera_btn)
+    Button iconCameraBtn;
+    
+    @BindView(R.id.mine_edit_user_account)
+    BoChatItemView accountView;
+    @BindView(R.id.mine_edit_user_age)
+    BoChatItemView ageView;
+    @BindView(R.id.mine_edit_user_area)
+    BoChatItemView areaView;
+    @BindView(R.id.mine_edit_user_description)
+    FJEditTextCount descriptionView;
+   
+    private UserEntity userInfo;
+    private NoticeAppDialog noticeAppDialog;
+    private ArrayList<String> provinceList;
+    private ArrayList<ArrayList<String>> cityList;
+    private ArrayList<ArrayList<String>> codeList;
+
+    private ArrayList<Integer> yearList = new ArrayList<>();
+    private ArrayList<Integer> monthList = new ArrayList<>();
+    private ArrayList<Integer> dayList = new ArrayList<>();
+    private File file;
+    private String paths;
+
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected EditUserInfoContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_edit_user_info);
+    }
+
+    private ArrayList<Integer> createArray(int n){
+        ArrayList<Integer> arrayList = new ArrayList<>();
+        for(int i = 1; i <= n; i++){
+            arrayList.add(i);
+        }
+        return arrayList;
+    }
+
+    int year = 0;
+    private int getYear(){
+        if(year == 0){
+            year = Calendar.getInstance().get(Calendar.YEAR);
+        }
+        return year;
+    }
+    
+    @Override
+    protected boolean isRefreshView() {
+        boolean is = !isSelectImage;
+        isSelectImage = true;
+        return is;
+    }
+
+    @Override
+    protected void initWidget() {
+        iconBtn.setType(TYPE_ROUND);
+        iconBtn.setRoundRadius(getResources().getDimensionPixelSize(R.dimen.dp_10));
+        noticeAppDialog=new NoticeAppDialog(this);
+        noticeAppDialog.show();
+        noticeAppDialog.dismiss();
+        noticeAppDialog.setOnButtonclick(new NoticeAppDialog.OnButtonclick() {
+            @Override
+            public void onFirstButtonClick(View view) {
+                useCamera();
+                noticeAppDialog.dismiss();
+            }
+
+            @Override
+            public void onSecondButtonClick(View view) {
+                Matisse.from(EditUserInfoActivity.this)
+                        .choose(MimeType.ofAll())
+                        .countable(true)
+                        .maxSelectable(9)
+                        .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                        .thumbnailScale(0.85f)
+                        .imageEngine(new Glide4Engine())
+                        .forResult(1);
+                noticeAppDialog.dismiss();
+            }
+
+            @Override
+            public void onCancelButtonClick(View view) {
+                noticeAppDialog.dismiss();
+            }
+        });
+        for(int i = 0; i < 100; i++){
+            yearList.add(getYear() - i);
+        }
+        monthList = createArray(12);
+        dayList = createArray(31);
+        
+        boChatTopBar.setOnClickListener(new BoChatTopBar.OnClickListener() {
+            @Override
+            public void onTextExtButtonClick() {
+                userInfo.setSignature(descriptionView.getText());
+                userInfo.setNickname(userName.getText().toString());
+                ALog.d("set name " + userInfo);
+                if(!TextUtils.isEmpty(headImage)){
+                    userInfo.setHeadImg(headImage);
+                }
+                presenter.onEnter(userInfo);
+            }
+        });
+    }
+
+    private void useCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
+                + "/bochat/images/" + System.currentTimeMillis() + ".jpg");
+        file.getParentFile().mkdirs();
+        Uri tempPhotoUri = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            tempPhotoUri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".FileProvider", file);
+        } else {
+            tempPhotoUri = Uri.fromFile(file);
+        }
+        //添加权限
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, tempPhotoUri);
+        startActivityForResult(intent, USE_CAMERA);
+
+    }
+
+    @OnClick({R.id.mine_edit_user_icon_btn, R.id.mine_edit_user_icon_camera_btn, R.id.mine_edit_user_name_edit_btn,
+            R.id.mine_edit_user_description, R.id.mine_edit_user_area, R.id.mine_edit_user_age})
+    @Override
+    protected void onViewClicked(View view) {
+        super.onViewClicked(view);
+        
+        switch (view.getId()) {
+            case R.id.mine_edit_user_icon_btn:
+            case R.id.mine_edit_user_icon_camera_btn:
+                noticeAppDialog.show();
+            break;
+            case R.id.mine_edit_user_name_edit_btn:
+                
+            break;
+            case R.id.mine_edit_user_area:
+                if(provinceList != null && !provinceList.isEmpty()){
+                    showAreaPicker();
+                }
+            break;
+            case R.id.mine_edit_user_age:
+                showAgePicker();
+            break;
+        
+            default:
+                break;
+        }
+        
+    }
+
+    private void showAreaPicker(){
+        OptionsPickerView pvOptions = new OptionsPickerBuilder(EditUserInfoActivity.this, new OnOptionsSelectListener() {
+            @Override
+            public void onOptionsSelect(int options1, int options2, int options3 ,View v) {
+                String area = "中国/" + provinceList.get(options1) + "/" + cityList.get(options1).get(options2);
+                areaView.getContentView().setText(area);
+                String code = codeList.get(options1).get(options2);
+                userInfo.setArea(code);
+                ALog.d("set " + code);
+            }
+        }).setLineSpacingMultiplier(2.0f).setSubmitColor(Color.parseColor("#000000"))
+                .setCancelColor(Color.parseColor("#000000")).build();
+        pvOptions.setPicker(provinceList, cityList);
+        pvOptions.show();
+    }
+    
+    private void showAgePicker(){
+        OptionsPickerView<Integer> pvOptions = new OptionsPickerBuilder(EditUserInfoActivity.this, new OnOptionsSelectListener() {
+            @Override
+            public void onOptionsSelect(int options1, int options2, int options3 ,View v) {
+                int age = getYear() - yearList.get(options1);
+                ageView.getContentView().setText(age+"岁");
+                userInfo.setAge(age);
+            }
+        }).setLineSpacingMultiplier(2.0f).setSubmitColor(Color.parseColor("#000000"))
+                .setCancelColor(Color.parseColor("#000000")).build();
+        pvOptions.setNPicker(yearList, monthList, dayList);
+        pvOptions.show();
+    }
+    
+    @Override
+    public void setAreaList(List<AddressItem> areaList) {
+        if(areaList != null && !areaList.isEmpty()){
+            provinceList = new ArrayList<>();
+            cityList = new ArrayList<>();
+            codeList = new ArrayList<>();
+            for(AddressItem item : areaList){
+                provinceList.add(item.getProvince());
+                ArrayList<String> cities = new ArrayList<>();
+                ArrayList<String> codes = new ArrayList<>();
+                for(ChildrenItem city : item.getChildren()){
+                    if(userInfo.getCity().equals(city.getCity())){
+                        userInfo.setArea(city.getCityCode());
+                    }
+                    cities.add(city.getCity());
+                    codes.add(city.getCityCode());
+                }
+                cityList.add(cities);
+                codeList.add(codes);
+            }
+        }
+    }
+
+    @Override
+    public void setUserInfo(UserEntity userEntity) {
+        
+        ALog.d("setUserInfo " + userEntity);
+        
+        userInfo = userEntity;
+        userName.setText(userEntity.getNickname());
+        Glide.with(this).load(userEntity.getHeadImg()).error(R.mipmap.default_head).into(iconBtn);
+        accountView.getContentView().setText(userEntity.getAccount());
+        ageView.getContentView().setText(String.valueOf(userEntity.getAge()) + "岁");
+        areaView.getContentView().setText(userEntity.getArea());
+        descriptionView.setText(userEntity.getSignature());
+    }
+    
+    private boolean isSelectImage;
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            isSelectImage = true;
+            if(resultCode == RESULT_OK){
+                List<Uri> selected = Matisse.obtainResult(data);
+                if(selected != null && !selected.isEmpty()){
+                    try{
+                        headImage = UriUtil.getFilePathByUri(this, selected.get(0));
+                        if(headImage.toLowerCase().contains("jpg")||headImage.toLowerCase().contains("png")){
+                            iconCameraBtn.setVisibility(View.INVISIBLE);
+                            Glide.with(this).load(selected.get(0)).into(iconBtn);
+                        }else{
+                            showTips(new ResultTipsType("只能选择图片哦",false));
+                        }
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }else if (requestCode == USE_CAMERA && resultCode == RESULT_OK) {
+            Log.e("TAG", "---------" + FileProvider.getUriForFile(this, "com.bochat.app.FileProvider", file));
+            paths=file.getAbsolutePath();
+            if(paths.toLowerCase().contains("jpg")||paths.toLowerCase().contains("png")) {
+                iconBtn.setImageBitmap(BitmapFactory.decodeFile(file.getAbsolutePath()));
+                //在手机相册中显示刚拍摄的图片
+                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                Uri contentUri = Uri.fromFile(file);
+                mediaScanIntent.setData(contentUri);
+                sendBroadcast(mediaScanIntent);
+                headImage=paths;
+                iconCameraBtn.setVisibility(View.INVISIBLE);
+            }else{
+                showTips(new ResultTipsType("只能选择图片哦",false));
+            }
+        }
+    }
+}

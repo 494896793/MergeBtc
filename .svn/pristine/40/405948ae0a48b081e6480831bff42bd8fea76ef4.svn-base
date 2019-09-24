@@ -1,0 +1,18 @@
+package com.bochat.app.business.fetcher;
+
+import com.bochat.app.common.fetcher.BaseEntityFetcher;
+import com.bochat.app.common.fetcher.IEntityRequest;
+import com.bochat.app.model.bean.BitMallEntity;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/07/24 09:52
+ * Description :
+ */
+
+public class BitMallLoginFetcher extends BaseEntityFetcher<BitMallLoginFetcher.BitMallLoginRequest, BitMallEntity> {
+    
+    public static class BitMallLoginRequest implements IEntityRequest{
+        
+    }
+}

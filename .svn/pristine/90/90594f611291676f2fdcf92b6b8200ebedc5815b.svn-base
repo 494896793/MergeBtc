@@ -1,0 +1,93 @@
+package com.bochat.app.app.adapter;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+import com.bochat.app.app.activity.bill.TokenTransferSelectCoinActivity;
+import com.bumptech.glide.Glide;
+
+import java.util.List;
+
+/**
+ * create by guoying ${Date} and ${Month}
+ */
+public class SelectCoinAdapter extends RecyclerView.Adapter<SelectCoinAdapter.SelectCoinViewHodler> implements View.OnClickListener {
+
+    private Context mContext;
+    private List<TokenTransferSelectCoinActivity.SelectToken> mListData;
+    TokenTransferSelectCoinActivity.SelectToken mSelectToken;
+    private LayoutInflater inflater;
+    private int mPosition;
+    private OnItemOnClickListener itemOnClickListener;
+
+    public SelectCoinAdapter(Context context,List data){
+        this.mContext = context;
+        this.mListData = data;
+        inflater = LayoutInflater.from(context);
+
+    }
+
+    @NonNull
+    @Override
+    public SelectCoinViewHodler onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = null;
+        view = LayoutInflater.from(mContext).inflate(R.layout.item_mine_token_transfer_coin_tye,parent,false);
+
+        return new SelectCoinViewHodler(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull SelectCoinViewHodler holder, int position) {
+             mPosition = position;
+              mSelectToken =  mListData.get(position);  //返回一个bean
+        Glide.with(mContext).load(mSelectToken.getToken().getbIamge()).into(holder.cion_img);
+        holder.cion_name.setText(mSelectToken.getToken().getbName());
+       /* viewHolder.setText(R.id.item_mine_token_transfer_coin_name, item.getToken().getbName());
+        ImageView imageView = viewHolder.getView(R.id.item_mine_token_transfer_coin_icon);
+        Glide.with(TokenTransferSelectCoinActivity.this).load(item.getToken().getbIamge()).into(imageView);
+        viewHolder.setVisible(R.id.item_mine_token_transfer_coin_select, item.isSelect());*/
+            //todo
+//            holder.cion_img.setImageResource();bean.img
+//             holder.cion_name.setText();
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return mListData.size();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (itemOnClickListener != null){
+            itemOnClickListener.itemOnClick(mPosition);
+        }
+    }
+
+    class SelectCoinViewHodler extends RecyclerView.ViewHolder{
+        ImageView cion_img;
+        TextView  cion_name;
+
+        public SelectCoinViewHodler(View itemView) {
+            super(itemView);
+            cion_img = (ImageView)itemView.findViewById(R.id.item_mine_token_transfer_coin_icon);
+            cion_name = (TextView)itemView.findViewById(R.id.item_mine_token_transfer_coin_name);
+        }
+    }
+
+    public void setItemOnClickListener(OnItemOnClickListener listener){
+        this.itemOnClickListener = listener;
+    }
+
+    public interface OnItemOnClickListener{
+        void itemOnClick(int position);
+    }
+}

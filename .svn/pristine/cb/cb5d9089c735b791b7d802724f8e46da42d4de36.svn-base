@@ -1,0 +1,21 @@
+package com.bochat.app.business.cache;
+
+import com.bochat.app.model.bean.GroupEntity;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/05/07 09:57
+ * Description :
+ */
+
+public class CacheGroupEntity extends BaseCache<GroupEntity>{
+    
+    protected CacheGroupEntity(String cacheName, int type) {
+        super(cacheName, type);
+    }
+
+    @Override
+    public long getId(GroupEntity cacheEntity) {
+        return cacheEntity.getGroup_id();
+    }
+}

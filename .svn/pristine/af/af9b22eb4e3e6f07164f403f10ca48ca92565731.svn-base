@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#F2F2F2">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_250"
+                android:background="@mipmap/extreme_flash_bg">
+                <com.bochat.app.app.view.BoChatTopBar
+                    android:id="@+id/mine_quick_exchange_top_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:top_hasBackBtn="true"
+                    app:top_backBtnBackground="@mipmap/ic_arrow_left_white"
+                    app:top_titleText="极速闪兑"
+                    app:top_titleColor="#FFFFFF"
+                    android:background="@color/transparent"
+                    />
+                <ImageView
+                    android:src="@mipmap/extreme_flash_font"
+                    android:layout_centerInParent="true"
+                    android:layout_width="@dimen/dp_233"
+                    android:layout_height="@dimen/dp_25" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/mine_quick_exchange_layout"
+                android:layout_width="@dimen/dp_345"
+                android:layout_height="@dimen/dp_286"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/dp_170"
+                android:background="@drawable/shape_mine_chang_hall_bg">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/dp_22"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="@dimen/dp_73"
+                    android:layout_marginTop="@dimen/dp_10"
+                    android:text="支付"
+                    android:textColor="#181818"
+                    android:textSize="@dimen/dp_16" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/dp_22"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/dp_10"
+                    android:layout_marginRight="@dimen/dp_74"
+                    android:text="兑换"
+                    android:textColor="#181818"
+                    android:textSize="@dimen/dp_16" />
+
+                <RelativeLayout
+                    android:layout_width="@dimen/dp_158"
+                    android:layout_height="@dimen/dp_36"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="@dimen/dp_10"
+                    android:layout_marginTop="@dimen/dp_47"
+                    android:background="@drawable/shape_white_5dp">
+                    <LinearLayout
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:id="@+id/pay_linear"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="@dimen/dp_5"
+                        >
+                        <ImageView
+                            android:id="@+id/pay_coin_img"
+                            android:layout_width="@dimen/dp_22"
+                            android:layout_height="@dimen/dp_22" />
+                        <TextView
+                            android:layout_marginLeft="@dimen/dp_10"
+                            android:textColor="#222222"
+                            android:textSize="@dimen/dp_12"
+                            android:id="@+id/pay_coin_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                    <ImageView
+                        android:id="@+id/mine_quick_exchange_pay_type_btn"
+                        android:layout_width="@dimen/dp_20"
+                        android:layout_height="@dimen/dp_20"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="@dimen/dp_7"
+                        android:scaleType="fitXY"
+                        android:src="@mipmap/arrow_right"
+                        />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="@dimen/dp_158"
+                    android:layout_height="@dimen/dp_36"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="@dimen/dp_47"
+                    android:layout_marginRight="@dimen/dp_10"
+                    android:background="@drawable/shape_white_5dp">
+                    <LinearLayout
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:id="@+id/exchange_linear"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="@dimen/dp_5"
+                        >
+                        <ImageView
+                            android:id="@+id/exchange_coin_img"
+                            android:layout_width="@dimen/dp_22"
+                            android:layout_height="@dimen/dp_22" />
+                        <TextView
+                            android:layout_marginLeft="@dimen/dp_10"
+                            android:textColor="#222222"
+                            android:textSize="@dimen/dp_12"
+                            android:id="@+id/exchange_coin_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                    <ImageView
+                        android:id="@+id/mine_quick_exchange_exchange_type_btn"
+                        android:layout_width="@dimen/dp_20"
+                        android:layout_height="@dimen/dp_20"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="@dimen/dp_7"
+                        android:scaleType="fitXY"
+                        android:src="@mipmap/arrow_right"
+                        />
+                </RelativeLayout>
+
+
+                <ImageView
+                    android:id="@+id/mine_quick_exchange_change_btn"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_width="@dimen/dp_20"
+                    android:layout_height="@dimen/dp_20"
+                    android:padding="@dimen/dp_2"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/dp_88"
+                    android:src="@mipmap/extreme_flash_icon" />
+
+
+                <RelativeLayout
+                    android:layout_width="@dimen/dp_158"
+                    android:layout_height="@dimen/dp_36"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="@dimen/dp_108"
+                    android:layout_marginRight="@dimen/dp_10"
+                    android:background="@drawable/shape_white_5dp">
+                    <TextView
+                        android:id="@+id/mine_quick_exchange_exchange_amount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:background="@null"
+                        android:textSize="@dimen/dp_15"
+                        android:maxLength="15"
+                        android:textColor="#181818"
+                        android:inputType="numberDecimal"
+                        android:hint="0.000000"
+                        android:layout_marginLeft="@dimen/dp_10"/>
+                    <ImageView
+                        android:visibility="gone"
+                        android:layout_width="@dimen/dp_20"
+                        android:layout_height="@dimen/dp_20"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="@dimen/dp_7"
+                        android:scaleType="fitXY"
+                        android:src="@mipmap/ic_arrow_down_gray24"
+                        />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="@dimen/dp_158"
+                    android:layout_height="@dimen/dp_36"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="@dimen/dp_10"
+                    android:layout_marginTop="@dimen/dp_108"
+                    android:background="@drawable/shape_white_5dp">
+                    <EditText
+                        android:id="@+id/mine_quick_exchange_pay_amount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:maxLength="15"
+                        android:background="@null"
+                        android:textSize="@dimen/dp_15"
+                        android:textColor="#181818"
+                        android:hint="0.000000"
+                        android:maxLines="1"
+                        android:inputType="numberDecimal"
+                        android:layout_marginLeft="@dimen/dp_10"/>
+                    <ImageView
+                        android:visibility="gone"
+                        android:layout_width="@dimen/dp_20"
+                        android:layout_height="@dimen/dp_20"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="@dimen/dp_7"
+                        android:scaleType="fitXY"
+                        android:src="@mipmap/ic_arrow_down_gray24"
+                        />
+
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/have_money"
+                    android:layout_marginLeft="@dimen/dp_15"
+                    android:text="可用资产：600.123456 BTC"
+                    android:layout_marginTop="@dimen/dp_155"
+                    android:textSize="@dimen/dp_12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/exchange_rate"
+                    android:textSize="@dimen/dp_12"
+                    android:layout_marginLeft="@dimen/dp_15"
+                    android:text="参考汇率：1 BTC=0.060000 BX"
+                    android:layout_marginTop="@dimen/dp_178"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <Button
+                    android:id="@+id/mine_quick_exchange_enter_btn"
+                    android:layout_width="@dimen/dp_266"
+                    android:layout_height="@dimen/dp_44"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="@dimen/dp_48"
+                    android:layout_marginTop="@dimen/dp_215"
+                    android:layout_marginRight="@dimen/dp_48"
+                    android:background="@drawable/shape_blue_btn"
+                    android:text="快速闪兑"
+                    android:textColor="#FFFFFF"
+                    android:textSize="@dimen/dp_16" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:layout_width="@dimen/dp_351"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/dp_24"
+                android:layout_marginBottom="@dimen/dp_26"
+                android:layout_below="@id/mine_quick_exchange_layout"
+                android:background="@drawable/shape_white_corner_10"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_marginLeft="@dimen/dp_15"
+                    android:layout_marginTop="@dimen/dp_15"
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:text="BX余额："
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:text="10000000000000 BX"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+                <TextView
+                    android:gravity="center"
+                    android:text="333333"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:gravity="center"
+                    android:text="333333"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:layout_width="match_parent"
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:text="万份收益"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:text="333333X"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                    <View
+                        android:layout_marginTop="@dimen/dp_10"
+                        android:layout_marginBottom="@dimen/dp_10"
+                        android:background="@color/lightGray"
+                        android:layout_width="@dimen/dp_1"
+                        android:layout_height="match_parent"/>
+                    <LinearLayout
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:layout_width="match_parent"
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:text="万份收益"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:text="333333X"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                    <View
+                        android:layout_marginTop="@dimen/dp_10"
+                        android:layout_marginBottom="@dimen/dp_10"
+                        android:background="@color/lightGray"
+                        android:layout_width="@dimen/dp_1"
+                        android:layout_height="match_parent"/>
+                    <LinearLayout
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:layout_width="match_parent"
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:text="万份收益"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            android:text="333333X"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

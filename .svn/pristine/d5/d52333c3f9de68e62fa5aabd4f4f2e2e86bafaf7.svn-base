@@ -1,0 +1,181 @@
+package com.bochat.app.app.activity.dynamic;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.view.NoticeDialog;
+import com.bochat.app.app.view.PayPasswordDialog;
+import com.bochat.app.common.contract.dynamic.FastSpeedContract;
+import com.bochat.app.model.bean.UserCurrencyEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bochat.app.mvp.view.ResultTipsType;
+import com.bumptech.glide.Glide;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+import static com.bochat.app.app.RouteTable.DYNAMIC_MAIN_FAST_SPEED;
+
+/**
+ * 2019/6/5
+ * Author LDL
+ **/
+@Route(path = DYNAMIC_MAIN_FAST_SPEED)
+public class FastSpeedActivity extends BaseActivity<FastSpeedContract.Presenter> implements FastSpeedContract.View, View.OnClickListener {
+
+    @Inject
+    FastSpeedContract.Presenter presenter;
+
+    @BindView(R.id.exchange_linear)
+    LinearLayout exchange_linear;
+
+    @BindView(R.id.pay_linear)
+    LinearLayout pay_linear;
+
+    @BindView(R.id.pay_coin_img)
+    ImageView pay_coin_img;
+
+    @BindView(R.id.pay_coin_name)
+    TextView pay_coin_name;
+
+    @BindView(R.id.exchange_coin_img)
+    ImageView exchange_coin_img;
+
+    @BindView(R.id.exchange_coin_name)
+    TextView exchange_coin_name;
+
+    @BindView(R.id.mine_quick_exchange_change_btn)
+    ImageView mine_quick_exchange_change_btn;
+
+    @BindView(R.id.mine_quick_exchange_exchange_amount)
+    TextView mine_quick_exchange_exchange_amount;
+
+    @BindView(R.id.mine_quick_exchange_pay_amount)
+    EditText mine_quick_exchange_pay_amount;
+
+    @BindView(R.id.mine_quick_exchange_enter_btn)
+    Button mine_quick_exchange_enter_btn;
+
+    @BindView(R.id.have_money)
+    TextView have_money;
+
+    @BindView(R.id.exchange_rate)
+    TextView exchange_rate;
+
+    UserCurrencyEntity tempare;
+    UserCurrencyEntity pay;
+    UserCurrencyEntity exchange;
+    int paySelection;
+    int exchangeSelection;
+    ArrayList<UserCurrencyEntity> list = new ArrayList<>();
+    private NoticeDialog noticeDialog=null;
+    private PayPasswordDialog dialog;
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected FastSpeedContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_fastspeed);
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+        noticeDialog=new NoticeDialog(this);
+        noticeDialog.show();
+        noticeDialog.dismiss();
+        mine_quick_exchange_change_btn.setOnClickListener(this);
+        mine_quick_exchange_enter_btn.setOnClickListener(this);
+        pay_linear.setOnClickListener(this);
+        exchange_linear.setOnClickListener(this);
+    }
+
+    public void setStartCurrency(UserCurrencyEntity currency) {
+        pay=currency;
+        Glide.with(this).load(pay.getbIamge()).into(pay_coin_img);
+        pay_coin_name.setText(pay.getbName());
+    }
+
+    public void setConvertCurrency(UserCurrencyEntity currency) {
+        exchange = currency;
+        Glide.with(this).load(exchange.getbIamge()).into(exchange_coin_img);
+        exchange_coin_name.setText(exchange.getbName());
+    }
+
+    public void showPayPop(){
+        dialog=new PayPasswordDialog(this, pay_coin_name.getText().toString().trim());
+        dialog.setOnEnterListener(new PayPasswordDialog.OnEnterListener() {
+            @Override
+            public void onEnter(String password) {
+
+            }
+        });
+        dialog.showPopupWindow();
+    }
+
+
+    @Override
+    public void setStartAmount(String amount) {
+        mine_quick_exchange_pay_amount.setText(amount);
+    }
+
+    @Override
+    public void setExchangeAmount(String amount) {
+        mine_quick_exchange_exchange_amount.setText(amount);
+    }
+
+    @Override
+    public void updateTotalProperty(String totalProperty) {
+        have_money.setText("可用资产："+totalProperty+"\t"+pay.getbName());
+    }
+
+    @Override
+    public void updateRate(String rate) {
+        exchange_rate.setText("参考汇率："+rate);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.mine_quick_exchange_change_btn:
+                if(TextUtils.isEmpty(pay_coin_name.getText().toString().trim())){
+                    presenter.onStartAmountChange(pay_coin_name.getText().toString().trim());
+                }
+                break;
+            case R.id.mine_quick_exchange_enter_btn:
+                presenter.onExchangeClick();
+                break;
+            case R.id.pay_linear:
+                break;
+            case R.id.exchange_linear:
+                break;
+        }
+    }
+
+}

@@ -1,0 +1,16 @@
+package com.bochat.app.common.contract.dynamic;
+
+import com.bochat.app.model.bean.MarketInfoListEntity;
+import com.bochat.app.mvp.presenter.IBasePresenter;
+import com.bochat.app.mvp.view.IBaseView;
+
+public interface MarketQuotationOptionalContract {
+
+    interface View extends IBaseView<Presenter> {
+        void obtainMarketInfo(MarketInfoListEntity entity);
+    }
+
+    interface Presenter extends IBasePresenter<View> {
+        void getMarketInfo(String type, String terms);
+    }
+}

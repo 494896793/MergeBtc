@@ -1,0 +1,167 @@
+<resources>
+    <string name="app_name" translatable="false">博信</string>
+    
+    <string name="contact_book" translatable="false">通讯录</string>
+    <string name="cv_group_detail_create_date" translatable="false">%1$s 创建本群</string>
+    <string name="cv_group_manage_upgrade" translatable="false">升级至%1$s人群</string>
+    <string name="cv_group_manage_upgrade_balance" translatable="false">当前可用GC：%1$s</string>
+    <string name="mine_token_transfer_type_tips" translatable="false">本二维码仅供接收%1$s使用</string>
+    <string name="mine_invite" translatable="false">已成功邀请%1$s位好友</string>
+    
+    <string name="identification_doing" translatable="false">项目认证中，请耐心等待</string>
+    <string name="identification_failed" translatable="false">项目认证失败</string>
+    <string name="identification_success" translatable="false">项目认证成功</string>
+    <string name="exchange" translatable="false">闪兑大厅</string>
+    <string name="view_look" translatable="false">今日看点</string>
+    <string name="app_store" translatable="false">应用市场</string>
+    <string name="project_apply" translatable="false">项目申请</string>
+    <string name="game_hall" translatable="false">游戏大厅</string>
+    <string name="otc_transcation" translatable="false">OTC一键交易</string>
+
+    <string name="sbc_name" translatable="false">Google Book Search</string>
+    <string name="button_search_book_contents" translatable="false">Search contents</string>
+    <string name="msg_sbc_searching_book" translatable="false">Searching book\u2026</string>
+    <string name="msg_sbc_failed" translatable="false">Sorry, the search encountered a problem.</string>
+    <string name="msg_sbc_results" translatable="false">Results</string>
+    <string name="msg_sbc_book_not_searchable" translatable="false">Sorry, this book is not searchable.</string>
+    <string name="msg_sbc_no_page_returned" translatable="false">No page returned</string>
+    <string name="msg_sbc_page" translatable="false">Page</string>
+    <string name="msg_sbc_snippet_unavailable" translatable="false">Snippet not available</string>
+    <string name="preferences_general_title"  translatable="false">General settings</string>
+    <string name="preferences_history_summary" translatable="false">Store your scans in History</string>
+    <string name="preferences_history_title" translatable="false">Add to History</string>
+    <string name="preferences_invert_scan_title" translatable="false">Invert scan</string>
+    <string name="preferences_invert_scan_summary" translatable="false">Scan for white barcodes on black background. Not available on some devices.</string>
+    <string name="preferences_name" translatable="false">Settings</string>
+    <string name="preferences_orientation_title" translatable="false">No automatic rotation</string>
+    <string name="preferences_play_beep_title" translatable="false">Beep</string>
+    <string name="preferences_remember_duplicates_summary" translatable="false">Store multiple scans of the same barcode in History</string>
+    <string name="preferences_remember_duplicates_title" translatable="false">Remember duplicates</string>
+    <string name="preferences_result_title" translatable="false">Result settings</string>
+    <string name="preferences_scanning_title" translatable="false">When scanning for barcodes, decode\u2026</string>
+    <string name="preferences_search_country" translatable="false">Search country</string>
+    <string name="preferences_supplemental_summary" translatable="false">Try to retrieve more information about the barcode contents</string>
+    <string name="preferences_supplemental_title" translatable="false">Retrieve more info</string>
+    <string name="preferences_vibrate_title" translatable="false">Vibrate</string>
+    <string name="result_address_book" translatable="false">Found contact info</string>
+    <string name="result_calendar" translatable="false">Found calendar event</string>
+    <string name="result_email_address" translatable="false">Found email address</string>
+    <string name="result_geo" translatable="false">Found geographic coordinates</string>
+    <string name="result_isbn" translatable="false">Found book</string>
+    <string name="result_product" translatable="false">Found product</string>
+    <string name="desc_image_tip" translatable="false">请选择所需的贴图！</string>
+    <string name="result_sms" translatable="false">Found SMS address</string>
+    <string name="result_tel" translatable="false">Found phone number</string>
+    <string name="result_text" translatable="false">Found plain text</string>
+    <string name="result_uri" translatable="false">Found URL</string>
+    <string name="result_wifi" translatable="false">Found WLAN Configuration</string>
+    <string name="wifi_changing_network" translatable="false">Requesting connection to network\u2026</string>
+    <string name="title_activity_scrolling" translatable="false">ScrollingActivity</string>
+    <string name="msg_sure" translatable="false">Are you sure?</string>
+    <string name="msg_unmount_usb" translatable="false">Sorry, the SD card is not accessible.</string>
+    <string name="preferences_actions_title" translatable="false">When a barcode is found\u2026</string>
+    <string name="preferences_auto_focus_title" translatable="false">Use auto focus</string>
+    <string name="preferences_auto_open_web_title" translatable="false">Open web pages automatically</string>
+    <string name="preferences_bulk_mode_summary" translatable="false">Scan and save many barcodes continuously</string>
+    <string name="preferences_bulk_mode_title" translatable="false">Bulk scan mode</string>
+    <string name="preferences_copy_to_clipboard_title" translatable="false">Copy to clipboard</string>
+    <string name="preferences_custom_product_search_summary" translatable="false" formatted="false">Substitutions: %s = contents, %f = format, %t = type</string>
+    <string name="preferences_custom_product_search_title" translatable="false">Custom search URL</string>
+    <string name="preferences_decode_1D_industrial_title" translatable="false">1D Industrial</string>
+    <string name="preferences_decode_1D_product_title" translatable="false">1D Product</string>
+    <string name="preferences_decode_Aztec_title" translatable="false">Aztec</string>
+    <string name="preferences_decode_Data_Matrix_title" translatable="false">Data Matrix</string>
+    <string name="preferences_decode_PDF417_title" translatable="false">PDF417 (β)</string>
+    <string name="preferences_decode_QR_title" translatable="false">QR Codes</string>
+    <string name="preferences_device_bug_workarounds_title" translatable="false">Device Bug Workarounds</string>
+    <string name="preferences_disable_barcode_scene_mode_title" translatable="false">No barcode scene mode</string>
+    <string name="preferences_disable_continuous_focus_summary" translatable="false">Use only standard focus mode</string>
+    <string name="preferences_disable_continuous_focus_title" translatable="false">No continuous focus</string>
+    <string name="preferences_disable_exposure_title" translatable="false">No exposure</string>
+    <string name="preferences_disable_metering_title" translatable="false">No metering</string>
+    <string name="preferences_front_light_title" translatable="false">Use front light</string>
+    <string name="preferences_front_light_auto" translatable="false">Automatic</string>
+    <string name="preferences_front_light_off" translatable="false">Off</string>
+    <string name="preferences_front_light_on" translatable="false">On</string>
+    <string name="preferences_front_light_summary" translatable="false">Improves scanning in low light on some phones, but may cause glare. Does not work on all phones.</string>
+    <string name="msg_error" translatable="false">Error</string>
+    <string name="msg_invalid_value" translatable="false">Invalid value</string>
+    <string name="toast_permission_camera" translatable="false">摄像头访问受限，请在权限设置中打开该权限</string>
+    <string name="menu_encode_mecard" translatable="false">Use MECARD</string>
+    <string name="menu_encode_vcard" translatable="false">Use vCard</string>
+    <string name="menu_share" translatable="false">Share</string>
+    <string name="msg_encode_contents_failed" translatable="false">Could not encode a barcode from the data provided.</string>
+    <string name="contents_text" translatable="false">Plain text</string>
+    <string name="contents_email" translatable="false">Email address</string>
+    <string name="contents_phone" translatable="false">Phone number</string>
+    <string name="contents_sms" translatable="false">SMS address</string>
+    <string name="contents_contact" translatable="false">Contact info</string>
+    <string name="contents_location" translatable="false">Geographic coordinates</string>
+    <string name="history_clear_one_history_text" translatable="false">Clear</string>
+    <string name="history_email_title" translatable="false">Barcode Scanner history</string>
+    <string name="history_empty" translatable="false">Empty</string>
+    <string name="history_empty_detail" translatable="false">No barcode scans have been recorded</string>
+    <string name="app_picker_name" translatable="false">Applications</string>
+    <string name="bookmark_picker_name" translatable="false">Bookmarks</string>
+    <string name="button_add_calendar" translatable="false">Add to calendar</string>
+    <string name="button_add_contact" translatable="false">Add contact</string>
+    <string name="button_book_search" translatable="false">Book Search</string>
+    <string name="button_cancel" translatable="false">Cancel</string>
+    <string name="button_custom_product_search" translatable="false">Custom search</string>
+    <string name="button_dial" translatable="false">Dial number</string>
+    <string name="button_email" translatable="false">Send email</string>
+    <string name="button_get_directions" translatable="false">Get directions</string>
+    <string name="button_mms" translatable="false">Send MMS</string>
+    <string name="button_ok" translatable="false">OK</string>
+    <string name="button_open_browser" translatable="false">Open browser</string>
+    <string name="button_product_search" translatable="false">Product search</string>
+    <string name="button_share_app" translatable="false">Application</string>
+    <string name="button_share_bookmark" translatable="false">Bookmark</string>
+    <string name="button_share_by_email" translatable="false">Share via email</string>
+    <string name="button_share_by_sms" translatable="false">Share via SMS</string>
+    <string name="button_share_clipboard" translatable="false">Clipboard</string>
+    <string name="button_share_contact" translatable="false">Contact</string>
+    <string name="button_show_map" translatable="false">Show map</string>
+    <string name="button_sms" translatable="false">Send SMS</string>
+    <string name="button_web_search" translatable="false">Web search</string>
+    <string name="button_wifi" translatable="false">Connect to Network</string>
+    <string name="msg_default_mms_subject" translatable="false">Hi</string>
+    <string name="msg_intent_failed" translatable="false">Sorry, the requested application could not be launched. The barcode contents may be invalid.</string>
+    <string name="menu_history" translatable="false">History</string>
+    <string name="menu_settings" translatable="false">Settings</string>
+    <string name="menu_help" translatable="false">Help</string>
+    <string name="history_send" translatable="false">Send history</string>
+    <string name="history_title" translatable="false">History</string>
+    <string name="history_clear_text" translatable="false">Clear history</string>
+    <string name="action_settings" translatable="false">设置</string>
+    <string name="msg_google_books" translatable="false">Google</string>
+    <string name="msg_redirect" translatable="false">Redirect</string>
+    <string name="msg_google_product" translatable="false">Google</string>
+    <string name="msg_share_explanation" translatable="false">You can share data by displaying a barcode on your screen and scanning it with another phone.</string>
+    <string name="update_descriptions" translatable="false">发现新版本</string>
+    <string name="update_progress" translatable="false">%1$d%2$s</string>
+    <string name="conversation_search_str" translatable="false">搜索</string>
+    <string name="myIdTitle" translatable="false">我的ID</string>
+    <string name="scanTitle" translatable="false">扫一扫</string>
+    <string name="scanCardDesc" translatable="false">扫描二维码名片</string>
+    <string name="create_group" translatable="false">创建群聊</string>
+    <string name="qr_card_area_format" translatable="false">%1$s/%2$s/%3$s</string>
+    <string name="conversation_group_people_visitor" translatable="false">%1$d人</string>
+    <string name="downloadCancelText" translatable="false">残忍拒绝</string>
+    <string name="downloadUpgradeText" translatable="false">立即升级</string>
+    <!--下拉刷新-->
+    <string name="pull_to_refresh" translatable="false">下拉可以刷新</string>
+    <string name="release_to_refresh" translatable="false">释放立即刷新</string>
+    <string name="refreshing" translatable="false">正在刷新…</string>
+    <string name="not_updated_yet" translatable="false">暂未更新过</string>
+    <string name="updated_at" translatable="false">上次更新于%1$s前</string>
+    <string name="updated_just_now" translatable="false">刚刚更新</string>
+    <string name="time_error" translatable="false">时间有问题</string>
+    <!--邀请好友-->
+    <string name="share_wx_friends_str" translatable="false">微信好友</string>
+    <string name="share_wx_circle_friends_str" translatable="false">朋友圈</string>
+    <string name="share_qq_str" translatable="false">QQ</string>
+    <string name="share_save_poster_str" translatable="false">保存海报</string>
+    <string name="invitation_user_id_format" translatable="false">ID:%1$d</string>
+    <string name="invitation_code" translatable="false">邀请码:%1$s</string>
+</resources>

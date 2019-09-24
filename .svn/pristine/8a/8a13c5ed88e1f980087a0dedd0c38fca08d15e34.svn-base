@@ -1,0 +1,36 @@
+package com.bochat.app.app.util;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+
+public class DecimalFormatter extends DecimalFormat {
+
+    private static DecimalFormatter instance;
+
+    private DecimalFormatter() {
+    }
+
+    public static DecimalFormatter newInstance() {
+        if (instance == null) {
+            synchronized (DecimalFormatter.class) {
+                if (instance == null) {
+                    instance = new DecimalFormatter();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public String toPlainString(double value, int newScale, int mode) {
+        return new BigDecimal(value).setScale(newScale, mode).toPlainString();
+    }
+
+    public String format(String pattern, double value) {
+        return format(pattern, new BigDecimal(value));
+    }
+
+    public String format(String pattern, BigDecimal value) {
+        instance.applyPattern(pattern);
+        return instance.format(value.doubleValue());
+    }
+}

@@ -1,0 +1,15 @@
+package com.bochat.app.business.main.dynamic;
+
+import com.bochat.app.common.contract.dynamic.ShakyCenterContract;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+/**
+ * 2019/6/12
+ * Author LDL
+ **/
+public class ShakyCenterPresenter extends BasePresenter<ShakyCenterContract.View> implements ShakyCenterContract.Presenter{
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+}

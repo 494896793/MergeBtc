@@ -1,0 +1,367 @@
+package com.bochat.app.business;
+
+
+import com.bochat.app.business.interceptor.LoginInterceptor;
+import com.bochat.app.business.interceptor.PropertyInterceptor;
+import com.bochat.app.business.login.LoginPresenter;
+import com.bochat.app.business.login.RegisterPresenter;
+import com.bochat.app.business.login.SplashScreenPresenter;
+import com.bochat.app.business.main.BoChatPresenter;
+import com.bochat.app.business.main.bill.GCSpecialCodePresenter;
+import com.bochat.app.business.main.bill.OrderListMinePresenter;
+import com.bochat.app.business.main.bill.OrderListPresenter;
+import com.bochat.app.business.main.bill.PropertyCashOutPresenter;
+import com.bochat.app.business.main.bill.PropertyRechargePresenter;
+import com.bochat.app.business.main.bill.PropertyRechargeResultPresenter;
+import com.bochat.app.business.main.bill.QuickExchangeDetailPresenter;
+import com.bochat.app.business.main.bill.QuickExchangeHallPresenter;
+import com.bochat.app.business.main.bill.QuickExchangePresenter;
+import com.bochat.app.business.main.bill.TestIncomeOfTodayPresenter;
+import com.bochat.app.business.main.bill.TokenDetailPresenter;
+import com.bochat.app.business.main.bill.TokenPropertyPresenter;
+import com.bochat.app.business.main.bill.TokenSelectPresenter;
+import com.bochat.app.business.main.bill.TokenTransferPresenter;
+import com.bochat.app.business.main.bill.TokenTransferReceivePresenter;
+import com.bochat.app.business.main.bill.TokenTransferSelectCoinPresenter;
+import com.bochat.app.business.main.bill.WalletPresenter;
+import com.bochat.app.business.main.bill.WalletPropertyPresenter;
+import com.bochat.app.business.main.book.AddressBlackListPresenter;
+import com.bochat.app.business.main.book.AddressBookPresenter;
+import com.bochat.app.business.main.book.AddressGroupPresenter;
+import com.bochat.app.business.main.book.AddressTeamPresenter;
+import com.bochat.app.business.main.book.AddressUserPresenter;
+import com.bochat.app.business.main.book.ApplyListPresenter;
+import com.bochat.app.business.main.book.DealAddFriendPresenter;
+import com.bochat.app.business.main.book.FriendApplyPresenter;
+import com.bochat.app.business.main.book.GroupApplyPresenter;
+import com.bochat.app.business.main.book.HeaderDetailPresenter;
+import com.bochat.app.business.main.book.SearchAddressBookPresenter;
+import com.bochat.app.business.main.conversation.AddFriendPresenter;
+import com.bochat.app.business.main.conversation.ConversationDetailPresenter;
+import com.bochat.app.business.main.conversation.ConversationPresenter;
+import com.bochat.app.business.main.conversation.EditAddFriendApplyPresenter;
+import com.bochat.app.business.main.conversation.FriendDetailPresenter;
+import com.bochat.app.business.main.conversation.FriendManageNotePresenter;
+import com.bochat.app.business.main.conversation.FriendManagePresenter;
+import com.bochat.app.business.main.conversation.GroupAddManagerPresenter;
+import com.bochat.app.business.main.conversation.GroupChatPresenter;
+import com.bochat.app.business.main.conversation.GroupDetailPresenter;
+import com.bochat.app.business.main.conversation.GroupManageEditNamePresenter;
+import com.bochat.app.business.main.conversation.GroupManageEditPresenter;
+import com.bochat.app.business.main.conversation.GroupManageForbiddenPresenter;
+import com.bochat.app.business.main.conversation.GroupManageJoinFilterPresenter;
+import com.bochat.app.business.main.conversation.GroupManageManagerPresenter;
+import com.bochat.app.business.main.conversation.GroupManagePresenter;
+import com.bochat.app.business.main.conversation.GroupManageUpgradePresenter;
+import com.bochat.app.business.main.conversation.GroupManagerSettingPresenter;
+import com.bochat.app.business.main.conversation.GroupMemberManageNotePresenter;
+import com.bochat.app.business.main.conversation.GroupMemberManagePresenter;
+import com.bochat.app.business.main.conversation.GroupMemberPresenter;
+import com.bochat.app.business.main.conversation.GroupMentionedSeletePresenter;
+import com.bochat.app.business.main.conversation.GroupQuestionAnswerPresenter;
+import com.bochat.app.business.main.conversation.QRCardPresenter;
+import com.bochat.app.business.main.conversation.SearchConversationPresenter;
+import com.bochat.app.business.main.conversation.SearchFriendPresenter;
+import com.bochat.app.business.main.conversation.SearchGroupPresenter;
+import com.bochat.app.business.main.conversation.SearchMessagePresenter;
+import com.bochat.app.business.main.conversation.SelectFriendPresenter;
+import com.bochat.app.business.main.conversation.SingleChatPresenter;
+import com.bochat.app.business.main.dynamic.DynamicFlashDetialPresenter;
+import com.bochat.app.business.main.dynamic.DynamicListAppDetailPresenter;
+import com.bochat.app.business.main.dynamic.DynamicNoticeDetailPresenter;
+import com.bochat.app.business.main.dynamic.DynamicNoticeFlashPresenter;
+import com.bochat.app.business.main.dynamic.DynamicNoticePresenter;
+import com.bochat.app.business.main.dynamic.DynamicPresenter;
+import com.bochat.app.business.main.dynamic.DynamicRecruitPresenter;
+import com.bochat.app.business.main.dynamic.DynamicFlashPresenter;
+import com.bochat.app.business.main.dynamic.FastSpeedPresenter;
+import com.bochat.app.business.main.dynamic.KChatPresenter;
+import com.bochat.app.business.main.dynamic.ListAppActivityPresenter;
+import com.bochat.app.business.main.dynamic.ListAppPresenter;
+import com.bochat.app.business.main.dynamic.MarketQuotationBuyAndSellPresenter;
+import com.bochat.app.business.main.dynamic.MarketQuotationDetailPresenter;
+import com.bochat.app.business.main.dynamic.MarketQuotationEntrustPagerPresenter;
+import com.bochat.app.business.main.dynamic.MarketQuotationEntrustPresenter;
+import com.bochat.app.business.main.dynamic.MarketQuotationOptionalPresenter;
+import com.bochat.app.business.main.dynamic.MarketQuotationPresenter;
+import com.bochat.app.business.main.dynamic.PrivilegePresenter;
+import com.bochat.app.business.main.dynamic.ProjectIdentificationPresenter;
+import com.bochat.app.business.main.dynamic.ProjectIdentificationResultPresenter;
+import com.bochat.app.business.main.dynamic.ProtocolBookPresenter;
+import com.bochat.app.business.main.dynamic.SearchAppPresenter;
+import com.bochat.app.business.main.dynamic.ShakyCenterPresenter;
+import com.bochat.app.business.main.dynamic.ViewLookSearchPresenter;
+import com.bochat.app.business.main.dynamic.ViewSpotPresenter;
+import com.bochat.app.business.main.dynamic.WebPresenter;
+import com.bochat.app.business.main.mine.AboutUsPresenter;
+import com.bochat.app.business.main.mine.BankCardAddPresenter;
+import com.bochat.app.business.main.mine.BankCardPresenter;
+import com.bochat.app.business.main.mine.BankSelectPresenter;
+import com.bochat.app.business.main.mine.BillDetailPresenter;
+import com.bochat.app.business.main.mine.BillPresenter;
+import com.bochat.app.business.main.mine.DevelopingPresenter;
+import com.bochat.app.business.main.mine.EditPasswordPresenter;
+import com.bochat.app.business.main.mine.EditPayPasswordPresenter;
+import com.bochat.app.business.main.mine.EditUserInfoPresenter;
+import com.bochat.app.business.main.mine.GetVerifyCodePresenter;
+import com.bochat.app.business.main.mine.InvitationPresenter;
+import com.bochat.app.business.main.mine.MinePresenter;
+import com.bochat.app.business.main.mine.RealNameAuthPresenter;
+import com.bochat.app.business.main.mine.RealNameInfoPresenter;
+import com.bochat.app.business.main.mine.SetPasswordPresenter;
+import com.bochat.app.business.main.mine.SetPayPasswordPresenter;
+import com.bochat.app.business.main.mine.SettingsPhoneInfoPresenter;
+import com.bochat.app.business.main.mine.SettingsPresenter;
+import com.bochat.app.business.main.redpacket.BidListPresenter;
+import com.bochat.app.business.main.redpacket.CandyPresenter;
+import com.bochat.app.business.main.redpacket.RedpacketDetailPresenter;
+import com.bochat.app.business.main.redpacket.SendRedPacketPresenter;
+import com.bochat.app.business.main.redpacket.SmallMoneyPresenter;
+import com.bochat.app.common.contract.dynamic.SearchAppContract;
+import com.bochat.app.model.ModelModule;
+import com.bochat.app.mvp.injector.scope.BusinessScope;
+
+import dagger.Component;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/12 09:50
+ * Description :
+ */
+@BusinessScope
+@Component(modules = {ModelModule.class})
+public interface BusinessComponent {
+
+    void inject(LoginInterceptor interceptor);
+
+    void inject(PropertyInterceptor interceptor);
+
+    void inject(LoginPresenter presenter);
+
+    void inject(BoChatPresenter presenter);
+
+    void inject(RegisterPresenter presenter);
+
+    void inject(SplashScreenPresenter presenter);
+
+    void inject(AddressBookPresenter presenter);
+
+    void inject(AddressUserPresenter presenter);
+
+    void inject(AddressGroupPresenter presenter);
+
+    void inject(AddressBlackListPresenter presenter);
+
+    void inject(EditAddFriendApplyPresenter presenter);
+
+    void inject(FriendDetailPresenter presenter);
+
+    void inject(ConversationPresenter presenter);
+
+    void inject(GroupDetailPresenter presenter);
+
+    void inject(SelectFriendPresenter presenter);
+
+    void inject(GroupChatPresenter presenter);
+
+    void inject(SingleChatPresenter presenter);
+
+    void inject(QRCardPresenter presenter);
+
+    void inject(AddFriendPresenter presenter);
+
+    void inject(SearchFriendPresenter presenter);
+
+    void inject(ApplyListPresenter presenter);
+
+    void inject(FriendApplyPresenter presenter);
+
+    void inject(GroupApplyPresenter presenter);
+
+    void inject(DealAddFriendPresenter presenter);
+
+    void inject(SearchConversationPresenter presenter);
+
+    void inject(ConversationDetailPresenter presenter);
+
+    void inject(GroupManageEditNamePresenter interceptor);
+
+    void inject(GroupManageEditPresenter interceptor);
+
+    void inject(GroupManageForbiddenPresenter interceptor);
+
+    void inject(GroupManagePresenter interceptor);
+
+    void inject(GroupManageUpgradePresenter interceptor);
+
+    void inject(GroupMemberManageNotePresenter interceptor);
+
+    void inject(GroupMemberManagePresenter interceptor);
+
+    void inject(GroupMemberPresenter interceptor);
+
+    void inject(MinePresenter presenter);
+
+    void inject(FriendManagePresenter presenter);
+
+    void inject(FriendManageNotePresenter presenter);
+
+    void inject(SearchMessagePresenter presenter);
+
+    void inject(DevelopingPresenter presenter);
+
+    void inject(WalletPresenter presenter);
+
+    void inject(PropertyRechargePresenter presenter);
+
+    void inject(PropertyCashOutPresenter presenter);
+
+    void inject(WalletPropertyPresenter presenter);
+
+    void inject(TokenPropertyPresenter presenter);
+
+    void inject(GCSpecialCodePresenter presenter);
+
+    void inject(TokenTransferReceivePresenter presenter);
+
+    void inject(TokenTransferSelectCoinPresenter presenter);
+
+    void inject(TokenTransferPresenter presenter);
+
+    void inject(TokenDetailPresenter presenter);
+
+    void inject(OrderListPresenter presenter);
+
+    void inject(OrderListMinePresenter presenter);
+
+    void inject(QuickExchangeDetailPresenter presenter);
+
+    void inject(QuickExchangeHallPresenter presenter);
+
+    void inject(AboutUsPresenter presenter);
+
+    void inject(QuickExchangePresenter presenter);
+
+    void inject(PropertyRechargeResultPresenter presenter);
+
+    void inject(DynamicPresenter presenter);
+
+    void inject(WebPresenter presenter);
+
+    void inject(ListAppPresenter presenter);
+
+    void inject(ListAppActivityPresenter presenter);
+
+    void inject(DynamicNoticePresenter presenter);
+
+    void inject(SendRedPacketPresenter presenter);
+
+    void inject(CandyPresenter presenter);
+
+    void inject(SmallMoneyPresenter presenter);
+
+    void inject(BidListPresenter presenter);
+
+    void inject(RedpacketDetailPresenter presenter);
+
+    void inject(BillPresenter presenter);
+
+    void inject(BillDetailPresenter presenter);
+
+    void inject(BankCardAddPresenter presenter);
+
+    void inject(RealNameAuthPresenter presenter);
+
+    void inject(RealNameInfoPresenter presenter);
+
+    void inject(BankSelectPresenter presenter);
+
+    void inject(EditUserInfoPresenter presenter);
+
+    void inject(SearchAddressBookPresenter presenter);
+
+    void inject(EditPasswordPresenter presenter);
+
+    void inject(GetVerifyCodePresenter presenter);
+
+    void inject(SettingsPhoneInfoPresenter presenter);
+
+    void inject(SettingsPresenter presenter);
+
+    void inject(SetPasswordPresenter presenter);
+
+    void inject(SetPayPasswordPresenter presenter);
+
+    void inject(EditPayPasswordPresenter presenter);
+
+    void inject(BankCardPresenter presenter);
+
+    void inject(InvitationPresenter presenter);
+
+    void inject(DynamicNoticeDetailPresenter presenter);
+
+    void inject(ViewSpotPresenter presenter);
+
+    void inject(ProjectIdentificationPresenter presenter);
+
+    void inject(ProjectIdentificationResultPresenter presenter);
+
+    void inject(ProtocolBookPresenter presenter);
+
+    void inject(SearchGroupPresenter presenter);
+
+    void inject(GroupManageJoinFilterPresenter presenter);
+
+    void inject(GroupManageManagerPresenter presenter);
+
+    void inject(ViewLookSearchPresenter presenter);
+
+    void inject(TestIncomeOfTodayPresenter presenter);
+
+    void inject(FastSpeedPresenter presenter);
+
+    void inject(TokenSelectPresenter presenter);
+
+    void inject(ShakyCenterPresenter presenter);
+
+    void inject(DynamicRecruitPresenter presenter);
+
+    void inject(KChatPresenter presenter);
+
+    void inject(HeaderDetailPresenter presenter);
+
+    void inject(GroupManagerSettingPresenter presenter);
+
+    void inject(GroupAddManagerPresenter presenter);
+
+    void inject(DynamicListAppDetailPresenter presenter);
+
+    void inject(SearchAppPresenter presenter);
+
+    void inject(MarketQuotationPresenter presenter);
+
+    void inject(MarketQuotationOptionalPresenter presenter);
+
+    void inject(MarketQuotationBuyAndSellPresenter presenter);
+
+    void inject(MarketQuotationDetailPresenter presenter);
+
+    void inject(MarketQuotationEntrustPresenter presenter);
+
+    void inject(GroupQuestionAnswerPresenter presenter);
+
+    void inject(GroupMentionedSeletePresenter presenter);
+
+    void inject(DynamicNoticeFlashPresenter presenter);
+
+    void inject(DynamicFlashPresenter presenter);
+
+    void inject(DynamicFlashDetialPresenter presenter);
+
+
+    void inject(MarketQuotationEntrustPagerPresenter presenter);
+
+    void inject(AddressTeamPresenter presenter);
+
+    void inject(PrivilegePresenter presenter);
+}

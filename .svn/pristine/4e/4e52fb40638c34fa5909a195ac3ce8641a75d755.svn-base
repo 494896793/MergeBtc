@@ -1,0 +1,79 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import org.json.JSONObject;
+
+import java.io.Serializable;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/07/02 18:52
+ * Description :
+ */
+
+public class KLineItemEntity implements Serializable {
+    
+    private long id;
+    private String openPrice;
+    private String closePrice;
+    private String maxPrice;
+    private String minPrice;
+    private String makeNum;
+    private String createTime;
+    
+    public KLineItemEntity() {
+    }
+
+    public KLineItemEntity(JSONObject json) {
+        try {
+            id = Long.valueOf(json.getString("id"));
+            openPrice = json.getString("openPrice");
+            closePrice = json.getString("closePrice");
+            maxPrice = json.getString("maxPrice");
+            minPrice = json.getString("minPrice");
+            makeNum = json.getString("makeNum");
+            createTime = json.getString("createTime");
+        } catch (Exception ignore){
+        }
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getNum() {
+        return makeNum;
+    }
+
+    public String getStart() {
+        return openPrice;
+    }
+
+    public String getEnd() {
+        return closePrice;
+    }
+
+    public String getMax() {
+        return maxPrice;
+    }
+
+    public String getMin() {
+        return makeNum;
+    }
+
+    @Override
+    public String toString() {
+        return "KLineItemEntity{" +
+                "id=" + id +
+                ", openPrice='" + openPrice + '\'' +
+                ", closePrice='" + closePrice + '\'' +
+                ", maxPrice='" + maxPrice + '\'' +
+                ", minPrice='" + minPrice + '\'' +
+                ", makeNum='" + makeNum + '\'' +
+                ", createTime='" + createTime + '\'' +
+                '}';
+    }
+}

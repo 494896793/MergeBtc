@@ -1,0 +1,58 @@
+package com.bochat.app.common.util;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+/**
+ * 2019/4/17
+ * Author ZZW
+ **/
+public class SharePreferenceUtil {
+
+    private static SharedPreferences sharedPreferences;
+    private static Context mContext;
+
+    public static SharedPreferences getSharePreference(){
+        return sharedPreferences;
+    }
+
+    public static void init(Context context){
+        mContext=context;
+        sharedPreferences=mContext.getSharedPreferences("BoChat_Preference",Context.MODE_PRIVATE);
+    }
+
+    public static void saveAccount(String username){
+        try{
+            SharedPreferences.Editor editor=sharedPreferences.edit();
+            editor.putString("account",username);
+            editor.commit();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveString(String key,String value){
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        editor.putString(key,value);
+        editor.commit();
+    }
+
+    public static void saveInt(String key,int value){
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        editor.putInt(key,value);
+        editor.commit();
+    }
+
+    public static String getString(String key){
+        return sharedPreferences.getString(key,null);
+    }
+
+    public static int getInt(String key){
+        return sharedPreferences.getInt(key,-1);
+    }
+
+    public static String getAccount(){
+        return sharedPreferences.getString("account",null);
+    }
+
+}

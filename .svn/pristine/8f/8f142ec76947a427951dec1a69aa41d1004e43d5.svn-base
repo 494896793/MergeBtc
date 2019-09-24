@@ -1,0 +1,21 @@
+package com.bochat.app.common.contract.book;
+
+import com.bochat.app.mvp.presenter.IBasePresenter;
+import com.bochat.app.mvp.view.IBaseView;
+
+/**
+ * 2019/4/22
+ * Author ZZW
+ **/
+public interface GroupApplyContract {
+
+    interface View extends IBaseView<GroupApplyContract.Presenter>{
+
+    }
+
+    interface Presenter extends IBasePresenter<GroupApplyContract.View>{
+
+    }
+
+
+}

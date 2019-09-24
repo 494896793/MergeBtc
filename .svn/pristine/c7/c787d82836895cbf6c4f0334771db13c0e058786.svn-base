@@ -1,0 +1,23 @@
+package com.bochat.app.common.router;
+
+import com.bochat.app.model.bean.DynamicMQEntity;
+
+public class RouterMarketQuotationDetail extends AbstractRouter {
+
+    public static final String PATH = "/path/RouterMarketQuotationnDetail";
+
+    private DynamicMQEntity entity;
+
+    public void setEntity(DynamicMQEntity entity) {
+        this.entity = entity;
+    }
+
+    public DynamicMQEntity getEntity() {
+        return entity;
+    }
+
+    @Override
+    public String getPath() {
+        return PATH;
+    }
+}

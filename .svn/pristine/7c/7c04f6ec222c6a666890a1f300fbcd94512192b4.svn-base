@@ -1,0 +1,81 @@
+package com.bochat.app.app.view;
+
+import android.content.Context;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+import com.bochat.app.R;
+import com.bochat.app.common.util.ShareUtil;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
+
+import razerdp.basepopup.BasePopupWindow;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/05/04 17:31
+ * Description :
+ */
+
+public class ShareDialog extends BasePopupWindow {
+    
+    private View view;
+    
+    public ShareDialog(final Context context, final String title, final String description, final String url) {
+        super(context);
+        setPopupGravity(Gravity.BOTTOM | Gravity.LEFT);
+//        setBackground(0);
+/*        RelativeLayout mainLayout = findViewById(R.id.share_dialog_layout);
+        mainLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });*/
+        RelativeLayout wechat = findViewById(R.id.wechat_layout);
+        wechat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShareUtil.getInstance().shareUrlToWx(url, title, description, SendMessageToWX.Req.WXSceneSession);
+                dismiss();
+            }
+        });
+        RelativeLayout wechatTimeLine = findViewById(R.id.wechat_time_line_layout);
+        wechatTimeLine.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShareUtil.getInstance().shareUrlToWx(url, title, description, SendMessageToWX.Req.WXSceneTimeline);
+                dismiss();
+            }
+        });
+        RelativeLayout qq = findViewById(R.id.qq_layout);
+        qq.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { 
+                ShareUtil.getInstance().shareToQQ(BaseActivity.getTop(), url, title, description);
+               dismiss(); 
+            }
+        });
+        RelativeLayout weibo = findViewById(R.id.weibo_layout);
+        weibo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, "尚未开放", Toast.LENGTH_SHORT).show();
+                dismiss();
+            }
+        });
+    }
+    
+    @Override
+    public View onCreateContentView() {
+        view = createPopupById(R.layout.view_share_dialog);
+        return view;
+    }
+
+    @Override
+    public void showPopupWindow() {
+        getPopupWindow().showAtLocation(view, Gravity.BOTTOM | Gravity.LEFT, 0, 0);
+    }
+}

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/bochat_topbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_background="@color/white"
+        app:top_extButtonSrc="@null"
+        app:top_hasExt2Btn="false"
+        app:top_hasExtBtn="false"
+        app:top_hasBackBtn="true"
+        app:top_titleText="我的特权" />
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/privilege_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/bochat_topbar"/>
+    <!--<com.scwang.smartrefresh.layout.SmartRefreshLayout-->
+        <!--android:id="@+id/privilege_refresh_layout"-->
+        <!--android:layout_below="@id/bochat_topbar"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
+
+        <!--<com.scwang.smartrefresh.layout.header.ClassicsHeader-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content" />-->
+
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:id="@+id/privilege_list"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:paddingStart="@dimen/dp_15"-->
+            <!--android:paddingEnd="@dimen/dp_15"/>-->
+
+        <!--<com.scwang.smartrefresh.layout.footer.ClassicsFooter-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content" />-->
+
+    <!--</com.scwang.smartrefresh.layout.SmartRefreshLayout>-->
+
+
+    <LinearLayout
+        android:id="@+id/no_privilege"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:contentDescription="@null"
+            android:src="@mipmap/ic_privilege_default" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/privilege_no_granted"
+            android:textColor="@color/color_222222" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingBottom="22dp"
+            android:text="@string/privilege_more_attention"
+            android:textColor="@color/color_999999"
+            android:textSize="@dimen/sp_11" />
+
+        <Button
+            android:id="@+id/privilege_go_activities"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:background="@drawable/privilege_go_activities_button_shape"
+            android:text="@string/privilege_go_center"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+</RelativeLayout>

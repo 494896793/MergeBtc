@@ -1,0 +1,556 @@
+package com.bochat.app.model.modelImpl;
+
+import android.net.Uri;
+
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.model.IIMModel;
+import com.bochat.app.common.util.ALog;
+import com.bochat.app.common.util.ConditionObject;
+import com.bochat.app.model.bean.RedPacketEntity;
+import com.bochat.app.model.bean.SendSpeedEntity;
+import com.bochat.app.model.bean.UserEntity;
+import com.bochat.app.model.event.ConversationRefreshEvent;
+import com.bochat.app.model.rong.BoChatMessage;
+import com.bochat.app.model.rong.GetRedPacketMessage;
+import com.bochat.app.model.rong.RedPacketMessage;
+import com.bochat.app.model.rong.SpeedConverMessage;
+import com.bochat.app.model.util.Api;
+
+import org.greenrobot.eventbus.EventBus;
+import org.json.JSONObject;
+
+import io.rong.imkit.RongIM;
+import io.rong.imlib.IRongCallback;
+import io.rong.imlib.RongIMClient;
+import io.rong.imlib.model.Conversation;
+import io.rong.imlib.model.Message;
+import io.rong.imlib.model.UserInfo;
+import io.rong.message.CommandMessage;
+import io.rong.message.ImageMessage;
+import io.rong.message.TextMessage;
+
+import static com.bochat.app.model.constant.Constan.GET_GROUP_REDPACKET;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/22 10:26
+ * Description :
+ */
+
+public class IMModel implements IIMModel {
+    
+    @Override
+    public boolean sendTextMsg(String targetId, String text) {
+        final ConditionObject block = new ConditionObject();
+        TextMessage content = TextMessage.obtain(text);
+        Message message = Message.obtain(targetId, Conversation.ConversationType.PRIVATE, content);
+        
+        RongIM.getInstance().sendMessage(message, "", "", new IRongCallback.ISendMediaMessageCallback() {
+            @Override
+            public void onProgress(Message message, int i) {
+            }
+
+            @Override
+            public void onCanceled(Message message) {
+                block.setHandleResult(false);
+                block.open();
+            }
+
+            @Override
+            public void onAttached(Message message) {
+
+            }
+
+            @Override
+            public void onSuccess(Message message) {
+                ALog.d("send text success");
+                block.setHandleResult(true);
+                block.open();
+            }
+
+            @Override
+            public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+                ALog.d("send text error " + errorCode);
+                block.setHandleResult(false);
+                block.open();
+            }
+        });
+        block.block();
+        return block.isHandleSuccess();
+    }
+
+    private boolean addFriend(String targetId, String text, int sourceType){
+
+        UserEntity userEntity = CachePool.getInstance().user().getLatest();
+
+        final ConditionObject block = new ConditionObject();
+        
+        BoChatMessage content = BoChatMessage.obtain(text, "",
+                BoChatMessage.MESSAGE_TYPE_ADD_FRIEND, sourceType, CachePool.getInstance().user().getLatest().getSignature());
+
+        String headImg = userEntity.getHeadImg();
+
+        content.setUserInfo(new UserInfo(userEntity.getId()+"", userEntity.getNickname(), Uri.parse(headImg == null ? "https://www.baidu.com/img/bd_logo1.png" : headImg)));
+
+        Message message = Message.obtain(targetId, Conversation.ConversationType.PRIVATE, content);
+
+        RongIM.getInstance().sendMessage(message, "", "", new IRongCallback.ISendMediaMessageCallback() {
+            @Override
+            public void onProgress(Message message, int i) {
+
+            }
+
+            @Override
+            public void onCanceled(Message message) {
+                block.setHandleResult(false);
+                block.open();
+            }
+
+            @Override
+            public void onAttached(Message message) {
+                
+            }
+
+            @Override
+            public void onSuccess(Message message) {
+                ALog.d("send text success");
+                RongIM.getInstance().deleteMessages(message.getConversationType(),message.getTargetId(),null);
+                RongIM.getInstance().removeConversation(Conversation.ConversationType.PRIVATE,message.getTargetId());
+                EventBus.getDefault().post(new ConversationRefreshEvent());
+                block.setHandleResult(true);
+                block.open();
+            }
+
+            @Override
+            public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+                ALog.d("send text error " + errorCode);
+                block.setHandleResult(false);
+                block.open();
+            }
+        });
+        block.block();
+        return block.isHandleSuccess();
+    }
+
+    @Override
+    public boolean addGroup(String targetId, String text, int sourceType){
+
+        UserEntity userEntity = CachePool.getInstance().user().getLatest();
+
+        final ConditionObject block = new ConditionObject();
+
+        BoChatMessage content = BoChatMessage.obtain(text, "",
+                BoChatMessage.MESSAGE_TYPE_ADD_GROUP, sourceType, CachePool.getInstance().user().getLatest().getSignature());
+
+        String headImg = userEntity.getHeadImg();
+
+        content.setUserInfo(new UserInfo(userEntity.getId()+"", userEntity.getNickname(), Uri.parse(headImg == null ? "https://www.baidu.com/img/bd_logo1.png" : headImg)));
+        Message message = Message.obtain(targetId, Conversation.ConversationType.GROUP, content);
+
+        RongIM.getInstance().sendMessage(message, "", "", new IRongCallback.ISendMediaMessageCallback() {
+            @Override
+            public void onProgress(Message message, int i) {
+
+            }
+
+            @Override
+            public void onCanceled(Message message) {
+                block.setHandleResult(false);
+                block.open();
+            }
+
+            @Override
+            public void onAttached(Message message) {
+
+            }
+
+            @Override
+            public void onSuccess(Message message) {
+                ALog.d("send text success");
+                block.setHandleResult(true);
+                block.open();
+            }
+
+            @Override
+            public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+                ALog.d("send text error " + errorCode);
+                block.setHandleResult(false);
+                block.open();
+            }
+        });
+        block.block();
+        return block.isHandleSuccess();
+    }
+
+    @Override
+    public boolean sendRedPacket(String targetId,RedPacketEntity entity, int messgType, int SourceType,boolean isgroup,int type){
+
+        UserEntity userEntity = CachePool.getInstance().user().getLatest();
+        final ConditionObject block = new ConditionObject();
+        RedPacketMessage content = RedPacketMessage.obtain(entity, messgType,SourceType,
+                isgroup,type,null);
+
+        String headImg = userEntity.getHeadImg();
+        content.setUserInfo(new UserInfo(userEntity.getId()+"", userEntity.getNickname(), Uri.parse(headImg == null ? "https://www.baidu.com/img/bd_logo1.png" : headImg)));
+        Message message=null;
+        if(entity.getGroup_id()!=-1&&entity.getGroup_id()!=0){
+            message = Message.obtain(targetId, Conversation.ConversationType.GROUP, content);
+        }else{
+            message = Message.obtain(targetId, Conversation.ConversationType.PRIVATE, content);
+        }
+
+        RongIM.getInstance().sendMessage(message, "[送利是]", "[送利是]", new IRongCallback.ISendMediaMessageCallback() {
+            @Override
+            public void onProgress(Message message, int i) {
+                ALog.d("send text success");
+            }
+
+            @Override
+            public void onCanceled(Message message) {
+                block.setHandleResult(false);
+                block.open();
+                ALog.d("send text success");
+            }
+
+            @Override
+            public void onAttached(Message message) {
+//                block.open();
+                ALog.d("send text success");
+            }
+
+            @Override
+            public void onSuccess(Message message) {
+                ALog.d("send text success");
+                block.setHandleResult(true);
+                block.open();
+            }
+
+            @Override
+            public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+                ALog.d("send text error " + errorCode);
+                block.setHandleResult(false);
+                block.open();
+            }
+        });
+        block.block();
+        return block.isHandleSuccess();
+//        return true;
+    }
+
+    public boolean sendImgMsg(Conversation.ConversationType type, String targetId, Uri thumUri, Uri localUri, boolean isFull){
+            final ConditionObject block = new ConditionObject();
+            
+        ImageMessage imageMessage = ImageMessage.obtain(thumUri,localUri,isFull);
+        
+        Message message = Message.obtain(targetId, type, imageMessage);
+        
+        RongIM.getInstance().sendImageMessage(message, "图片", "图片", new RongIMClient.SendImageMessageCallback() {
+            @Override
+            public void onAttached(Message message) {
+                ALog.d("send image onAttached");
+            }
+
+            @Override
+            public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+                ALog.d("send image error " + errorCode);
+                block.setHandleResult(false);
+                block.open();
+            }
+
+            @Override
+            public void onSuccess(Message message) {
+                ALog.d("send image success");
+                block.setHandleResult(true);
+                block.open();
+            }
+
+            @Override
+            public void onProgress(Message message, int i) {
+                ALog.d("send image onProgress " + i);
+            }
+        });
+        block.block();
+        return block.isHandleSuccess();
+    }
+
+    @Override
+    public boolean getGroupRedPacket(boolean isgroup,int type,String targetId,String sendUserId,String sendUserName,String receiverUserId,String receiveUserName,String statusId,int status){
+        UserEntity userEntity = CachePool.getInstance().user().getLatest();
+        final ConditionObject block = new ConditionObject();
+        GetRedPacketMessage content = GetRedPacketMessage.obtain(type,sendUserId,sendUserName,receiverUserId,receiveUserName,statusId,status);
+
+        String headImg = userEntity.getHeadImg();
+        content.setUserInfo(new UserInfo(userEntity.getId()+"", userEntity.getNickname(), Uri.parse(headImg == null ? "https://www.baidu.com/img/bd_logo1.png" : headImg)));
+        Message messages=null;
+        if(isgroup){
+            messages = Message.obtain(targetId, Conversation.ConversationType.GROUP, content);
+        }else{
+            messages = Message.obtain(targetId, Conversation.ConversationType.PRIVATE, content);
+        }
+        String pushContent="";
+        String pushData="";
+        if(type==GET_GROUP_REDPACKET){
+            pushContent=receiveUserName+"[送利是]";
+            pushData=receiveUserName+"[送利是]";
+        }else{
+            pushContent=receiveUserName+"[闪兑消息]";
+            pushData=receiveUserName+"[闪兑消息]";
+        }
+        RongIM.getInstance().sendMessage(messages, pushContent, pushData, new IRongCallback.ISendMediaMessageCallback() {
+            @Override
+            public void onProgress(Message message, int i) {
+                ALog.d("send text success");
+            }
+
+            @Override
+            public void onCanceled(Message message) {
+                block.setHandleResult(false);
+                block.open();
+                ALog.d("send text success");
+            }
+
+            @Override
+            public void onAttached(Message message) {
+//                block.open();
+                ALog.d("send text success");
+            }
+
+            @Override
+            public void onSuccess(Message message) {
+                ALog.d("send text success");
+                block.setHandleResult(true);
+                block.open();
+            }
+
+            @Override
+            public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+                ALog.d("send text error " + errorCode);
+                block.setHandleResult(false);
+                block.open();
+            }
+        });
+        block.block();
+        return block.isHandleSuccess();
+    }
+
+
+    @Override
+    public boolean sendSpeedConver(String targetId, String startId, String convertId, SendSpeedEntity speedEntity,boolean isGroup) {
+        UserEntity userEntity = CachePool.getInstance().user().getLatest();
+        final ConditionObject block = new ConditionObject();
+        SpeedConverMessage content = SpeedConverMessage.obtain(targetId,startId,convertId,speedEntity);
+
+        String headImg = userEntity.getHeadImg();
+        content.setUserInfo(new UserInfo(userEntity.getId()+"", userEntity.getNickname(), Uri.parse(headImg == null ? Api.DEFAULT_HEAD : headImg)));
+        Message messages=null;
+        if(isGroup){
+            messages = Message.obtain(targetId, Conversation.ConversationType.GROUP, content);
+        }else{
+            messages = Message.obtain(targetId, Conversation.ConversationType.PRIVATE, content);
+        }
+        RongIM.getInstance().sendMessage(messages, "[闪兑消息]", "[闪兑消息]", new IRongCallback.ISendMediaMessageCallback() {
+            @Override
+            public void onProgress(Message message, int i) {
+                ALog.d("send text success");
+            }
+
+            @Override
+            public void onCanceled(Message message) {
+                block.setHandleResult(false);
+                block.open();
+                ALog.d("send text success");
+            }
+
+            @Override
+            public void onAttached(Message message) {
+//                block.open();
+                ALog.d("send text success");
+            }
+
+            @Override
+            public void onSuccess(Message message) {
+                ALog.d("send text success");
+                block.setHandleResult(true);
+                block.open();
+            }
+
+            @Override
+            public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+                ALog.d("send text error " + errorCode);
+                block.setHandleResult(false);
+                block.open();
+            }
+        });
+        block.block();
+        return block.isHandleSuccess();
+    }
+
+    @Override
+    public boolean cancelExchange(String targetId,boolean isGroup,String orderId){
+        final ConditionObject block = new ConditionObject();
+        try{
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("orderId",orderId);
+            jsonObject.put("status",3);
+            CommandMessage commandMessage=CommandMessage.obtain("cancelSpeedConver",jsonObject.toString());
+            Message messages=null;
+            if(isGroup){
+                messages = Message.obtain(targetId, Conversation.ConversationType.GROUP, commandMessage);
+            }else{
+                messages = Message.obtain(targetId, Conversation.ConversationType.PRIVATE, commandMessage);
+            }
+            RongIM.getInstance().sendMessage(messages, "[闪兑消息]", "[闪兑消息]", new IRongCallback.ISendMediaMessageCallback() {
+                @Override
+                public void onProgress(Message message, int i) {
+                    ALog.d("send text success");
+                }
+
+                @Override
+                public void onCanceled(Message message) {
+                    block.setHandleResult(false);
+                    block.open();
+                    ALog.d("send text success");
+                }
+
+                @Override
+                public void onAttached(Message message) {
+//                block.open();
+                    ALog.d("send text success");
+                }
+
+                @Override
+                public void onSuccess(Message message) {
+                    ALog.d("send text success");
+                    block.setHandleResult(true);
+                    block.open();
+                }
+
+                @Override
+                public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+                    ALog.d("send text error " + errorCode);
+                    block.setHandleResult(false);
+                    block.open();
+                }
+            });
+            block.block();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return block.isHandleSuccess();
+    }
+
+
+    @Override
+    public boolean getRedPacket(String targetId, RedPacketMessage message, int messgType, int SourceType,String receiverID) {
+
+        UserEntity userEntity = CachePool.getInstance().user().getLatest();
+        final ConditionObject block = new ConditionObject();
+        RedPacketMessage content = RedPacketMessage.obtain(message, messgType,SourceType,
+                receiverID);
+
+        String headImg = userEntity.getHeadImg();
+        content.setUserInfo(new UserInfo(userEntity.getId()+"", userEntity.getNickname(), Uri.parse(headImg == null ? "https://www.baidu.com/img/bd_logo1.png" : headImg)));
+
+        Message messages = Message.obtain(targetId, Conversation.ConversationType.PRIVATE, content);
+
+        RongIM.getInstance().sendMessage(messages, "[送利是]", "[送利是]", new IRongCallback.ISendMediaMessageCallback() {
+            @Override
+            public void onProgress(Message message, int i) {
+                ALog.d("send text success");
+            }
+
+            @Override
+            public void onCanceled(Message message) {
+                block.setHandleResult(false);
+                block.open();
+                ALog.d("send text success");
+            }
+
+            @Override
+            public void onAttached(Message message) {
+//                block.open();
+                ALog.d("send text success");
+            }
+
+            @Override
+            public void onSuccess(Message message) {
+                ALog.d("send text success");
+                block.setHandleResult(true);
+                block.open();
+            }
+
+            @Override
+            public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+                ALog.d("send text error " + errorCode);
+                block.setHandleResult(false);
+                block.open();
+            }
+        });
+        block.block();
+        return block.isHandleSuccess();
+    }
+
+    @Override
+    public boolean acceptFriend(String targetId, String text, int sourceType){
+        final ConditionObject block = new ConditionObject();
+        UserEntity userEntity = CachePool.getInstance().user().getLatest();
+        String desc = userEntity.getSignature();
+        if(desc==null){
+            desc="";
+        }
+        BoChatMessage content = BoChatMessage.obtain(text, "",
+                BoChatMessage.MESSAGE_TYPE_AGREEN_ADD_FRIEND, sourceType,desc);
+        content.setUserInfo(new UserInfo(userEntity.getId()+"", userEntity.getNickname(), Uri.parse(userEntity.getHeadImg())));
+        Message message = Message.obtain(targetId, Conversation.ConversationType.PRIVATE, content);
+
+        RongIM.getInstance().sendMessage(message, "", "", new IRongCallback.ISendMediaMessageCallback() {
+            @Override
+            public void onProgress(Message message, int i) {
+
+            }
+
+            @Override
+            public void onCanceled(Message message) {
+                block.setHandleResult(false);
+                block.open();
+            }
+
+            @Override
+            public void onAttached(Message message) {
+
+            }
+
+            @Override
+            public void onSuccess(Message message) {
+                ALog.d("send text success");
+                block.setHandleResult(true);
+                block.open();
+            }
+
+            @Override
+            public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+                ALog.d("send text error " + errorCode);
+                block.setHandleResult(false);
+                block.open();
+            }
+        });
+        block.block();
+        return block.isHandleSuccess();
+    }
+    
+    @Override
+    public boolean addFriendFromAccount(String targetId, String text) {
+        return addFriend(targetId, text, BoChatMessage.SOURCE_TYPE_ACCOUNT);
+    }
+
+    @Override
+    public boolean addFriendFromQR(String targetId, String text) {
+        return addFriend(targetId, text, BoChatMessage.SOURCE_TYPE_QR_SCAN);
+    }
+
+    @Override
+    public boolean addFriendFromGroup(String targetId, String text) {
+        return addFriend(targetId, text, BoChatMessage.SOURCE_TYPE_GROUP_LIST);
+    }
+}

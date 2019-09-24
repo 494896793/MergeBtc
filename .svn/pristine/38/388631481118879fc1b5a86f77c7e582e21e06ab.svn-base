@@ -1,0 +1,99 @@
+package com.bochat.app.app.activity.dynamic;
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.util.TypedValue;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.MarketQuotationPagerAdapter;
+import com.bochat.app.app.fragment.dynamic.KChatFragment;
+import com.bochat.app.app.fragment.dynamic.MarketQuotationOptionalFragment;
+import com.bochat.app.app.util.ResourceUtils;
+import com.bochat.app.common.contract.dynamic.MarketQuotationContract;
+import com.bochat.app.common.router.RouterMarketQuotation;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.flyco.tablayout.SlidingTabLayout;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+@Route(path = RouterMarketQuotation.PATH)
+public class MarketQuotationActivity extends BaseActivity<MarketQuotationContract.Presenter> implements MarketQuotationContract.View {
+
+    @Inject
+    MarketQuotationContract.Presenter presenter;
+
+    @BindView(R.id.market_quotation_tab)
+    SlidingTabLayout tabLayout;
+
+    @BindView(R.id.market_quotation_view_pager)
+    ViewPager viewPager;
+
+    private String[] titles = {"自选", "ETH", "BTC", "USDT"};
+
+    private MarketQuotationPagerAdapter mPagerAdapter;
+    private List<Fragment> mFragmentList;
+
+    @Override
+    protected void initWidget() {
+
+        mFragmentList = new ArrayList<>();
+        MarketQuotationOptionalFragment optional = new MarketQuotationOptionalFragment();
+        MarketQuotationOptionalFragment eth = new MarketQuotationOptionalFragment();
+        optional.setTestNoData(true);
+        MarketQuotationOptionalFragment btc = new MarketQuotationOptionalFragment();
+        KChatFragment usdt = new KChatFragment();
+        mFragmentList.add(optional);
+        mFragmentList.add(eth);
+        mFragmentList.add(btc);
+        mFragmentList.add(usdt);
+
+        mPagerAdapter = new MarketQuotationPagerAdapter(getSupportFragmentManager(), mFragmentList, titles);
+        viewPager.setAdapter(mPagerAdapter);
+        tabLayout.setViewPager(viewPager);
+        tabLayout.getTitleView(0).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_16));
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                if (i != 0)
+                    tabLayout.getTitleView(0).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_14));
+                if (i != 1)
+                    tabLayout.getTitleView(1).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_14));
+                if (i != 2)
+                    tabLayout.getTitleView(2).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_14));
+
+                tabLayout.getTitleView(i).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_16));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected MarketQuotationContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_market_quotation_layout);
+    }
+}

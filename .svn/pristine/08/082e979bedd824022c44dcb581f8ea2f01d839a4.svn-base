@@ -1,0 +1,94 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import android.os.Handler;
+import android.os.HandlerThread;
+
+import com.bochat.app.common.model.IMarketCenterModel;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 09:27
+ * Description :
+ */
+
+public class MarketCenterModel implements IMarketCenterModel {
+
+    private static MarketCenterModel marketCenterModel = new MarketCenterModel();
+
+    private HandlerThread handlerThread;
+    private Handler handler;
+    
+    private HashMap<MarketCenterType, ArrayList<MarketCenterObserver>> listenerMap = new HashMap<>();
+
+    private MarketCenterModel() {
+        handlerThread = new HandlerThread(MarketCenterModel.class.getSimpleName() + "1288");
+        handlerThread.start();
+        handler = new Handler(handlerThread.getLooper());
+    }
+
+    public static MarketCenterModel getInstance(){
+        return marketCenterModel;
+    }
+    
+    @Override
+    public <T extends MarketCenterData> int addObserver(Class<T> tClass, MarketCenterObserver<T> listener) {
+
+        try {
+            MarketCenterType type = tClass.newInstance().getType();
+            ArrayList<MarketCenterObserver> listenerArray = listenerMap.get(type);
+            if(listenerArray == null){
+                listenerArray = new ArrayList<>();
+                listenerMap.put(type, listenerArray);
+            }
+            listenerArray.add(listener);
+            
+            return listenerArray.size();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public <T extends MarketCenterData> int removeObserver(Class<T> tClass, MarketCenterObserver<T> listener) {
+        try {
+            MarketCenterType type = tClass.newInstance().getType();
+            ArrayList<MarketCenterObserver> listenerArray = listenerMap.get(type);
+            if(listenerArray == null || listenerArray.isEmpty()){
+                return 0;
+            }
+            listenerArray.remove(listener);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public SendCommandResult sendCommand(MarketCenterCommand command) {
+        return new SendCommandResult(command, false, "404");
+    }
+
+    @Override
+    public void sendCommand(final MarketCenterCommand command, final SendCommandCallback callback) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                callback.onComplete(new SendCommandResult(command, false, "404"));
+            }
+        });
+    }
+
+    @Override
+    public void destroy() {
+        listenerMap.clear();
+        handlerThread.quitSafely();
+    }
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/dp_15"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <com.bochat.app.app.view.SpImageView
+        android:id="@+id/item_top_grid_icon"
+        android:layout_width="@dimen/dp_40"
+        android:layout_height="@dimen/dp_40"
+        tools:src="@mipmap/ic_application_game" />
+
+    <TextView
+        android:id="@+id/item_top_grid_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        tools:text="游戏" />
+
+</LinearLayout>

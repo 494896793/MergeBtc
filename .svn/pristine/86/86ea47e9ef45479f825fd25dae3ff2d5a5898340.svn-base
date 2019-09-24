@@ -1,0 +1,41 @@
+package com.bochat.app.business.main.conversation;
+
+import android.content.Intent;
+
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.conversation.QRCardContract;
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.model.bean.UserEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/16 11:44
+ * Description :
+ */
+
+public class QRCardPresenter extends BasePresenter<QRCardContract.View> implements QRCardContract.Presenter{
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        Intent intent = getView().getViewIntent();
+        if(intent.hasExtra(RouteExtra.FriendEntity)){
+            FriendEntity friendEntity = (FriendEntity) intent.getSerializableExtra(RouteExtra.FriendEntity);
+            getView().updateFriendQRCard(friendEntity);
+        } else if(intent.hasExtra(RouteExtra.GroupEntity)){
+            GroupEntity groupEntity = (GroupEntity) intent.getSerializableExtra(RouteExtra.GroupEntity);
+            getView().updateGroupQRCard(groupEntity);
+        } else {
+            UserEntity latest = CachePool.getInstance().user().getLatest();
+            getView().updateUserQRCard(latest);
+        }
+    }
+}

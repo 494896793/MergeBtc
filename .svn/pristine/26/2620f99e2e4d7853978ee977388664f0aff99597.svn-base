@@ -1,0 +1,136 @@
+package com.bochat.app.business.main.book;
+
+import android.content.Intent;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.book.AddressUserContract;
+import com.bochat.app.common.model.IUserLocalModel;
+import com.bochat.app.common.model.IUserModel;
+import com.bochat.app.common.util.ALog;
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.model.bean.FriendListEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+/**
+ * 2019/4/19
+ * Author LDL
+ **/
+public class AddressUserPresenter extends BasePresenter<AddressUserContract.View> implements AddressUserContract.Presenter {
+
+    @Inject
+    IUserModel userModel;
+
+    @Inject
+    IUserLocalModel userLocalModel;
+    
+    private boolean isCreate;
+    
+    private String returnUrl;
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        returnUrl = null;
+        if(!isCreate){
+            isCreate = true;
+        } else {
+            requestFriendList();
+        }
+        Intent intent = getView().getViewIntent();
+        if(intent.hasExtra(RouteExtra.ReturnUrl)){
+            returnUrl = intent.getStringExtra(RouteExtra.ReturnUrl);
+        }
+    }
+
+    @Override
+    public void requestFriendList() {
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<List<FriendEntity>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<FriendEntity>> emitter) throws Exception {
+                try {
+                    List<FriendEntity> friendList = CachePool.getInstance().friend().getAll();
+                    if(friendList != null && !friendList.isEmpty()){
+                        ALog.d("update friend list from cache");
+                        emitter.onNext(friendList);
+                    }
+                    long id = userLocalModel.getLocalUserInfo().getId();
+                    FriendListEntity friendListEntity = userModel.getFriendListInfo(String.valueOf(id), "0", "0");
+                    if(friendListEntity.getRetcode() != 0){
+                        emitter.onError(new RxErrorThrowable(friendListEntity));
+                    } else {
+                        List<FriendEntity> items = friendListEntity.getItems();
+                        if(items == null){
+                            items = new ArrayList<>();
+                        }
+
+                        List<FriendEntity> result = new ArrayList<>();
+                        for(FriendEntity friendEntity : items){
+                            if(friendEntity.getId() != id){
+                                result.add(friendEntity);
+                            }
+                        }
+                        CachePool.getInstance().friend().clear();
+                        CachePool.getInstance().friend().put(result);
+                        emitter.onNext(result);
+                    }
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<FriendEntity>>() {
+            @Override
+            public void accept(List<FriendEntity> entity) throws Exception {
+                if(isActive()){
+                    getView().onViewRefresh(entity);
+                }
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                ALog.e("获取好友列表失败 " + object.getMessage());
+            }
+
+            @Override
+            public String getDefaultErrorTips() {
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public void onFriendItemClick(FriendEntity item) {
+        if(returnUrl == null){
+            ARouter.getInstance().build(RouteTable.BOOK_ADDRESS_FRIEND_DETAIL)
+                    .withBoolean(RouteExtra.FriendEntityFromAddressBook, true)
+                    .withString(RouteExtra.ConversationId_String, String.valueOf(item.getId()))
+                    .navigation();
+        } else {
+            ARouter.getInstance().build(returnUrl).withSerializable(RouteExtra.FriendEntity, item).navigation();
+        }
+    }
+}

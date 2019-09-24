@@ -1,0 +1,83 @@
+package com.bochat.app.business.main.mine;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.business.DaggerBusinessComponent;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.mine.MineContract;
+import com.bochat.app.common.model.ISettingModule;
+import com.bochat.app.common.model.IUserModel;
+import com.bochat.app.model.bean.UserEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import javax.inject.Inject;
+
+/**
+ *
+ */
+public class MinePresenter extends BasePresenter<MineContract.View> implements MineContract.Presenter {
+
+    @Inject
+    ISettingModule settingModule;
+    
+    @Inject
+    IUserModel userModel;
+    
+    private UserEntity userEntity;
+    
+    @Override
+    public void initInjector() {
+        DaggerBusinessComponent.create().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        CachePool.getInstance().user().getLatest();
+        userEntity = CachePool.getInstance().user().getLatest();
+        if(userEntity != null){
+            getView().updateUserInfo(userEntity);
+        }
+    }
+
+    @Override
+    public void onWalletClick() {
+        ARouter.getInstance().build(RouteTable.MINE_WALLET).withSerializable(RouteExtra.UserEntiry, userEntity).navigation();
+    }
+
+    @Override
+    public void onBillClick() {
+        ARouter.getInstance().build(RouteTable.MINE_BILL).withSerializable(RouteExtra.UserEntiry, userEntity).navigation();
+    }
+
+    @Override
+    public void onBankCardClick() {
+        ARouter.getInstance().build(RouteTable.MINE_BANK_CARD_LIST).navigation();
+    }
+
+    @Override
+    public void onInviteClick() {
+        ARouter.getInstance().build(RouteTable.MINE_INVITATION).navigation();
+    }
+
+    @Override
+    public void onUserInformationClick() {
+        ARouter.getInstance().build(RouteTable.MINE_USER_INFO).withSerializable(RouteExtra.UserEntiry, userEntity).navigation();
+    }
+
+    @Override
+    public void onRealNameAuthClick() {
+        ARouter.getInstance().build(RouteTable.MINE_REAL_NAME_INFO).navigation();
+    }
+
+    @Override
+    public void onSettingClick() {
+        ARouter.getInstance().build(RouteTable.MINE_SETTINGS).navigation();
+    }
+
+    @Override
+    public void onQRCodeClick() {
+        ARouter.getInstance().build(RouteTable.CONVERSATION_QR_CARD).navigation();
+    }
+}

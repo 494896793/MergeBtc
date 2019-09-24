@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#F2F2F2"
+    android:orientation="vertical">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/cv_group_manage_edit_name_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_titleText="群名称"
+        app:top_hasBackBtn="true"
+        app:top_background="#FFFFFF"/>
+
+    <EditText
+        android:id="@+id/cv_group_manage_edit_name_input"
+        android:layout_below="@id/cv_group_manage_edit_name_top_bar"
+        android:layout_marginTop="@dimen/dp_15"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:layout_toLeftOf="@id/cv_group_manage_edit_name_clear"
+        android:background="#FFFFFF"
+        style="@style/default_text"
+        android:paddingLeft="@dimen/dp_15"
+        android:maxLines="1"
+        />
+    
+    <RelativeLayout
+        android:id="@+id/cv_group_manage_edit_name_clear"
+        android:layout_below="@id/cv_group_manage_edit_name_top_bar"
+        android:layout_marginTop="@dimen/dp_15"
+        android:layout_width="@dimen/dp_44"
+        android:layout_height="@dimen/dp_44"
+        android:layout_alignParentRight="true"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="#FFFFFF">
+        <ImageView
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:src="@mipmap/ic_close_gray"
+            android:layout_centerInParent="true"
+            />
+    </RelativeLayout>
+    
+    <Button
+        android:id="@+id/cv_group_manage_edit_name_enter_btn"
+        android:layout_width="@dimen/dp_345"
+        android:layout_height="@dimen/dp_44"
+        style="@style/default_btn"
+        android:layout_below="@id/cv_group_manage_edit_name_input"
+        android:text="提交"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dp_60"/>
+    
+</RelativeLayout>

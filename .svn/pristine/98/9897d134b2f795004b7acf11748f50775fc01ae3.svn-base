@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/dp_132"
+    android:layout_height="@dimen/dp_105"
+    android:background="@mipmap/bg_bochat_list_dialog">
+   
+    <RelativeLayout
+        android:id="@+id/bochat_add_friend_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_30"
+        android:layout_marginTop="@dimen/dp_19">
+        <ImageView
+            android:id="@+id/bochat_add_friend_ic"
+            android:layout_width="@dimen/dp_18"
+            android:layout_height="@dimen/dp_18"
+            android:src="@mipmap/ic_bochat_add_friend"
+            android:layout_marginLeft="@dimen/dp_24"
+            android:layout_marginTop="@dimen/dp_5"
+            />
+        <TextView
+            android:id="@+id/bochat_add_friend_btn"
+            android:layout_width="@dimen/dp_56"
+            android:layout_height="@dimen/dp_20"
+            android:layout_marginLeft="@dimen/dp_10"
+            android:layout_toRightOf="@id/bochat_add_friend_ic"
+            android:layout_marginTop="@dimen/dp_5"
+            android:background="@null"
+            android:text="添加好友 "
+            />
+    </RelativeLayout>
+    
+    <RelativeLayout
+        android:id="@+id/bochat_create_group_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_30"
+        android:layout_marginTop="@dimen/dp_54">
+        <ImageView
+            android:id="@+id/bochat_create_group_ic"
+            android:layout_width="@dimen/dp_18"
+            android:layout_height="@dimen/dp_18"
+            android:src="@mipmap/ic_bochat_create_group"
+            android:layout_marginLeft="@dimen/dp_24"
+            android:layout_marginTop="@dimen/dp_5"
+            />
+        <TextView
+            android:id="@+id/bochat_create_group_btn"
+            android:layout_width="@dimen/dp_56"
+            android:layout_height="@dimen/dp_20"
+            android:layout_toRightOf="@id/bochat_create_group_ic"
+            android:layout_marginLeft="@dimen/dp_10"
+            android:background="@null"
+            android:text="创建群聊"
+            android:layout_marginTop="@dimen/dp_5"
+            />
+    </RelativeLayout>
+</RelativeLayout>

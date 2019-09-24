@@ -1,0 +1,146 @@
+package com.bochat.app.app.fragment.dynamic;
+
+import android.os.Bundle;
+import android.os.Handler;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.bochat.app.R;
+import com.bochat.app.app.kline.KData;
+import com.bochat.app.app.kline.KLineView;
+import com.bochat.app.common.contract.dynamic.KChatContract;
+import com.bochat.app.mvp.view.BaseFragment;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+/**
+ * 2019/6/19
+ * Author LDL
+ **/
+public class KChatFragment extends BaseFragment<KChatContract.Presenter> implements KChatContract.View {
+
+    @Inject
+    KChatContract.Presenter presenter;
+
+    @BindView(R.id.mKLineView)
+    KLineView mKLineView;
+
+    private Handler mHandler;
+    private Runnable dataListAddRunnable;
+
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected KChatContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view=inflater.inflate(R.layout.fragment_kchat,null);
+        return view;
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+
+        //初始化控件加载数据
+        mKLineView.initKDataList(getKDataList(10));
+        //设置十字线移动模式，默认为0：固定指向收盘价
+        mKLineView.setCrossHairMoveMode(KLineView.CROSS_HAIR_MOVE_OPEN);
+
+        mHandler = new Handler();
+        dataListAddRunnable = new Runnable() {
+            @Override
+            public void run() {
+                //分页加载时添加多条数据
+                mKLineView.addPreDataList(getKDataList(10), true);
+            }
+        };
+
+        /**
+         * 当控件显示数据属于总数据量的前三分之一时，会自动调用该接口，用于预加载数据，保证控件操作过程中的流畅性，
+         * 虽然做了预加载，当总数据量较小时，也会出现用户滑到左边界了，但数据还未获取到，依然会有停顿。
+         * 所以数据量越大，越不会出现停顿，也就越流畅
+         */
+        mKLineView.setOnRequestDataListListener(new KLineView.OnRequestDataListListener() {
+            @Override
+            public void requestData() {
+                //延时3秒执行，模拟网络请求耗时
+                mHandler.postDelayed(dataListAddRunnable, 3000);
+            }
+        });
+    }
+
+    /*模拟K线数据*/
+    private List<KData> getKDataList(double num) {
+        long start = System.currentTimeMillis();
+
+        Random random = new Random();
+        List<KData> dataList = new ArrayList<>();
+        double openPrice = 100;
+        double closePrice;
+        double maxPrice;
+        double minPrice;
+        double volume;
+
+        for (int x = 0; x < num * 10; x++) {
+            for (int i = 0; i < 12; i++) {
+                start += 60 * 1000 * 5;
+                closePrice = openPrice + getAddRandomDouble();
+                maxPrice = closePrice + getAddRandomDouble();
+                minPrice = openPrice - getSubRandomDouble();
+                volume = random.nextInt(100) * 1000 + random.nextInt(10) * 10 + random.nextInt(10) + random.nextDouble();
+                dataList.add(new KData(start, openPrice, closePrice, maxPrice, minPrice, volume));
+                openPrice = closePrice;
+            }
+
+            for (int i = 0; i < 8; i++) {
+                start += 60 * 1000 * 5;
+                closePrice = openPrice - getSubRandomDouble();
+                maxPrice = openPrice + getAddRandomDouble();
+                minPrice = closePrice - getSubRandomDouble();
+                volume = random.nextInt(100) * 1000 + random.nextInt(10) * 10 + random.nextInt(10) + random.nextDouble();
+                dataList.add(new KData(start, openPrice, closePrice, maxPrice, minPrice, volume));
+                openPrice = closePrice;
+            }
+
+        }
+        long end = System.currentTimeMillis();
+        return dataList;
+    }
+
+    private double getAddRandomDouble(){
+        Random random = new Random();
+        return random.nextInt(5) * 5 + random.nextDouble();
+    }
+
+    private double getSubRandomDouble(){
+        Random random = new Random();
+        return random.nextInt(5) * 5  - random.nextDouble();
+    }
+
+    private int dp2px(float dpValue) {
+        final float scale = getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //退出页面时停止子线程并置空，便于回收，避免内存泄露
+        mKLineView.cancelQuotaThread();
+    }
+
+}

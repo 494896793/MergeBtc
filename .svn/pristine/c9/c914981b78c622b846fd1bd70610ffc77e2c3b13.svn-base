@@ -1,0 +1,598 @@
+package com.bochat.app.model.net;
+
+import java.util.Map;
+
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
+import retrofit2.http.Multipart;
+import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Part;
+import retrofit2.http.QueryMap;
+import retrofit2.http.Url;
+
+/**
+ * Created by ldl on 2019/4/9.
+ */
+
+public interface RetrofitService {
+    // useing json type parameter
+    @POST()
+    Call<String> requestPost(@Url() String url, @Body RequestBody requestBody);
+
+    @GET()
+    Call<String> requestGet(@Url() String url, @QueryMap Map<String, Object> map);
+
+    @PUT()
+    Call<String> requestPut(@Url() String url, @QueryMap Map<String, Object> map);
+
+    @Multipart
+    @POST
+    Call<String> sendCode(@Url() String url, @Part("phone") String phone, @Part("type") int type);
+
+    @Multipart
+    @POST
+    Call<String> codeLogin(@Url() String url, @Part("username") String username, @Part("code") String code, @Part("loginType") int loginType);
+
+    @Multipart
+    @POST
+    Call<String> pwdLogin(@Url() String url, @Part("username") String username, @Part("password") String password, @Part("loginType") int loginType);
+
+    @Multipart
+    @POST
+    Call<String> getInfo(@Url() String url, @Part("Authorization") String token, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> checkCode(@Url() String url, @Part("phone") String phone, @Part("type") String type, @Part("code") String code);
+
+    @Multipart
+    @POST
+    Call<String> updateUserInfo(@Url() String url, @Part("nickname") String nickname, @Part("sex") int sex, @Part("birthday") String age, @Part("area") String area, @Part("mySign") String mySign, @Part("headImg") String headImg);
+
+    @Multipart
+    @POST
+    Call<String> getFriendList(@Url() String url, @Part("Authorization") String token, @Part("userId") String userId, @Part("start") String start, @Part("offset") String offset);
+
+    @Multipart
+    @POST
+    Call<String> checkOnline(@Url() String url, @Part("String") String userId);
+
+    @Multipart
+    @POST
+    Call<String> getArea(@Url() String url, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> getFriendApplyList(@Url() String url, @Part("userId") String userId, @Part("start") int start, @Part("offset") int offset);
+
+    @Multipart
+    @POST
+    Call<String> createGroup(@Url() String url, @Part("userId") String userId, @Part("group_name") String group_name, @Part("introduce") String introduce, @Part("label") String label, @Part("head") String head);
+
+    @Multipart
+    @POST
+    Call<String> dealFriendApply(@Url() String url, @Part("apply_id") String apply_id, @Part("apply_state") String apply_state, @Part("refuse_text") String refuse_text);
+
+    @Multipart
+    @POST
+    Call<String> sendAddAFriendpply(@Url() String url, @Part("proposer_id") String proposer_id, @Part("target_id") String target_id, @Part("refuse_text") String refuse_text, @Part("apply_from") String apply_from);
+
+    @Multipart
+    @POST
+    Call<String> queryFriendList(@Url() String url, @Part("userId") String userId, @Part("start") String start, @Part("offset") String offset);
+
+    @Multipart
+    @POST
+    Call<String> getFriendInfo(@Url() String url, @Part("keyword") String userId, @Part("start") int start, @Part("offset") int offset);
+
+    @Multipart
+    @POST
+    Call<String> getFriendInfoExact(@Url() String url, @Part("keyword") String userId);
+
+    @Multipart
+    @POST
+    Call<String> updateChange(@Url() String url, @Part("head") String head, @Part("level") String level, @Part("introduce") String introduce, @Part("label") String label, @Part("target") String target, @Part("group_id") long group_id, @Part("group_name") String group_name, @Part("tradepwd") String tradepwd, @Part("price") double price);
+
+    @Multipart
+    @POST
+    Call<String> updateChange(@Url() String url, @Part("head") String head, @Part("introduce") String introduce, @Part("label") String label, @Part("group_id") long group_id, @Part("group_name") String group_name);
+
+    @Multipart
+    @POST
+    Call<String> addFriend(@Url() String url, @Part("targetId") String targetId);
+
+    @Multipart
+    @POST
+    Call<String> queryGroup(@Url() String url, @Part("keyword") String keyword, @Part("start") int start, @Part("offset") int offset);
+
+    @Multipart
+    @POST
+    Call<String> queryGroupExact(@Url() String url, @Part("group_id") long gapply_id, @Part("start") int start, @Part("offset") int offset);
+
+    @Multipart
+    @POST
+    Call<String> dissmissGroup(@Url() String url, @Part("group_id") long group_id, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> quitGroup(@Url() String url, @Part("groupId") long group_id);
+
+    @Multipart
+    @POST
+    Call<String> handleGroupApply(@Url() String url, @Part("applyId") String applyId, @Part("applyState") String applyState, @Part("refuseText") String refuseText);
+
+    @Multipart
+    @POST
+    Call<String> queryGroupLevel(@Url() String url, @Part("group_id") String group_id);
+
+    @Multipart
+    @POST
+    Call<String> getEnterGroupStatu(@Url() String url, @Part("userId") String userId, @Part("start") int start);
+
+    @Multipart
+    @POST
+    Call<String> getMyGroupApply(@Url() String url, @Part("userId") String userId, @Part("start") int start, @Part("offset") int offset);
+
+    @Multipart
+    @POST
+    Call<String> shieldFriendRelation(@Url String url, @Part("targetId") String targetId, @Part("type") String type, @Part("relation") String relation);
+
+    @Multipart
+    @POST
+    Call<String> blockFriendRelation(@Url String url, @Part("targetId") String targetId, @Part("type") String type, @Part("black") String black);
+
+    @Multipart
+    @POST
+    Call<String> unBlockFriendRelation(@Url String url, @Part("targetId") String targetId, @Part("type") String type);
+
+    @Multipart
+    @POST
+    Call<String> deleteFriendRelation(@Url String url, @Part("type") String type, @Part("targetId") String targetId);
+
+    @Multipart
+    @POST
+    Call<String> updateUserName(@Url() String url, @Part("userId") int userId, @Part("note") String note, @Part("int") int friendId);
+
+    @Multipart
+    @POST
+    Call<String> addGroupManager(@Url() String url, @Part("group_id") int group_id, @Part("groupToken") String groupToken, @Part("targetId") int targetId, @Part("targetToken") String targetToken);
+
+    @Multipart
+    @POST
+    Call<String> loginOut(@Url() String url, @Part("Authorization") String Authorization);
+
+    @Multipart
+    @POST
+    Call<String> setLoginPwd(@Url() String url, @Part("password") String password);
+
+    @Multipart
+    @POST
+    Call<String> queryMyGroupList(@Url() String url, @Part("userId") String userId, @Part("start") int start, @Part("offset") int offset);
+
+    @Multipart
+    @POST
+    Call<String> queryGroupMembers(@Url String url, @Part("group_id") long group_id, @Part("start") int start, @Part("offset") int offset);
+
+    @Multipart
+
+    @POST
+    Call<String> queryGroupApply(@Url String url, @Part("start") int start, @Part("offset") int offset);
+
+    @Multipart
+    @POST
+    Call<String> authentication(@Url String url, @Part("idCard") String idCard, @Part("name") String name);
+
+    @Multipart
+    @POST
+    Call<String> updateLogin(@Url String url, @Part("oldPassword") String oldPassword, @Part("newPassword") String newPassword);
+
+    @Multipart
+    @POST
+    Call<String> forgetLogin(@Url String url, @Part("phone") String phone, @Part("code") String code, @Part("password") String password);
+
+    @Multipart
+    @POST
+    Call<String> getPassWord(@Url String url, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> authDetail(@Url String url, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> setTradePwd(@Url String url, @Part("password") String password, @Part("type") int type);
+
+    @Multipart
+    @POST
+    Call<String> updateTradePwd(@Url String url, @Part("oldPassword") String oldPassword, @Part("newPassword") String newPassword);
+
+    @Multipart
+    @POST
+    Call<String> updatePhone(@Url String url, @Part("phone") String phone, @Part("code") String code);
+
+    @Multipart
+    @POST
+    Call<String> getBoChatLogo(@Url String url, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> joinGroup(@Url String url, @Part("group_id") String group_id, @Part("group_name") String group_name, @Part("answer") String answer);
+
+    @Multipart
+    @POST
+    Call<String> bindBank(@Url String url, @Part("bankId") int bankId, @Part("bankNo") String bankNo, @Part("bankBranch") String bankBranch);
+
+    @Multipart
+    @POST
+    Call<String> unbindUserBank(@Url String url, @Part("bankId") int bankId);
+
+    @Multipart
+    @POST
+    Call<String> getBank(@Url String url, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> getUserBank(@Url String url, @Part("type") int type);
+
+    @Multipart
+    @POST
+    Call<String> addGCTransfer(@Url String url, @Part("number") int number, @Part("password") String password, @Part("recipientUserId") int recipientUserId);
+
+    @POST
+    Call<String> getGCReceive(@Url String url);
+
+    @Multipart
+    @POST
+    Call<String> addTrunOut(@Url String url, @Part("trunoutnum") double trunoutnum, @Part("walletaddre") String walletaddre, @Part("tradpassw") String tradpassw, @Part("bid") int bid);
+
+    @Multipart
+    @POST
+    Call<String> getOutPrompt(@Url String url, @Part("bid") int bid);
+
+    @Multipart
+    @POST
+    Call<String> listPlatformCurrency(@Url String url, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> getUserCurrencyTrading(@Url String getUserCurrencyTrading, @Part("start") int start, @Part("offset") int offset, @Part("bid") int bid);
+
+    @Multipart
+    @POST
+    Call<String> getUserCurrencyDetails(@Url String url, @Part("bid") int bid);
+
+    @POST
+    Call<String> listUserCurrency(@Url String url);
+
+    @POST
+    Call<String> getUserCurrencyCny(@Url String url);
+
+    @Multipart
+    @POST
+    Call<String> getCandyDetails(@Url String url, @Part("id") int id);
+
+    @Multipart
+    @POST
+    Call<String> getChangeDetails(@Url String url, @Part("id") int id);
+
+    @Multipart
+    @POST
+    Call<String> getIncomeSpending(@Url String url, @Part("bid") int bid);
+
+    @Multipart
+    @POST
+    Call<String> tradingRecord(@Url String url, @Part("start") int start, @Part("offset") int offset, @Part("bid") int bid, @Part("orderType") int orderType);
+
+    @Multipart
+    @POST
+    Call<String> getAmount(@Url String url, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> userWithdraw(@Url String url, @Part("bankId") int bankId, @Part("money") String money, @Part("tradePwd") String tradePwd);
+
+    @Multipart
+    @POST
+    Call<String> getClasses(@Url String url, @Part("type") int type);
+
+    @Multipart
+    @POST
+    Call<String> userRecharge(@Url String url, @Part("payType") int payType, @Part("money") String money);
+
+    @Multipart
+    @POST
+    Call<String> getHandpick(@Url String url, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> speedConverList(@Url String url, @Part("startPage") int startPage, @Part("pageSize") String pageSize);
+
+    @Multipart
+    @POST
+    Call<String> mySpeedConver(@Url String url, @Part("startPage") int startPage, @Part("pageSize") String pageSize, @Part("type") int type, @Part("tradeStatus") int tradeStatus, @Part("tradeTime") String tradeTime);
+
+    @Multipart
+    @POST
+    Call<String> mySpeedConver(@Url String url, @Part("startPage") int startPage, @Part("pageSize") String pageSize, @Part("type") int type, @Part("tradeTime") String tradeTime);
+
+    @Multipart
+    @POST
+    Call<String> mySpeedConver(@Url String url, @Part("startPage") int startPage, @Part("pageSize") String pageSize, @Part("type") int type, @Part("tradeStatus") int tradeStatus);
+
+    @Multipart
+    @POST
+    Call<String> mySpeedConver(@Url String url, @Part("startPage") int startPage, @Part("pageSize") String pageSize, @Part("type") int type);
+
+    @Multipart
+    @POST
+    Call<String> myTradeDetail(@Url String url, @Part("id") int id, @Part("type") int type);
+
+    @Multipart
+    @POST
+    Call<String> sendSpeedConver(@Url String url, @Part("startId") int startId, @Part("converId") int converId, @Part("startNum") double startNum, @Part("converNum") double converNum, @Part("site") int site, @Part("isSync") int isSync, @Part("payPwd") String payPwd, @Part("relevanceId") long relevanceId);
+
+    @Multipart
+    @POST
+    Call<String> speedConverTrading(@Url String url, @Part("orderId") int orderId, @Part("payPwd") String payPwd);
+
+    @Multipart
+    @POST
+    Call<String> cancelConverTrading(@Url String url, @Part("orderId") int orderId);
+
+    @Multipart
+    @POST
+    Call<String> queryTakeRecord(@Url String url, @Part("rewardId") int rewardId, @Part("start") int start, @Part("offset") int offset);
+
+    @Multipart
+    @POST
+    Call<String> getWelfare(@Url String url, @Part("welfareId") int welfareId, @Part("userName") String userName);
+
+    @Multipart
+    @POST
+    Call<String> sendWelfareFirst(@Url String url, @Part("money") double money, @Part("count") int count, @Part("type") int type, @Part("text") String text, @Part("password") String password, @Part("groupId") String groupId, @Part("coin") int coin);
+
+    @Multipart
+    @POST
+    Call<String> sendWelfare(@Url String url, @Part("money") double money, @Part("count") int count, @Part("type") int type, @Part("text") String text, @Part("password") String password);
+
+    @Multipart
+    @POST
+    Call<String> sendWelfareFirstSecond(@Url String url, @Part("money") double money, @Part("count") int count, @Part("type") int type, @Part("text") String text, @Part("password") String password, @Part("coin") int coin);
+
+    @Multipart
+    @POST
+    Call<String> sendWelfareThird(@Url String url, @Part("money") double money, @Part("count") int count, @Part("type") int type, @Part("text") String text, @Part("password") String password, @Part("groupId") String groupId);
+
+    @Multipart
+    @POST
+    Call<String> listApplicationHome(@Url String url, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> getAppStoreType(@Url String url, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> listApplication(@Url String url, @Part("start") int start, @Part("offset") int offset, @Part("type") int type, @Part("classification") int typeId);
+
+    @Multipart
+    @POST
+    Call<String> listApplication(@Url String url, @Part("type") int type, @Part("isFeatured") int isFeatured);
+
+    @Multipart
+    @POST
+    Call<String> searchListApplication(@Url String url, @Part("type") String type, @Part("classification") String classification, @Part("name") String name, @Part("isHottest") int isHottest, @Part("id") int id, @Part("isFeatured") int isFeatured);
+
+    @Multipart
+    @POST
+    Call<String> searchListApplication(@Url String url, @Part("type") String type, @Part("name") String classification);
+
+    @Multipart
+    @POST
+    Call<String> searchListApplication(@Url String url, @Part("type") String type);
+
+    @Multipart
+    @POST
+    Call<String> searchListApplication(@Url String url, @Part("type") String type, @Part("isHottest") int isHottest);
+
+    @Multipart
+    @POST
+    Call<String> listBanner(@Url String url, @Part("type") int type);
+
+    @POST("app/meet/listBanner")
+    Call<String> listBanners(@Body MultipartBody multipartBody);
+
+    @Multipart
+    @POST
+    Call<String> listAnnouncement(@Url String url, @Part("start") int start, @Part("offset") int offset, @Part("type") int type);
+
+    @Multipart
+    @POST
+    Call<String> invitejoinGroup(@Url String url, @Part("group_id") String group_id, @Part("targetId") String targetId, @Part("userName") String userName);
+
+    @Multipart
+    @POST
+    Call<String> setGroupAuth(@Url String url, @Part("groupId") String group_id, @Part("joinType") int joinType, @Part("question") String question, @Part("answer") String answer);
+
+    @POST
+    Call<String> getUserInviteCode(@Url String url);
+
+    @Multipart
+    @POST
+    Call<String> getApplicationVersion(@Url String url, @Part("version") String version);
+
+    @POST
+    Call<String> getRecommendFriend(@Url String url);
+
+    @POST
+    Call<String> getRecommendGroup(@Url String url);
+
+    @Multipart
+    @POST
+    Call<String> getInfomationList(@Url String url, @Part("start") int start, @Part("offset") int offset, @Part("keyword") String keyword);
+
+    @Multipart
+    @POST
+    Call<String> addProjectParty(@Url String url, @Part("companyName") String companyName, @Part("website") String website, @Part("logo") String logo, @Part("license") String license);
+
+    @Multipart
+    @POST
+    Call<String> getProjectParty(@Url String url, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> getProtocolBook(@Url String url, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> gameLogin(@Url String url, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> bitMallLogin(@Url String url, @Part("userId") String userId);
+
+    @Multipart
+    @POST
+    Call<String> getIncomeOfToday(@Url String url, @Part("currencyId") int currencyId);
+
+    @POST
+    Call<String> listAppService(@Url String url);
+
+
+    @Multipart
+    @POST
+    Call<String> getTokenRate(@Url String url, @Part("sourceToken") String sourceToken, @Part("targetToken") String targetToken);
+
+    @Multipart
+    @POST
+    Call<String> getExchangeAmount(@Url String url, @Part("sourceToken") String sourceToken, @Part("targetToken") String targetToken, @Part("sourceAmount") String sourceAmount);
+
+    @POST
+    Call<String> getExchangeToken(@Url String url);
+
+    @Multipart
+    @POST
+    Call<String> listActivities(@Url String url, @Part("start") String start, @Part("offset") String offset);
+
+    @Multipart
+    @POST
+    Call<String> doExchangeToken(@Url String url, @Part("currencyIdSource") String currencyIdSource,
+                                 @Part("currencyIdTarget") String currencyIdTarget,
+                                 @Part("currencyAmountSource") double currencyAmountSource,
+                                 @Part("tradPass") String tradPass);
+
+    @POST
+    Call<String> queryUserBXInfo(@Url String url);
+
+    @POST
+    @Multipart
+    Call<String> incomeOfToday(@Url String url, @Part("currencyId") String Id);
+
+    @POST
+    Call<String> getPationInfo(@Url String url);
+
+
+    @POST
+    @Multipart
+    Call<String> muteAllMembers(@Url String url, @Part("groupId") String groupId, @Part("prohibitState") String prohibitState);
+
+    @POST
+    @Multipart
+    Call<String> queryMuteMembers(@Url String url, @Part("start") String start, @Part("offset") String offset, @Part("groupId") String groupId);
+
+    @POST
+    @Multipart
+    Call<String> muteMembers(@Url String url, @Part("groupId") String groupId, @Part("memberId") String memberId, @Part("prohibitState") String prohibitState);
+
+    @POST
+    @FormUrlEncoded
+    Call<String> adminQuitGroup(@Url String url, @Field("groupId") long groupId, @Field("groupUserIdList") String groupUserIdList);
+
+    @POST
+    @Multipart
+    Call<String> addGroupManager(@Url String url, @Part("groupId") String groupId, @Part("targetId") String targetId);
+
+    @POST
+    @Multipart
+    Call<String> queryGroupManager(@Url String url, @Part("start") String start, @Part("offset") String offset, @Part("groupId") String groupId);
+
+    @POST
+    @Multipart
+    Call<String> deleteGroupManager(@Url String url, @Part("groupId") String groupId, @Part("userId") String userId);
+
+    @POST
+    @Multipart
+    Call<String> queryKLineRecord(@Url String url, @Part("marketId") long groupId, @Part("period") int period, @Part("startId") long startId, @Part("offset") int offset);
+
+    @POST
+    Call<String> getSweetsActivity(@Url String url);
+
+    @POST
+    Call<String> insertActivityRecord(@Url String url);
+
+    @POST
+    Call<String> getBannerForYysc(@Url String url);
+
+
+    @POST
+    @Multipart
+    Call<String> getGroupVerify(@Url String url, @Part("groupId") String groupId);
+
+    @POST
+    @Multipart
+    Call<String> queryApplyList(@Url String url, @Part("marketId") int marketId, @Part("type") int type, @Part("pageNum") int pageNum, @Part("pageSize") int pageSize);
+
+    @POST
+    Call<String> queryByCurrency(@Url String url);
+
+    @POST
+    @Multipart
+    Call<String> listResidueAmount(@Url String url, @Part("userId") long userId, @Part("currencyIdL") String currencyIdL, @Part("currencyIdR") String currencyIdR);
+
+    @POST
+    @Multipart
+    Call<String> isCollect(@Url String url, @Part("marketId") String marketId, @Part("isCollect") int isCollect);
+
+    @POST
+    @Multipart
+    Call<String> queryTradingRules(@Url String url, @Part("marketId") long marketId);
+
+    @POST
+    @Multipart
+    Call<String> saleBuying(@Url String url, @Part("marketId") long marketId, @Part("price") String price, @Part("num") double num, @Part("type") int type, @Part("currencyIdL") long currencyIdL, @Part("currencyIdR") long currencyIdR);
+
+    @POST
+    @Multipart
+    Call<String> queryCollection(@Url String url, @Part("marketId") long marketId);
+
+    @POST
+    @Multipart
+    Call<String> revoke(@Url String url, @Part("id") int id);
+
+    @POST
+    @Multipart
+    Call<String> messageLists(@Url String url,@Part("page") String page,@Part("pageSize") String pageSize);
+
+
+    @POST
+    @Multipart
+    Call<String> like(@Url String url,@Part("flashId") String flashId,@Part("option") String option);
+
+    @POST
+    Call<String> push(@Url String url);
+
+
+
+
+    //    // 登录接口
+    //    // POST /login
+    //    @POST("login")
+    //    @Headers({"Content-Type: application/json", "Accept: application/json"})
+    //    Flowable<String> userLogin(@Body RequestBody requestBody);
+}

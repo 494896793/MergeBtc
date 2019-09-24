@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/bg_splash_screen">
+    <Button
+        android:id="@+id/splash_screen_skip_btn"
+        android:layout_width="@dimen/dp_70"
+        android:layout_height="@dimen/dp_30"
+        android:textColor="#FFFFFF"
+        android:textSize="@dimen/dp_16"
+        android:text="跳过3s"
+        android:background="@mipmap/bg_splash_screen_skip_btn"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="@dimen/dp_36"
+        android:layout_marginRight="@dimen/dp_15"
+        />
+</RelativeLayout>

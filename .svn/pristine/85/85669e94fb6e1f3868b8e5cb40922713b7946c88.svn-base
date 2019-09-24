@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:orientation="vertical">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/cv_group_member_manage_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_hasBackBtn="true"
+        app:top_titleText="设置"/>
+
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/cv_group_member_manage_forbidden"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dp_44"
+        android:layout_marginTop="@dimen/dp_20"
+        app:item_hasRightBtn="false"
+        app:item_hasSwitchBtn="true"
+        app:item_text="群内禁言"
+        />
+
+    <Button
+        android:id="@+id/cv_group_member_manage_enter_btn"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:layout_marginLeft="@dimen/dp_15"
+        android:layout_marginRight="@dimen/dp_15"
+        android:background="@drawable/shape_button_5dp"
+        android:text="移出本群"
+        android:textColor="#FFFFFF"
+        android:textSize="@dimen/dp_16"
+        android:layout_marginTop="@dimen/dp_50"
+        />
+</LinearLayout>

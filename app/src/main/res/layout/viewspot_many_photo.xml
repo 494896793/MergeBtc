@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:paddingLeft="@dimen/dp_15"
+    android:paddingRight="@dimen/dp_15"
+    android:layout_height="@dimen/dp_175">
+    <LinearLayout
+        android:paddingTop="@dimen/dp_20"
+        android:id="@+id/linear"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="@dimen/dp_150">
+        <LinearLayout
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_marginTop="@dimen/dp_1"
+                android:layout_marginRight="@dimen/dp_6"
+                android:id="@+id/hot_point"
+                android:paddingTop="@dimen/dp_2"
+                android:paddingBottom="@dimen/dp_2"
+                android:paddingRight="@dimen/dp_4"
+                android:paddingLeft="@dimen/dp_4"
+                android:textSize="@dimen/sp_8"
+                android:text="热门"
+                android:textColor="#FF4B3E"
+                android:background="@drawable/origin_shape"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:id="@+id/title_text"
+                android:text="BoChat1.0全新改版上线！BoChat1.0全新改版上线！"
+                android:textColor="#222222"
+                android:textSize="@dimen/sp_14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+            <com.bochat.app.app.view.HorizontalListView
+                android:layout_marginTop="@dimen/dp_20"
+                android:id="@+id/listview"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_90"
+                android:horizontalSpacing="10dp"
+                android:gravity="center" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_below="@id/linear"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginBottom="@dimen/dp_19"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/from_text"
+            android:layout_alignParentBottom="true"
+            android:textSize="@dimen/sp_12"
+            android:textColor="@color/color_999999"
+            android:text="BoChat运营团队"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/time_text"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:textColor="@color/color_999999"
+            android:textSize="@dimen/sp_12"
+            android:text="2019-3-21"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+    <View
+        android:layout_alignParentBottom="true"
+        android:background="#F7F7F7"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1"/>
+</RelativeLayout>

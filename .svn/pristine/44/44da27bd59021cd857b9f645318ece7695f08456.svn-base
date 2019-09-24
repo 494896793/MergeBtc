@@ -1,0 +1,83 @@
+package com.bochat.app.app.activity.dynamic;
+
+import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.ShakyCenterAdapter;
+import com.bochat.app.common.contract.dynamic.ShakyCenterContract;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.liaoinstan.springview.container.DefaultFooter;
+import com.liaoinstan.springview.container.DefaultHeader;
+import com.liaoinstan.springview.widget.SpringView;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+import static com.bochat.app.app.RouteTable.DYNAMIC_MAIN_SHAKY_CENTER;
+
+/**
+ * 2019/6/12
+ * Author LDL
+ **/
+@Route(path = DYNAMIC_MAIN_SHAKY_CENTER)
+public class ShakyCenterActivity extends BaseActivity<ShakyCenterContract.Presenter> implements ShakyCenterContract.View, SpringView.OnFreshListener {
+
+    @Inject
+    ShakyCenterContract.Presenter presenter;
+
+    @BindView(R.id.recycler)
+    RecyclerView recycler;
+
+    @BindView(R.id.springView)
+    SpringView springView;
+
+    private ShakyCenterAdapter adapter;
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected ShakyCenterContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_shakycenter);
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+
+        initSpringView();
+        initRecycler();
+    }
+
+    private void initSpringView(){
+        springView.setListener(this);
+        springView.setHeader(new DefaultHeader(this));
+        springView.setFooter(new DefaultFooter(this));
+    }
+
+    public void initRecycler(){
+        recycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
+        recycler.setAdapter(new ShakyCenterAdapter(this));
+    }
+
+    @Override
+    public void onRefresh() {
+        springView.onFinishFreshAndLoad();
+    }
+
+    @Override
+    public void onLoadmore() {
+        springView.onFinishFreshAndLoad();
+    }
+}

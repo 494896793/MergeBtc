@@ -1,0 +1,11 @@
+package com.bochat.app.app.activity;
+
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bochat.app.common.contract.conversation.GroupQuestionAnswerContract;
+
+/**
+ * create by guoying ${Date} and ${Month}
+ */
+public class GroupQuestionAnsweActivity  {
+
+}

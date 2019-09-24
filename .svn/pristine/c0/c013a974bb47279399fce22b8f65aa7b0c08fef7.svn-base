@@ -1,0 +1,177 @@
+package com.bochat.app.model.modelImpl;
+
+import com.bochat.app.common.model.IDynamicModel;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.DynamicBannerListEntity;
+import com.bochat.app.model.bean.DynamicNoticeListEntity;
+import com.bochat.app.model.bean.DynamicShopGameListEntity;
+import com.bochat.app.model.bean.DynamicShopTypeListEntity;
+import com.bochat.app.model.bean.DynamicTopShopListEntity;
+import com.bochat.app.model.bean.HttpClientEntity;
+import com.bochat.app.model.bean.ProjectIdentificationEntity;
+import com.bochat.app.model.bean.ProtocolBookEntity;
+import com.bochat.app.model.bean.ViewSpotEntity;
+import com.bochat.app.model.bean.ViewSpotListEntity;
+import com.bochat.app.model.constant.Constan;
+import com.bochat.app.model.net.HttpClient;
+import com.bochat.app.model.net.RetrofitService;
+import com.bochat.app.model.util.Api;
+
+/**
+ * 2019/5/5
+ * Author LDL
+ **/
+public class DynamicModel implements IDynamicModel {
+
+
+    public DynamicTopShopListEntity listApplicationHome(String userId){
+        DynamicTopShopListEntity dynamicTopShopListEntity=null;
+        HttpClientEntity httpClientEntity= (HttpClientEntity) HttpClient.getInstance().sends(DynamicTopShopListEntity.class,HttpClient.getInstance().retrofit().create(RetrofitService.class).listApplicationHome(Api.listApplicationHome,userId));
+        if(httpClientEntity.getCode()== Constan.NET_SUCCESS){
+            dynamicTopShopListEntity=httpClientEntity.getObj();
+        }else{
+            dynamicTopShopListEntity=new DynamicTopShopListEntity();
+            dynamicTopShopListEntity.setCode(httpClientEntity.getCode());
+            dynamicTopShopListEntity.setMsg(httpClientEntity.getMessage());
+            dynamicTopShopListEntity.setRetcode(httpClientEntity.getCode());
+        }
+        return dynamicTopShopListEntity;
+    }
+
+    @Override
+    public DynamicShopTypeListEntity getAppStoreType(String userId) {
+        DynamicShopTypeListEntity dynamicTopShopListEntity=null;
+        HttpClientEntity httpClientEntity= (HttpClientEntity) HttpClient.getInstance().sends(DynamicShopTypeListEntity.class,HttpClient.getInstance().retrofit().create(RetrofitService.class).getAppStoreType(Api.getAppStoreType,userId));
+        if(httpClientEntity.getCode()== Constan.NET_SUCCESS){
+            dynamicTopShopListEntity=httpClientEntity.getObj();
+        }else{
+            dynamicTopShopListEntity=new DynamicShopTypeListEntity();
+            dynamicTopShopListEntity.setCode(httpClientEntity.getCode());
+            dynamicTopShopListEntity.setMsg(httpClientEntity.getMessage());
+            dynamicTopShopListEntity.setRetcode(httpClientEntity.getCode());
+        }
+        return dynamicTopShopListEntity;
+    }
+
+    @Override
+    public DynamicShopGameListEntity listApplication(int start, int offset, int type, int typeId) {
+        DynamicShopGameListEntity dynamicShopGameListEntity=null;
+        HttpClientEntity httpClientEntity= (HttpClientEntity) HttpClient.getInstance().sends(DynamicShopGameListEntity.class,"data",HttpClient.getInstance().retrofit().create(RetrofitService.class).listApplication(Api.listApplication,start,offset,type,typeId));
+        if(httpClientEntity.getCode()== Constan.NET_SUCCESS){
+            dynamicShopGameListEntity=httpClientEntity.getObj();
+        }else{
+            dynamicShopGameListEntity=new DynamicShopGameListEntity();
+            dynamicShopGameListEntity.setCode(httpClientEntity.getCode());
+            dynamicShopGameListEntity.setMsg(httpClientEntity.getMessage());
+            dynamicShopGameListEntity.setRetcode(httpClientEntity.getCode());
+        }
+        return dynamicShopGameListEntity;
+    }
+
+    @Override
+    public DynamicBannerListEntity listBanner(int type) {
+        DynamicBannerListEntity dynamicBannerListEntity=null;
+        HttpClientEntity httpClientEntity= (HttpClientEntity) HttpClient.getInstance().sends(DynamicBannerListEntity.class,HttpClient.getInstance().retrofit().create(RetrofitService.class).listBanner(Api.listBanner,type));
+        if(httpClientEntity.getCode()== Constan.NET_SUCCESS){
+            dynamicBannerListEntity=httpClientEntity.getObj();
+        }else{
+            dynamicBannerListEntity=new DynamicBannerListEntity();
+            dynamicBannerListEntity.setCode(httpClientEntity.getCode());
+            dynamicBannerListEntity.setMsg(httpClientEntity.getMessage());
+            dynamicBannerListEntity.setRetcode(httpClientEntity.getCode());
+        }
+        return dynamicBannerListEntity;
+    }
+
+    @Override
+    public DynamicNoticeListEntity listAnnouncement(int start, int offset, int type) {
+        DynamicNoticeListEntity dynamicNoticeListEntity=null;
+        HttpClientEntity httpClientEntity= (HttpClientEntity) HttpClient.getInstance().sends(DynamicNoticeListEntity.class,"data",HttpClient.getInstance().retrofit().create(RetrofitService.class).listAnnouncement(Api.listAnnouncement,start,offset,type));
+        if(httpClientEntity.getCode()== Constan.NET_SUCCESS){
+            dynamicNoticeListEntity=httpClientEntity.getObj();
+        }else{
+            dynamicNoticeListEntity=new DynamicNoticeListEntity();
+            dynamicNoticeListEntity.setCode(httpClientEntity.getCode());
+            dynamicNoticeListEntity.setMsg(httpClientEntity.getMessage());
+            dynamicNoticeListEntity.setRetcode(httpClientEntity.getCode());
+        }
+        return dynamicNoticeListEntity;
+    }
+
+    @Override
+    public ViewSpotEntity getInfomationList(int start, int offset, String keyword) {
+        ViewSpotEntity entity=null;
+        HttpClientEntity httpClientEntity= (HttpClientEntity) HttpClient.getInstance().sends(ViewSpotEntity.class,"data",HttpClient.getInstance().retrofit().create(RetrofitService.class).getInfomationList(Api.getInfomationList,start,offset,keyword));
+        if(httpClientEntity.getCode()== Constan.NET_SUCCESS){
+            entity=httpClientEntity.getObj();
+        }else{
+            entity=new ViewSpotEntity();
+            entity.setCode(httpClientEntity.getCode());
+            entity.setMsg(httpClientEntity.getMessage());
+            entity.setRetcode(httpClientEntity.getCode());
+        }
+        return entity;
+    }
+
+    @Override
+    public CodeEntity addProjectParty(String companyName, String website, String logo, String license) {
+        CodeEntity entity = null;
+        HttpClientEntity httpClientEntity = (HttpClientEntity) HttpClient.getInstance().sends(CodeEntity.class, "data", HttpClient.getInstance().retrofit().create(RetrofitService.class).addProjectParty(Api.addProjectParty,companyName,website,logo,license ));
+        if (httpClientEntity.getCode() == Constan.NET_SUCCESS) {
+            entity = httpClientEntity.getObj();
+        } else {
+            entity = new CodeEntity();
+            entity.setCode(httpClientEntity.getCode());
+            entity.setMsg(httpClientEntity.getMessage());
+            entity.setRetcode(httpClientEntity.getCode());
+        }
+        return entity;
+    }
+
+    @Override
+    public ProjectIdentificationEntity getProjectParty() {
+        ProjectIdentificationEntity entity = null;
+        HttpClientEntity httpClientEntity = (HttpClientEntity) HttpClient.getInstance().sends(ProjectIdentificationEntity.class, "data", HttpClient.getInstance().retrofit().create(RetrofitService.class).getProjectParty(Api.getProjectParty,"" ));
+        if (httpClientEntity.getCode() == Constan.NET_SUCCESS) {
+            entity = httpClientEntity.getObj();
+        } else {
+            entity = new ProjectIdentificationEntity();
+            entity.setCode(httpClientEntity.getCode());
+            entity.setMsg(httpClientEntity.getMessage());
+            entity.setRetcode(httpClientEntity.getCode());
+        }
+        return entity;
+    }
+
+    @Override
+    public ProtocolBookEntity getProtocolBook() {
+        ProtocolBookEntity entity = null;
+        HttpClientEntity httpClientEntity = (HttpClientEntity) HttpClient.getInstance().sends(ProtocolBookEntity.class, "data", HttpClient.getInstance().retrofit().create(RetrofitService.class).getProtocolBook(Api.getProtocolBook,"" ));
+        if (httpClientEntity.getCode() == Constan.NET_SUCCESS) {
+            entity = httpClientEntity.getObj();
+        } else {
+            entity = new ProtocolBookEntity();
+            entity.setCode(httpClientEntity.getCode());
+            entity.setMsg(httpClientEntity.getMessage());
+            entity.setRetcode(httpClientEntity.getCode());
+        }
+        return entity;
+    }
+
+    @Override
+    public DynamicTopShopListEntity listAppService() {
+        DynamicTopShopListEntity entity = null;
+        HttpClientEntity httpClientEntity = (HttpClientEntity) HttpClient.getInstance().sends(DynamicTopShopListEntity.class,  HttpClient.getInstance().retrofit().create(RetrofitService.class).listAppService(Api.listAppService ));
+        if (httpClientEntity.getCode() == Constan.NET_SUCCESS) {
+            entity = httpClientEntity.getObj();
+        } else {
+            entity = new DynamicTopShopListEntity();
+            entity.setCode(httpClientEntity.getCode());
+            entity.setMsg(httpClientEntity.getMessage());
+            entity.setRetcode(httpClientEntity.getCode());
+        }
+        return entity;
+    }
+
+
+}

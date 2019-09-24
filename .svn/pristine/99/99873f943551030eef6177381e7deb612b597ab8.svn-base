@@ -1,0 +1,78 @@
+package com.bochat.app.model.bean;
+
+import java.io.Serializable;
+
+/**
+ * 2019/4/29
+ * Author LDL
+ **/
+public class CurrencyDetailEntity extends CodeEntity implements Serializable {
+
+
+    private String totalAmount;
+    private String cnyPrice;
+    private String address;
+    private String bName;
+    private String bid;
+    private String bIamge;
+
+    @Override
+    public String toString() {
+        return "CurrencyDetailEntity{" +
+                "totalAmount='" + totalAmount + '\'' +
+                ", cnyPrice='" + cnyPrice + '\'' +
+                ", address='" + address + '\'' +
+                ", bName='" + bName + '\'' +
+                ", bid='" + bid + '\'' +
+                ", bIamge='" + bIamge + '\'' +
+                '}';
+    }
+
+    public String getBid() {
+        return bid;
+    }
+
+    public void setBid(String bid) {
+        this.bid = bid;
+    }
+
+    public String getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(String totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public String getCnyPrice() {
+        return cnyPrice;
+    }
+
+    public void setCnyPrice(String cnyPrice) {
+        this.cnyPrice = cnyPrice;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getbName() {
+        return bName;
+    }
+
+    public void setbName(String bName) {
+        this.bName = bName;
+    }
+
+    public String getbIamge() {
+        return bIamge;
+    }
+
+    public void setbIamge(String bIamge) {
+        this.bIamge = bIamge;
+    }
+}

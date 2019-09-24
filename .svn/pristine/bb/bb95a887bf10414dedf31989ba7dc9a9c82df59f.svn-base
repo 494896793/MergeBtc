@@ -1,0 +1,220 @@
+package com.bochat.app.app.adapter;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+import com.bochat.app.common.contract.dynamic.DynamicContract;
+import com.bochat.app.model.bean.DynamicAdapterEntity;
+import com.bochat.app.model.bean.DynamicBannerEntity;
+import com.bochat.app.model.bean.DynamicTopShopEntity;
+import com.bochat.app.model.bean.DynamicTopShopListEntity;
+import com.bochat.app.model.bean.ViewPagerItemJumpEntity;
+
+import java.util.List;
+
+/**
+ * 2019/5/8
+ * Author LDL
+ **/
+public class DynamicAdapter extends RecyclerView.Adapter<DynamicAdapter.DynamicViewHolder> implements DynamicViewPagerAdapter.OnPagerClick, DynamicBodyBaseAdapter.OnItemClick {
+
+    private List<DynamicAdapterEntity> list;
+    private Context mContext;
+    private DynamicBodyBaseAdapter bodyBaseAdapter;
+    private OnViewpagerItemClick onViewpagerItemClick;
+    private OnGridViewItemClick onGridViewItemClick;
+    private OnAppTitleClickListenner onAppTitleClickListenner;
+    private OnNoticeClick onNoticeClick;
+
+    public void setOnNoticeClick(OnNoticeClick onNoticeClick){
+        this.onNoticeClick=onNoticeClick;
+    }
+
+    public void setOnAppTitleClickListenner(OnAppTitleClickListenner onAppTitleClickListenner){
+        this.onAppTitleClickListenner=onAppTitleClickListenner;
+    }
+
+    public void setOnViewpagerItemClick(OnViewpagerItemClick onViewpagerItemClick){
+        this.onViewpagerItemClick=onViewpagerItemClick;
+    }
+
+    public void setOnGridViewItemClick(OnGridViewItemClick onGridViewItemClick){
+        this.onGridViewItemClick=onGridViewItemClick;
+    }
+
+
+    public DynamicAdapter(List<DynamicAdapterEntity> list,Context mContext){
+        this.mContext=mContext;
+        this.list=list;
+    }
+
+    @NonNull
+    @Override
+    public DynamicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view=null;
+        if(viewType==0){       //header
+            view= LayoutInflater.from(mContext).inflate(R.layout.fragment_dynamic_top,null);
+        }else if(viewType==1){              //body
+            view= LayoutInflater.from(mContext).inflate(R.layout.fragment_dynamic_body,null);
+        }else if(viewType==2){              //body_app
+            view= LayoutInflater.from(mContext).inflate(R.layout.fragment_dynamic_body_app,null);
+        }
+        return new DynamicViewHolder(view);
+    }
+
+    public void refreshData(List<DynamicAdapterEntity> list){
+        this.list=list;
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull DynamicViewHolder holder, int position) {
+        switch (getItemViewType(position)){
+            case 0:
+                if(holder.viewpager.getAdapter()==null){
+                    DynamicViewPagerAdapter viewPagerAdapter=new DynamicViewPagerAdapter(list.get(position).getDynamicBannerListEntity().getData(),mContext);
+                    viewPagerAdapter.setOnPagerClick(this);
+                    holder.viewpager.setAdapter(viewPagerAdapter);
+                    if(list.get(position).getDynamicBannerListEntity()==null||list.get(position).getDynamicBannerListEntity().getData()==null||list.get(position).getDynamicBannerListEntity().getData().size()==0){
+                        holder.viewpager.setVisibility(View.GONE);
+                    }
+                }else{
+                    holder.viewpager.getAdapter().notifyDataSetChanged();
+                }
+                if(list.get(position).getDynamicNoticeListEntity()!=null&&list.get(position).getDynamicNoticeListEntity().getItems()!=null&&list.get(position).getDynamicNoticeListEntity().getItems().size()>0){
+                    holder.notice_text.setText(list.get(position).getDynamicNoticeListEntity().getItems().get(0).getTitle());
+                }else{
+                    holder.notice_relative.setVisibility(View.GONE);
+                }
+                holder.notice_relative.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(onNoticeClick!=null){
+                            onNoticeClick.onNoticeClick();
+                        }
+                    }
+                });
+                break;
+            case 1:
+                if(holder.viewpager.getAdapter()==null){
+                    DynamicViewPagerAdapter viewPagerAdapter=new DynamicViewPagerAdapter(mContext,list.get(position).getBannerEntityList());
+                    viewPagerAdapter.setOnPagerClick(this);
+                    holder.viewpager.setAdapter(viewPagerAdapter);
+                }else{
+                    holder.viewpager.getAdapter().notifyDataSetChanged();
+                }
+                if(list.get(position).getTitle().equals("闪兑大厅")){
+                    holder.enter_img.setVisibility(View.GONE);
+                }
+                if(list.get(position).getBannerEntityList()==null||list.get(position).getBannerEntityList().size()==0){
+                    holder.linear.setVisibility(View.GONE);
+                }
+                holder.title_text.setText(list.get(position).getTitle());
+                break;
+            case 2:
+                if(bodyBaseAdapter==null){
+                    bodyBaseAdapter=new DynamicBodyBaseAdapter(list.get(position).getDynamicTopShopListEntity().getData(),mContext);
+                    bodyBaseAdapter.setOnItemClick(this);
+                    holder.grid_view.setAdapter(bodyBaseAdapter);
+                }else{
+                    bodyBaseAdapter.notifyDataSetChanged();
+                }
+                holder.title_text.setText(list.get(position).getTitle());
+                holder.title_relative.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(onAppTitleClickListenner!=null){
+                            onAppTitleClickListenner.onTitleClick();
+                        }
+                    }
+                });
+                if(list.get(position).getDynamicTopShopListEntity()==null||list.get(position).getDynamicTopShopListEntity().getData()==null||list.get(position).getDynamicTopShopListEntity().getData().size()==0){
+                    holder.title_relative.setVisibility(View.GONE);
+                    holder.view_line.setVisibility(View.GONE);
+                    holder.grid_view.setVisibility(View.GONE);
+                }
+                break;
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return list.get(position).getType();
+    }
+
+    @Override
+    public int getItemCount() {
+        return list.size();
+    }
+
+    @Override
+    public void onPageItemClick(int position, DynamicBannerEntity entity, ViewPagerItemJumpEntity jumpEntity) {
+        if(onViewpagerItemClick!=null){
+            onViewpagerItemClick.onItemClick(position,entity,jumpEntity);
+        }
+    }
+
+    @Override
+    public void onClick(int position, DynamicTopShopEntity entity) {
+        if(onGridViewItemClick!=null){
+            onGridViewItemClick.onItemClick(position,entity);
+        }
+    }
+
+    class DynamicViewHolder extends RecyclerView.ViewHolder{
+
+        TextView title_text;
+        GridView grid_view;
+        TextView notice_text;
+        ImageView dynamic_add_icon;
+        ImageView enter_img;
+        ViewPager viewpager;
+        RelativeLayout title_relative;
+        RelativeLayout notice_relative;
+        RelativeLayout linear;
+        View view_line;
+
+
+        public DynamicViewHolder(View itemView) {
+            super(itemView);
+            view_line=itemView.findViewById(R.id.view_line);
+            linear=itemView.findViewById(R.id.linear);
+            notice_relative=itemView.findViewById(R.id.notice_relative);
+            title_relative=itemView.findViewById(R.id.title_relative);
+            viewpager=itemView.findViewById(R.id.viewpager);
+            title_text=itemView.findViewById(R.id.title_text);
+            grid_view=itemView.findViewById(R.id.grid_view);
+            notice_text=itemView.findViewById(R.id.notice_text);
+            dynamic_add_icon=itemView.findViewById(R.id.dynamic_add_icon);
+            enter_img=itemView.findViewById(R.id.enter_img);
+        }
+    }
+
+    public interface OnAppTitleClickListenner{
+        void onTitleClick();
+    }
+
+    public interface OnViewpagerItemClick{
+        void onItemClick(int position,DynamicBannerEntity entity,ViewPagerItemJumpEntity jumpEntity);
+    }
+
+    public interface OnGridViewItemClick{
+        void onItemClick(int position, DynamicTopShopEntity entity);
+    }
+
+    public interface OnNoticeClick{
+        void onNoticeClick();
+    }
+
+}

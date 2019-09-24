@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+
+
+        <com.bochat.app.app.view.BoChatTopBar
+            android:id="@+id/bochat_topbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:top_background="@color/white"
+            app:top_extButton2Src="@mipmap/ic_bochat_add"
+            app:top_extButtonSrc="@null"
+            app:top_hasExt2Btn="true"
+            app:top_hasExtBtn="false"
+            app:top_titleText="消息" />
+
+        <com.scwang.smartrefresh.layout.SmartRefreshLayout
+            android:id="@+id/refreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.scwang.smartrefresh.layout.header.ClassicsHeader
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/bochat_search_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_34"
+                    android:layout_marginLeft="@dimen/dp_15"
+                    android:layout_marginTop="@dimen/dp_11"
+                    android:layout_marginRight="@dimen/dp_15"
+                    android:background="@drawable/shape_search"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/bochat_search_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@mipmap/ic_bochat_search"
+                        android:drawablePadding="@dimen/dp_6"
+                        android:text="@string/conversation_search_str"
+                        android:textAlignment="center"
+                        android:textColor="@color/colorFontColorForDark"
+                        android:textSize="@dimen/dp_14" />
+
+                </LinearLayout>
+                <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/fast_news_linear"
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:layout_marginLeft="@dimen/dp_15"
+                        android:layout_marginTop="@dimen/dp_7"
+                        android:layout_marginBottom="@dimen/dp_7"
+                        android:src="@mipmap/home_icon_fast"
+                        android:layout_width="@dimen/dp_28"
+                        android:layout_height="@dimen/dp_17" />
+                    <com.bochat.app.app.view.MarqueeView
+                        android:layout_marginTop="@dimen/dp_7"
+                        android:layout_marginBottom="@dimen/dp_7"
+                        android:layout_weight="1"
+                        android:layout_marginRight="@dimen/dp_15"
+                        android:layout_marginLeft="@dimen/dp_9"
+                        android:id="@+id/marqueeview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                    </com.bochat.app.app.view.MarqueeView>
+
+                    <ImageView
+                        android:id="@+id/fast_news_close"
+                        android:layout_marginRight="@dimen/dp_15"
+                        android:src="@mipmap/home_icon_close"
+                        android:layout_width="@dimen/dp_16"
+                        android:layout_height="@dimen/dp_16" />
+                </LinearLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="@dimen/dp_11">
+
+                    <FrameLayout
+                        android:id="@+id/conversationlist"
+                        android:name="io.rong.imkit.fragment.ConversationListFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </RelativeLayout>
+            </LinearLayout>
+
+        </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:background="@drawable/yellow_linear"
+        android:layout_marginBottom="@dimen/dp_24"
+        android:layout_marginLeft="@dimen/dp_15"
+        android:orientation="horizontal"
+        android:id="@+id/notice_linear"
+        android:layout_width="@dimen/dp_216"
+        android:layout_alignParentBottom="true"
+        android:layout_height="@dimen/dp_24">
+        <com.bochat.app.app.view.UPMarqueeView
+            android:visibility="gone"
+            android:id="@+id/upmarquee_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </com.bochat.app.app.view.UPMarqueeView>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/candy_img"
+        android:src="@mipmap/candy_click"
+        android:layout_marginBottom="@dimen/dp_19"
+        android:layout_marginRight="@dimen/dp_11"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_width="@dimen/dp_56"
+        android:layout_height="@dimen/dp_59"
+        android:visibility="gone"/>
+</RelativeLayout>

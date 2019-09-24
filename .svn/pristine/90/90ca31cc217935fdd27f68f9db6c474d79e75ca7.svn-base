@@ -1,0 +1,232 @@
+package com.bochat.app.app.adapter;
+
+import android.content.Context;
+import android.graphics.Typeface;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+import com.bochat.app.app.util.DecimalFormatter;
+import com.bochat.app.model.bean.MarketInfoEntity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MarketQuotationOptionalAdapter extends RecyclerView.Adapter implements View.OnClickListener , RadioGroup.OnCheckedChangeListener {
+
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_NORMAL = 1;
+
+    private OnMarketQuotationHeaderClickListener mMarketQuotationHeaderClickListener;
+    private OnMarketQuotationItemClickListener mMarketQuotationItemClickListener;
+
+    private Context mContext;
+    private List<MarketInfoEntity> mData = new ArrayList<>();
+
+    private View mHeaderView;
+
+
+    public MarketQuotationOptionalAdapter(Context context) {
+        mContext = context;
+    }
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (mHeaderView != null && viewType == TYPE_HEADER) {
+            mHeaderView = LayoutInflater.from(mContext).inflate(R.layout.market_quotation_optional_header_view, parent, false);
+            return new DynamicOptionsHeaderViewHolder(mHeaderView);
+        }
+        View itemView = LayoutInflater.from(mContext).inflate(R.layout.market_quotation_optional_item, parent, false);
+        return new DynamicOptionsViewHolder(itemView);
+
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (getItemViewType(position) == TYPE_HEADER) {
+            DynamicOptionsHeaderViewHolder headerViewHolder = (DynamicOptionsHeaderViewHolder) holder;
+            headerViewHolder.group_radio.setOnCheckedChangeListener(this);
+            return;
+        }
+
+        final int pos = getRealPosition(holder);
+        final MarketInfoEntity dynamicMKEntity = mData.get(pos);
+        DynamicOptionsViewHolder itemViewHolder = (DynamicOptionsViewHolder) holder;
+
+        SpannableString spanName = new SpannableString(" / " + dynamicMKEntity.getSellerCurrencyName());
+        spanName.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color.color_999999)), 0, spanName.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanName.setSpan(new AbsoluteSizeSpan(12, true), 0, spanName.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanName.setSpan(new StyleSpan(Typeface.NORMAL), 0, spanName.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        SpannableStringBuilder spanBuilder = new SpannableStringBuilder(dynamicMKEntity.getBuyerCurrencyName());
+        spanBuilder.append(spanName);
+
+        itemViewHolder.mDynamicMKItemName.setText(spanBuilder);
+        itemViewHolder.mDynamicMKItemCount.setText(mContext.getString(
+                R.string.market_quotation_number_count_fmt,
+                DecimalFormatter.newInstance().format("##,####",
+                        Double.parseDouble(String.valueOf(dynamicMKEntity.getNum())
+                        ))));
+        itemViewHolder.mDynamicMKItemNewPrice.setText(String.valueOf(dynamicMKEntity.getCurrentprice()));
+        itemViewHolder.mDynamicMKItemExChange.setText(dynamicMKEntity.getRMB());
+
+        itemViewHolder.mDynamicMKItemStockIndex.setBackgroundResource(!dynamicMKEntity.getUptolow().startsWith("-") ? R.drawable.shape_up_red : R.drawable.shape_down_green);
+        itemViewHolder.mDynamicMKItemStockIndex.setText(dynamicMKEntity.getUptolow());
+    }
+
+    public void setHeaderView(View headerView) {
+        mHeaderView = headerView;
+        notifyItemInserted(0);
+    }
+
+    public View getHeaderView() {
+        return mHeaderView;
+    }
+
+    public void notifyData(List<MarketInfoEntity> data) {
+        mData.addAll(data);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemCount() {
+//        return mData != null ? mHeaderView != null ? mData.size() + 1 : mData.size() : 0;
+        return 1;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (mHeaderView == null) return TYPE_NORMAL;
+        if (position == 0) return TYPE_HEADER;
+        return TYPE_NORMAL;
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        RecyclerView.LayoutManager manager = recyclerView.getLayoutManager();
+        if (manager instanceof GridLayoutManager) {
+            final GridLayoutManager gridManager = ((GridLayoutManager) manager);
+            gridManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    return getItemViewType(position) == TYPE_HEADER
+                            ? gridManager.getSpanCount() : 1;
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
+        if (lp instanceof StaggeredGridLayoutManager.LayoutParams) {
+            StaggeredGridLayoutManager.LayoutParams p = (StaggeredGridLayoutManager.LayoutParams) lp;
+            p.setFullSpan(holder.getLayoutPosition() == 0);
+        }
+    }
+
+    private int getRealPosition(RecyclerView.ViewHolder holder) {
+        int position = holder.getLayoutPosition();
+        return mHeaderView == null ? position : position - 1;
+    }
+
+
+    public void setMarketQuotationHeaderClickListener(OnMarketQuotationHeaderClickListener listenter) {
+        mMarketQuotationHeaderClickListener = listenter;
+    }
+
+    public void setOnMarketQuotationItemClickListener(OnMarketQuotationItemClickListener listener) {
+        mMarketQuotationItemClickListener = listener;
+    }
+
+    @Override
+    public void onClick(View view) {
+
+    }
+
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        switch (checkedId){
+            case R.id.default_sort_radio:
+                if (mMarketQuotationHeaderClickListener != null)
+                    mMarketQuotationHeaderClickListener.onClickSort();
+                break;
+            case R.id.price_sort_radio:
+                if (mMarketQuotationHeaderClickListener != null)
+                    mMarketQuotationHeaderClickListener.onClickNewPrice();
+                break;
+            case R.id.gain_sort_radio:
+                if (mMarketQuotationHeaderClickListener != null)
+                    mMarketQuotationHeaderClickListener.onClickUpAndDown();
+                break;
+        }
+    }
+
+    public class DynamicOptionsHeaderViewHolder extends RecyclerView.ViewHolder {
+
+        RadioGroup group_radio;
+
+        public DynamicOptionsHeaderViewHolder(View itemView) {
+            super(itemView);
+            group_radio=itemView.findViewById(R.id.group_radio);
+        }
+
+    }
+
+    public class DynamicOptionsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        LinearLayout mDynamicMKItem;
+        TextView mDynamicMKItemName;
+        TextView mDynamicMKItemCount;
+        TextView mDynamicMKItemNewPrice;
+        TextView mDynamicMKItemExChange;
+        Button mDynamicMKItemStockIndex;
+
+        DynamicOptionsViewHolder(View itemView) {
+            super(itemView);
+            mDynamicMKItem = itemView.findViewById(R.id.dynamic_mk_item);
+            mDynamicMKItemName = itemView.findViewById(R.id.dynamic_mk_item_name);
+            mDynamicMKItemCount = itemView.findViewById(R.id.dynamic_mk_item_count);
+            mDynamicMKItemNewPrice = itemView.findViewById(R.id.dynamic_mk_item_new_price);
+            mDynamicMKItemExChange = itemView.findViewById(R.id.dynamic_mk_item_exchange);
+            mDynamicMKItemStockIndex = itemView.findViewById(R.id.dynamic_mk_item_stock_index);
+            mDynamicMKItem.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (mMarketQuotationItemClickListener != null) {
+                mMarketQuotationItemClickListener.onItemClick(v, mData.get(getAdapterPosition()));
+            }
+        }
+    }
+
+    public interface OnMarketQuotationItemClickListener {
+        void onItemClick(View view, MarketInfoEntity entity);
+    }
+
+    public interface OnMarketQuotationHeaderClickListener {
+        void onClickSort();
+
+        void onClickNewPrice();
+
+        void onClickUpAndDown();
+    }
+}

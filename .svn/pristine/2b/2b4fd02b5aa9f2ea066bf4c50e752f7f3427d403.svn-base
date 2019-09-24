@@ -1,0 +1,46 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 14:11
+ * Description :
+ */
+
+public enum MarketCenterType{
+    
+    TRANSACTION("1", TransactionListEntity.class),
+    ENTRUST_SELL("prices", EntrustSellListEntity.class),
+    ENTRUST_BUY("3", EntrustBuyListEntity.class),
+    KLINE("4", KLineEntity.class);
+
+    private String type;
+    private Class<? extends MarketCenterData> clazz;
+    
+    MarketCenterType(String type, Class<? extends MarketCenterData> clazz) {
+        this.type = type;
+        this.clazz = clazz;
+    }
+    
+    public static MarketCenterType search(String type){
+        if(TRANSACTION.type.equals(type)) {
+            return TRANSACTION;
+        } else if(ENTRUST_SELL.type.equals(type)) {
+            return ENTRUST_SELL;
+        } else if(ENTRUST_BUY.type.equals(type)) {
+            return ENTRUST_BUY;
+        } else if(KLINE.type.equals(type)){
+            return KLINE;
+        } else {
+            return null;
+        }
+    }
+
+    public Class<? extends MarketCenterData> getClazz() {
+        return clazz;
+    }
+
+    public String getType() {
+        return type;
+    }
+}
+    

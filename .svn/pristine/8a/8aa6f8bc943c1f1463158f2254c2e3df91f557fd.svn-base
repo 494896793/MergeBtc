@@ -1,0 +1,154 @@
+package com.bochat.app.app.adapter;
+
+import android.content.Context;
+import android.graphics.Color;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+import com.bochat.app.model.bean.EntrustApplyEntity;
+import com.bochat.app.model.bean.EntrustApplyListEntity;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+public class MarketQuotationEntrustAdapter extends RecyclerView.Adapter<MarketQuotationEntrustAdapter.MarketQuotationEntrustViewHolder> {
+
+    private Context mContext;
+
+    private List<EntrustApplyEntity> mData = new ArrayList<>();
+
+    private OnEntrustItemClickListener mEntrustItemClickListener;
+
+    private int buyColor = Color.parseColor("#F14348");
+    private int sellColor = Color.parseColor("#4FCC7A");
+
+    public MarketQuotationEntrustAdapter(Context context) {
+        mContext = context;
+    }
+
+    @NonNull
+    @Override
+    public MarketQuotationEntrustViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(mContext).inflate(R.layout.market_quotation_entrust_item, parent, false);
+        return new MarketQuotationEntrustViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull MarketQuotationEntrustViewHolder holder, int position) {
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mEntrustItemClickListener != null)
+                    mEntrustItemClickListener.onClickView();
+            }
+        });
+
+        EntrustApplyEntity entity = mData.get(position);
+
+        holder.buy_count_cell_des.setText(entity.getNum());
+        holder.buy_price_cell_des.setText(entity.getPrice());
+        holder.entrust_time_cell_des.setText(entity.getTrustTime());
+        holder.deal_count_cell_des.setText(entity.getTurnoverNum());
+        holder.transaction_amount_cell_des.setText(entity.getTurnoverMoney());
+        holder.service_charge_cell_des.setText(entity.getServiceCharge());
+
+        holder.entrust_bs_txt.setText(entity.getType() == 0 ? "买入" : "卖出");
+        holder.entrust_bs_txt.setBackgroundColor(
+                entity.getType() == 0 ?
+                        buyColor :
+                        sellColor);
+
+        String state = getState(entity.getState());
+        holder.entrust_bs_progress_state.setVisibility(state.equals("委托中") ? View.VISIBLE : View.GONE);
+        holder.entrust_bs_progress_state.setText(state);
+
+        holder.entrust_bs_revoke.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+    }
+
+    private String getState(int state) {
+        switch (state) {
+            case 1:
+                return "已完成";
+            case 2:
+                return "委托中";
+            case 3:
+                return "已撤销";
+            default:
+                return "";
+        }
+
+    }
+
+    public void setOnEntrustItemClickListener(OnEntrustItemClickListener mEntrustItemClickListener) {
+        this.mEntrustItemClickListener = mEntrustItemClickListener;
+    }
+
+    public void onRefresh(EntrustApplyListEntity entity) {
+        mData.clear();
+        mData.addAll(entity.getItems());
+        notifyDataSetChanged();
+    }
+
+    public void onLoadMore(EntrustApplyListEntity entity) {
+        mData.addAll(entity.getItems());
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemCount() {
+        return mData != null ? mData.size() : 0;
+    }
+
+    public class MarketQuotationEntrustViewHolder extends RecyclerView.ViewHolder {
+
+        private TextView buy_count_cell_des;
+        private TextView buy_price_cell_des;
+        private TextView entrust_time_cell_des;
+        private TextView deal_count_cell_des;
+        private TextView transaction_amount_cell_des;
+        private TextView service_charge_cell_des;
+        private TextView entrust_bs_txt;
+        private TextView entrust_bs_progress_state;
+        private TextView entrust_bs_revoke;
+        private ProgressBar entrust_bs_progress;
+
+        private TextView mEntrustBSRevoke;
+
+        MarketQuotationEntrustViewHolder(View itemView) {
+            super(itemView);
+
+            buy_count_cell_des = itemView.findViewById(R.id.buy_count_cell_des);
+            buy_price_cell_des = itemView.findViewById(R.id.buy_price_cell_des);
+            entrust_time_cell_des = itemView.findViewById(R.id.entrust_time_cell_des);
+            deal_count_cell_des = itemView.findViewById(R.id.deal_count_cell_des);
+            transaction_amount_cell_des = itemView.findViewById(R.id.transaction_amount_cell_des);
+            service_charge_cell_des = itemView.findViewById(R.id.service_charge_cell_des);
+            entrust_bs_txt = itemView.findViewById(R.id.entrust_bs_txt);
+            entrust_bs_progress_state = itemView.findViewById(R.id.entrust_bs_progress_state);
+            entrust_bs_progress = itemView.findViewById(R.id.entrust_bs_progress);
+            entrust_bs_revoke = itemView.findViewById(R.id.entrust_bs_revoke);
+        }
+    }
+
+    public interface OnEntrustItemClickListener {
+        void onClickView();
+    }
+}

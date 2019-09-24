@@ -1,0 +1,49 @@
+package com.bochat.app.business.login;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.business.DaggerBusinessComponent;
+import com.bochat.app.common.contract.SplashScreenContract;
+import com.bochat.app.common.model.IUpgradeModel;
+import com.bochat.app.model.util.APKUtils;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import javax.inject.Inject;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/10 13:42
+ * Description :
+ */
+
+public class SplashScreenPresenter extends BasePresenter<SplashScreenContract.View> implements SplashScreenContract.Presenter {
+
+    @Inject
+    IUpgradeModel upgradeModel;
+
+    @Override
+    public void onScreenClick() {
+        getView().showTips("恭喜发财，红包拿来！");
+    }
+
+    @Override
+    public void onSkipButtonClick() {
+        ARouter.getInstance().build(RouteTable.USER_LOGIN).navigation();
+    }
+
+    @Override
+    public void onViewInactivation() {
+        getView().finish();
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+    }
+
+    @Override
+    public void initInjector() {
+        DaggerBusinessComponent.create().inject(this);
+    }
+
+}

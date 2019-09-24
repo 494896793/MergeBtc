@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/invitation_bg"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/invitation_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_backBtnBackground="@mipmap/ic_arrow_left_white"
+        app:top_extButton2Src="@mipmap/ic_share"
+        app:top_hasBackBtn="true"
+        app:top_titleText="" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:id="@+id/screen_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_10"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/invitation_ad_container"
+                android:layout_width="@dimen/dp_335"
+                android:layout_height="@dimen/dp_69"
+                android:background="@mipmap/invitation_font" />
+
+            <RelativeLayout
+                android:id="@+id/invitation_info_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_18">
+
+                <RelativeLayout
+                    android:id="@+id/invitation_code_info_container"
+                    android:layout_width="@dimen/dp_265"
+                    android:layout_height="@dimen/dp_320"
+                    android:layout_marginTop="@dimen/dp_37"
+                    android:background="@mipmap/invitation_bg_frame"
+                    android:orientation="vertical">
+                    <LinearLayout
+                        android:id="@+id/invitation_code_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="@dimen/dp_30"
+                        android:layout_above="@id/invitation_success_member"
+                        android:gravity="center"
+                        android:background="@drawable/invitation_qr_code_shape"
+                        android:orientation="vertical">
+                        <ImageView
+                            android:id="@+id/invitation_qr_code"
+                            android:layout_width="@dimen/dp_132"
+                            android:layout_height="@dimen/dp_132"
+                            android:scaleType="centerCrop"
+                            android:src="@mipmap/bg_default" />
+                        <TextView
+                            android:id="@+id/invitation_code_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/dp_12"
+                            android:textSize="@dimen/dp_11"
+                            android:textColor="@color/color_222222"
+                            tools:text="@string/invitation_code"/>
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/invitation_success_member"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/dp_11"
+                        android:textColor="@color/color_222222"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_margin="@dimen/dp_20"
+                        tools:text="@string/mine_invite"/>
+                </RelativeLayout>
+
+                <com.bochat.app.app.view.SpImageView
+                    android:id="@+id/invitation_user_header"
+                    android:layout_width="@dimen/dp_74"
+                    android:layout_height="@dimen/dp_74"
+                    android:layout_centerHorizontal="true"
+                    android:src="@mipmap/ic_default_head" />
+
+                <TextView
+                    android:id="@+id/invitation_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/invitation_user_header"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/dp_10"
+                    android:textColor="@color/color_222222"
+                    android:textSize="@dimen/dp_16"
+                    android:textStyle="bold"
+                    tools:text="大白兔奶糖" />
+
+                <TextView
+                    android:id="@+id/invitation_user_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/invitation_user_name"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/dp_3"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:text="无"
+                    android:textColor="@color/color_222222"
+                    android:textSize="@dimen/sp_11"
+                    tools:text="ID:1235468852" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/invitation_share_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_39"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/invitation_share_wx_friends"
+                    android:layout_width="@dimen/dp_45"
+                    android:layout_height="wrap_content"
+                    android:drawableTop="@mipmap/invitation_wechat"
+                    android:gravity="center"
+                    android:layout_marginEnd="@dimen/dp_36"
+                    android:text="@string/share_wx_friends_str"
+                    android:textSize="@dimen/dp_11"
+                    android:drawablePadding="@dimen/dp_8"
+                    android:textColor="@color/golden_yellow" />
+
+                <TextView
+                    android:id="@+id/invitation_share_wx_circle_friends"
+                    android:layout_width="@dimen/dp_45"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/dp_36"
+                    android:drawablePadding="@dimen/dp_8"
+                    android:drawableTop="@mipmap/invitation_friends"
+                    android:gravity="center"
+                    android:text="@string/share_wx_circle_friends_str"
+                    android:textSize="@dimen/dp_11"
+                    android:textColor="@color/golden_yellow" />
+
+                <TextView
+                    android:id="@+id/invitation_share_qq"
+                    android:layout_width="@dimen/dp_45"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="@dimen/dp_8"
+                    android:layout_marginEnd="@dimen/dp_36"
+                    android:drawableTop="@mipmap/invitation_qq"
+                    android:gravity="center"
+                    android:text="@string/share_qq_str"
+                    android:textSize="@dimen/dp_11"
+                    android:textColor="@color/golden_yellow" />
+
+                <TextView
+                    android:id="@+id/invitation_share_save_poster"
+                    android:layout_width="@dimen/dp_45"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="@dimen/dp_8"
+                    android:drawableTop="@mipmap/invitation_preservation"
+                    android:gravity="center"
+                    android:text="@string/share_save_poster_str"
+                    android:textSize="@dimen/dp_11"
+                    android:textColor="@color/golden_yellow" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

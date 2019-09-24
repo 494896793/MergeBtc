@@ -1,0 +1,237 @@
+package com.bochat.app.app.fragment;
+
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.adapter.AddressBookAdapter;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.app.view.SideBar;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.book.AddressBookContract;
+import com.bochat.app.model.bean.FriendApplyEntity;
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.model.event.FriendApplyEvent;
+import com.bochat.app.model.event.PinYinEvent;
+import com.bochat.app.mvp.view.BaseFragment;
+import com.flyco.tablayout.SlidingTabLayout;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+import static com.bochat.app.app.RouteTable.BOOK_ADDRESS;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/17 16:41
+ * Description :
+ */
+@Route(path = BOOK_ADDRESS)
+public class AddressBookFragment extends BaseFragment<AddressBookContract.Presenter> implements AddressBookContract.View{
+
+    @BindView(R.id.bochat_search_layout)
+    RelativeLayout bochat_search_layout;
+
+    @BindView(R.id.tableayout)
+    SlidingTabLayout tableayout;
+
+    @BindView(R.id.top_list_linear)
+    LinearLayout top_list_linear;
+
+    @BindView(R.id.bochat_topbar)
+    BoChatTopBar bochat_topbar;
+
+    @BindView(R.id.top_list_linear2)
+    LinearLayout top_list_linear2;
+
+    @BindView(R.id.viewpager)
+    ViewPager viewpager;
+
+    @BindView(R.id.num_notice_tx)
+    TextView num_notice_tx;
+
+    @BindView(R.id.sidebar)
+    SideBar sidebar;
+
+    @Inject
+    AddressBookContract.Presenter presenter;
+
+    private AddressBookAdapter adapter;
+    private List<Fragment> fragmentList;
+    private String[] titles=new String[]{"我的好友","我的群聊"};
+    private HashMap<String,String> lettersMap = new HashMap<>();
+    
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void onEventMainThread(FriendApplyEvent event){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                List<FriendApplyEntity> list = new ArrayList<>();
+
+                List<FriendApplyEntity> all = CachePool.getInstance().friendApply().getAll();
+                for(FriendApplyEntity entity : all){
+                    if("1".equals(entity.getApply_state())&&entity.getIsRead().equals("1")){
+                        list.add(entity);
+                    }
+                }
+                if(list.isEmpty()){
+                    num_notice_tx.setVisibility(View.GONE);
+                    num_notice_tx.setText("0");
+                }else{
+                    int num=list.size();
+                    num_notice_tx.setText(num+"");
+                    num_notice_tx.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
+    
+    @Subscribe
+    public void onLettersUpdate(final ArrayList<String> event){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                for(String letter : event){
+                    lettersMap.put(letter, letter);
+                }
+                Collection<String> values = lettersMap.values();
+                ArrayList<String> list = new ArrayList<>(values);
+                Collections.sort(list);
+                list.add("#");
+                String[] strings = list.toArray(new String[]{});
+                sidebar.setLetters(strings);
+            }
+        });
+    }
+
+    @Override
+    public void updateNewRequestCount(String count) {
+        
+    }
+
+    @Override
+    public void updateFriendList(List<FriendEntity> list) {
+
+    }
+
+    @Override
+    public void updateGroupChatList(List<GroupEntity> list) {
+
+    }
+    
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected AddressBookContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view=inflater.inflate(R.layout.fragment_address_book,container,false);
+        return view;
+    }
+
+    @OnClick({R.id.bochat_search_layout,R.id.top_list_linear,R.id.top_list_linear2})
+    public void onClick(View view){
+        switch (view.getId()){
+            case R.id.top_list_linear:
+                List<FriendApplyEntity> all = CachePool.getInstance().friendApply().getAll();
+                if(all != null && !all.isEmpty()) {
+                    for(FriendApplyEntity entity : all){
+                        entity.setIsRead("0");
+                    }
+                }
+                initNotReadNum(null);
+                ARouter.getInstance().build(RouteTable.BOOK_APPLY_LIST).navigation();
+                break;
+            case R.id.top_list_linear2:
+                presenter.onSearchGroupClick();
+                break;
+            case R.id.bochat_search_layout:
+                presenter.onSearchBarClick();
+                break;
+        }
+    }
+
+    @Override
+    protected void initWidget() {
+        try{
+            bochat_topbar.setRightButtonInvisble(true);
+            bochat_topbar.setTitleText("通讯录");
+
+            fragmentList=new ArrayList<>();
+            fragmentList.add(new AddressUserFragment());
+            fragmentList.add(new AddressGroupFragment());
+            adapter=new AddressBookAdapter(getActivity().getSupportFragmentManager(),fragmentList,titles);
+            viewpager.setAdapter(adapter);
+
+            tableayout.setViewPager(viewpager);
+            
+            sidebar.setOnTouchingLetterChangedListener(new SideBar.OnTouchingLetterChangedListener() {
+                @Override
+                public void onTouchingLetterChanged(String s) {
+                    EventBus.getDefault().post(new PinYinEvent(s));
+                }
+            });
+            List<FriendApplyEntity> all = CachePool.getInstance().friendApply().getAll();
+            List<FriendApplyEntity> unRead = new ArrayList<>();
+            for(FriendApplyEntity item : all){
+                if(item.getApply_state().equals("1")){
+                    unRead.add(item);
+                }
+            }
+            initNotReadNum(unRead);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    
+    private void initNotReadNum(List<FriendApplyEntity> list){
+        if(list==null||list.size()==0){
+            num_notice_tx.setVisibility(View.GONE);
+        }else{
+            num_notice_tx.setText(list.size()+"");
+            num_notice_tx.setVisibility(View.VISIBLE);
+        }
+    }
+}

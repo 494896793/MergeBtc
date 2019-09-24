@@ -1,0 +1,14 @@
+package com.bochat.app.common.model;
+
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.GameGoEntity;
+
+/**
+ * 2019/5/30
+ * Author LDL
+ **/
+public interface IThirdServicesModel {
+
+    GameGoEntity gameLogin();
+
+}

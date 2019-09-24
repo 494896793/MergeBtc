@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#F2F2F2"
+    android:gravity="center_horizontal"
+    android:layout_height="match_parent">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_titleText="设置"
+        app:top_background="#FFFFFF"
+        app:top_hasBackBtn="true"/>
+    
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/mine_settings_safety"
+        android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/dp_10"
+        android:layout_height="@dimen/dp_44"
+        app:item_hasRightBtn="true"
+        app:item_text="账号安全"/>
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/mine_settings_notification"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:visibility="gone"
+        app:item_hasRightBtn="true"
+        app:item_text="消息通知方式"/>
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/mine_settings_pay_password"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_hasRightBtn="true"
+        android:layout_marginTop="@dimen/dp_10"
+        app:item_text="支付密码"/>
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/mine_settings_login_password"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_hasRightBtn="true"
+        app:item_text="登录密码"/>
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/mine_settings_blacklist"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_hasRightBtn="true"
+        android:visibility="gone"
+        app:item_text="黑名单管理"/>
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/mine_settings_about_us"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:layout_marginTop="@dimen/dp_10"
+        app:item_hasRightBtn="true"
+        app:item_text="关于我们"/>
+
+    <Button
+        android:id="@+id/mine_settings_enter_btn"
+        android:layout_width="@dimen/dp_345"
+        android:layout_height="@dimen/dp_44"
+        android:background="@drawable/shape_red_5dp"
+        android:textSize="@dimen/dp_17"
+        android:layout_marginTop="@dimen/dp_60"
+        android:text="退出登录"
+        android:textColor="#FFFFFF"/>
+
+</LinearLayout>

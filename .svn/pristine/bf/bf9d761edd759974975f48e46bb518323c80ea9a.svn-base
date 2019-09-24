@@ -1,0 +1,19 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 13:48
+ * Description :
+ */
+
+public class EntrustSellCommand extends EntrustBuyCommand {
+
+    public EntrustSellCommand(String marketId) {
+        super(marketId);
+    }
+
+    @Override
+    public MarketCenterType getType() {
+        return MarketCenterType.ENTRUST_SELL;
+    }
+}

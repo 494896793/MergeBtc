@@ -1,0 +1,238 @@
+package com.bochat.app.app.activity.mine;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.view.SelectDialog;
+import com.bochat.app.common.contract.mine.BillContract;
+import com.bochat.app.model.bean.TradingRecordDataEntity;
+import com.bochat.app.model.bean.TradingRecordItemEntity;
+import com.bochat.app.model.bean.UserCurrencyDataEntity;
+import com.bochat.app.model.bean.UserCurrencyEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.zhy.adapter.abslistview.CommonAdapter;
+import com.zhy.adapter.abslistview.ViewHolder;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/24 17:24
+ * Description :
+ */
+
+@Route(path = RouteTable.MINE_BILL)
+public class BillActivity extends BaseActivity<BillContract.Presenter> implements BillContract.View{
+    
+    @Inject
+    BillContract.Presenter presenter;
+    
+    @BindView(R.id.mine_bill_list)
+    ListView listView;
+    
+    @BindView(R.id.mine_bill_token_type_name)
+    TextView tokenType;
+    
+    @BindView(R.id.mine_bill_charge_type_name)
+    TextView chrgeType;
+
+    List<TradingRecordItemEntity> sourceList = new ArrayList<>();
+    private ArrayList<UserCurrencyEntity> tokenTypeList;
+    private ArrayList<String> typeList = new ArrayList<>();
+    private ArrayList<String> chargeList = new ArrayList<>();
+    
+    private String currentBid;
+    private int currentCharge;
+    private int currentB;
+    
+    private CommonAdapter<TradingRecordItemEntity> adapter;
+    private static final String[] TOKEN_TYPE = {
+            "",             //0
+            "接收",         //1
+            "转出",         //2
+            "发红包",      //3
+            "抢红包",      //4
+            "闪兑兑换",      //5
+            "闪兑发送",      //6
+            "红包退还",             //7
+            "划转转出",             //8
+            "划转接收",      //9
+            "注册赠送",      //10
+            "邀请好友赠送",   //11
+            "推荐人闪兑收益", //12
+            "升级群",        //13
+            "游戏充值"       //14 
+    };
+    
+    private static final String[] CHANGE_TYPE = {
+            "",             //0
+            "充值",         //1
+            "提现",         //2
+            "购买商品",      //3
+            "抢红包",      //4
+            "红包退还",      //5
+            "发红包",      //6
+    };
+
+    private static final String[] STATUS = {
+            "",             //0
+            "未完成",         //1
+            "已完成",         //2
+            "已撤销",      //3
+    };
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+    
+    @Override
+    protected BillContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_mine_bill);
+    }
+
+    @Override
+    protected void initWidget() {
+        adapter = new CommonAdapter<TradingRecordItemEntity>(this, R.layout.item_bill, sourceList) {
+            @Override
+            protected void convert(ViewHolder viewHolder, TradingRecordItemEntity item, int position) {
+                String type = "";
+                String operator = "";
+                double count = item.getOrder_money();
+                String countStr = "";
+                if(item.getCategory() == 1){
+                    type = CHANGE_TYPE[item.getType_depict()];
+                    operator = (item.getOrder_type() == 1 ? "+" : "-");
+                    countStr = String.format("%.2f", count);
+                } else {
+                    type = TOKEN_TYPE[item.getType_depict()];
+                    operator = (item.getOrder_type() == 1 ? "+" : "-");
+                    if(item.getType_depict() == 1 || item.getType_depict() == 4 || item.getType_depict() == 5){
+                        count = count - item.getCost();
+                    }
+                    countStr = String.format("%.4f", count);
+                }
+                viewHolder.setText(R.id.ic_bill_type, type);
+                viewHolder.setText(R.id.bill_amount, operator + countStr + (item.getbName() == null ? "" : item.getbName()));
+                viewHolder.setText(R.id.bill_date, item.getTime().substring(0, 10));
+            }
+        };
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ARouter.getInstance().build(RouteTable.MINE_BILL_DETAIL)
+                        .withSerializable(RouteExtra.TradingRecordItemEntity,
+                                sourceList.get(position) ).navigation();
+            }
+        });
+        chargeList.add("所有");
+        chargeList.add("收入");
+        chargeList.add("支出");
+        currentCharge = 0;
+    }
+
+    @Override
+    protected boolean isRefreshView() {
+        return tokenTypeList == null;
+    }
+
+    @Override
+    public void updateTokenList(UserCurrencyDataEntity list) {
+        if(tokenTypeList == null){
+            tokenTypeList = new ArrayList<>();
+        }
+        
+        typeList.clear();
+        List<UserCurrencyEntity> data = list.getData();
+        
+        UserCurrencyEntity lingqian = new UserCurrencyEntity();
+        lingqian.setBid("0");
+        lingqian.setbName("零钱");
+        typeList.add(lingqian.getbName());
+        tokenTypeList.add(lingqian);
+        
+        for(UserCurrencyEntity userCurrencyEntity : data){
+            typeList.add(userCurrencyEntity.getbName());
+            tokenTypeList.add(userCurrencyEntity);
+        }
+        
+        if(!tokenTypeList.isEmpty()){
+            tokenType.setText(typeList.get(0));
+            presenter.getTokenList(tokenTypeList.get(0).getBid(), 0);
+            currentBid = tokenTypeList.get(0).getBid();
+        }
+    }
+
+    @Override
+    public void updateTradeList(TradingRecordDataEntity data) {
+        sourceList.clear();
+        if(data.getData() != null &&data.getData().getItems() != null && !data.getData().getItems().isEmpty()){
+            sourceList.addAll(data.getData().getItems());
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    @OnClick({R.id.mine_bill_token_type_btn, R.id.mine_bill_charge_type_btn})
+    @Override
+    protected void onViewClicked(View view) {
+        super.onViewClicked(view);
+        switch (view.getId()) {
+            case R.id.mine_bill_token_type_btn:
+                SelectDialog selectDialog = new SelectDialog(this, "资产类型", typeList, currentB);
+                selectDialog.setOnChooseListener(new SelectDialog.OnChooseListener() {
+                    @Override
+                    public void onEnter(int position) {
+                        currentB = position;
+                        tokenType.setText(typeList.get(position));
+                        currentBid = tokenTypeList.get(position).getBid();
+                        presenter.getTokenList(currentBid, currentCharge);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                    
+                    }
+                });
+                selectDialog.showPopupWindow();
+            break;
+            case R.id.mine_bill_charge_type_btn:
+                SelectDialog selectDialog2 = new SelectDialog(this, "交易类型", chargeList, currentCharge);
+                selectDialog2.setOnChooseListener(new SelectDialog.OnChooseListener() {
+                    @Override
+                    public void onEnter(int position) {
+                        currentCharge = position;
+                        chrgeType.setText(chargeList.get(currentCharge));
+                        presenter.getTokenList(currentBid, currentCharge);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                    }
+                });
+                selectDialog2.showPopupWindow();
+            break;
+            default:
+                break;
+        }
+    }
+}

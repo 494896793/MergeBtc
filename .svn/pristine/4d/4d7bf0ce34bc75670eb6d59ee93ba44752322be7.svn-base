@@ -1,0 +1,64 @@
+package com.bochat.app.app.adapter;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MarketQuotationBSAdapter extends RecyclerView.Adapter<MarketQuotationBSAdapter.MarketQuotationBSViewHolder> {
+
+    private Context mContext;
+    private List mData = new ArrayList();
+
+    public MarketQuotationBSAdapter(Context context) {
+        mContext = context;
+    }
+
+    @NonNull
+    @Override
+    public MarketQuotationBSViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(mContext).inflate(R.layout.fragment_bs_socket_push_entrust_item, parent, false);
+        return new MarketQuotationBSViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull MarketQuotationBSViewHolder holder, int position) {
+        holder.mSortId.setText(String.valueOf(position + 1));
+    }
+
+    public void notifyData(List data) {
+        mData.addAll(data);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemCount() {
+        return mData != null ? mData.size() : 0;
+    }
+
+    class MarketQuotationBSViewHolder extends RecyclerView.ViewHolder {
+
+        TextView mSortId;
+
+        TextView mPrice;
+
+        TextView mCount;
+
+        public MarketQuotationBSViewHolder(View itemView) {
+            super(itemView);
+
+            mSortId = itemView.findViewById(R.id.sort_id);
+            mPrice = itemView.findViewById(R.id.price);
+            mCount = itemView.findViewById(R.id.count);
+        }
+    }
+
+}

@@ -1,0 +1,73 @@
+package com.bochat.app.common.bean;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import io.rong.imlib.model.Conversation;
+import io.rong.imlib.model.Message;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/05/04 14:27
+ * Description :
+ */
+
+public class SearchedConversation implements Parcelable {
+    private Conversation conversation;
+    private List<Message> messages;
+
+    public SearchedConversation() {
+    }
+
+    public SearchedConversation(Conversation conversation, ArrayList<Message> messages) {
+        this.conversation = conversation;
+        this.messages = messages;
+    }
+
+    protected SearchedConversation(Parcel in) {
+        conversation = in.readParcelable(Conversation.class.getClassLoader());
+        messages = in.createTypedArrayList(Message.CREATOR);
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(conversation, flags);
+        dest.writeTypedList(messages);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<SearchedConversation> CREATOR = new Creator<SearchedConversation>() {
+        @Override
+        public SearchedConversation createFromParcel(Parcel in) {
+            return new SearchedConversation(in);
+        }
+
+        @Override
+        public SearchedConversation[] newArray(int size) {
+            return new SearchedConversation[size];
+        }
+    };
+
+    public Conversation getConversation() {
+        return conversation;
+    }
+
+    public void setConversation(Conversation conversation) {
+        this.conversation = conversation;
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
+    }
+}

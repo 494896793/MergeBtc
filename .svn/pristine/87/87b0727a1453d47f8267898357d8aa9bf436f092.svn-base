@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:background="#FFFFFF"
+    android:orientation="vertical">
+    
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/mine_token_transfer_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_hasBackBtn="true"
+        android:background="#F2F2F2"
+        app:top_titleText="划转"/>
+    
+    <RelativeLayout
+        android:id="@+id/mine_token_transfer_select_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:layout_marginBottom="@dimen/dp_10"
+        android:background="#FFFFFF">
+
+        <TextView
+            android:layout_width="@dimen/dp_96"
+            android:layout_height="@dimen/dp_22"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/dp_15"
+            android:layout_centerVertical="true"
+            android:text="选择币种"
+            android:textColor="#ff181818"
+            android:textSize="@dimen/dp_16" />
+
+        <RelativeLayout
+            android:id="@+id/mine_token_transfer_select_coin_btn"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_alignParentRight="true"
+            android:layout_width="@dimen/dp_150"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/mine_token_transfer_selected_coin"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_22"
+                android:layout_marginRight="@dimen/dp_8"
+                android:layout_toLeftOf="@+id/iv_arrow_right"
+                android:text=""
+                android:textColor="#181818"
+                android:textSize="@dimen/dp_16" />
+
+
+            <ImageView
+                android:layout_centerVertical="true"
+                android:id="@+id/iv_arrow_right"
+                android:layout_width="@dimen/dp_24"
+                android:layout_height="@dimen/dp_24"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="@dimen/dp_15"
+                android:src="@mipmap/ic_arrow_right_gray24" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:background="#FFFFFF"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="@dimen/dp_96"
+            android:layout_height="@dimen/dp_22"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/dp_15"
+            android:text="接收人地址"
+            android:textColor="#ff181818"
+            android:textSize="@dimen/dp_16" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        android:background="#FFFFFF"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/mine_token_transfer_address"
+            android:layout_width="@dimen/dp_311"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/dp_16"
+            android:text=""
+            android:textColor="#ff333333"
+            android:maxLines="2"
+            android:background="@null"
+            android:hint="请扫描或输入地址"
+            android:textSize="@dimen/dp_16" />
+        <RelativeLayout
+            android:layout_centerVertical="true"
+            android:id="@+id/mine_token_transfer_address_scan"
+            android:focusable="true"
+            android:clickable="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_5"
+            android:layout_width="@dimen/dp_36"
+            android:layout_height="@dimen/dp_36">
+            <ImageView
+                android:layout_centerInParent="true"
+                android:layout_width="@dimen/dp_24"
+                android:layout_height="@dimen/dp_24"
+                android:src="@mipmap/ic_mine_scan" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dp_1"
+        android:background="#F2F2F2" />
+
+    <RelativeLayout
+        android:layout_width="@dimen/dp_375"
+        android:layout_height="@dimen/dp_44"
+        android:background="#FFFFFF"
+        android:layout_marginTop="@dimen/dp_1"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="@dimen/dp_96"
+            android:layout_height="@dimen/dp_22"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/dp_15"
+            android:text="发送数量"
+            android:textColor="#ff181818"
+            android:textSize="@dimen/dp_16" />
+
+    </RelativeLayout>
+    
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        android:background="#FFFFFF">
+
+        <EditText
+            android:id="@+id/mine_token_transfer_amount_input"
+            android:layout_width="@dimen/dp_150"
+            android:layout_height="@dimen/dp_22"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/dp_15"
+            android:layout_centerVertical="true"
+            android:inputType="numberDecimal"
+            android:background="@null"
+            android:hint="请填写发送数量"
+            android:textColor="#999999"
+            android:textSize="@dimen/dp_16" />
+
+        <TextView
+            android:id="@+id/mine_token_transfer_coin_type"
+            android:layout_toLeftOf="@id/tv_max_div"
+            android:layout_width="wrap_content"
+            android:layout_centerVertical="true"
+            android:text=""
+            android:textSize="@dimen/dp_16"
+            android:textColor="#333333"
+            android:layout_marginRight="@dimen/dp_15"
+            android:layout_height="wrap_content"/>
+        
+        <View
+            android:id="@+id/tv_max_div"
+            android:layout_width="@dimen/dp_1"
+            android:layout_height="@dimen/dp_16"
+            android:layout_marginRight="@dimen/dp_15"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/mine_token_transfer_amount_max"
+            android:background="#DFDFDF" />
+        
+        <TextView
+            android:id="@+id/mine_token_transfer_amount_max"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/dp_22"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/dp_15"
+            android:text="最大"
+            android:textColor="#FE695E"
+            android:textSize="@dimen/dp_16"/>
+        
+    </RelativeLayout>
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dp_1"
+        android:background="#F2F2F2" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/mine_token_transfer_amount_mine"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_15"
+            android:layout_marginTop="@dimen/dp_25"
+            android:text=""
+            android:textColor="#FE695E" />
+
+        <TextView
+            android:id="@+id/mine_token_transfer_amount_charge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_15"
+            android:layout_marginTop="@dimen/dp_9"
+            android:text=""
+            android:textColor="#4F5A7B" />
+
+
+        <TextView
+            android:id="@+id/mine_token_transfer_amount_min"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_15"
+            android:layout_marginTop="@dimen/dp_9"
+            android:text=""
+            android:textColor="#4F5A7B" />
+
+        <TextView
+            android:id="@+id/mine_token_transfer_amount_real"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_15"
+            android:layout_marginTop="@dimen/dp_9"
+            android:text=""
+            android:textColor="#4F5A7B" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:background="#FFFFFF"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <Button
+            android:id="@+id/mine_token_transfer_enter_btn"
+            android:layout_width="@dimen/dp_345"
+            android:layout_height="@dimen/dp_44"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/dp_30"
+            android:background="@drawable/deal_friend_refuse"
+            android:text="下一步"
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/dp_17" />
+    </RelativeLayout>
+</LinearLayout>

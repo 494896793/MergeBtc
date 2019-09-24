@@ -1,0 +1,55 @@
+package com.bochat.app.app.activity.bill;
+
+import android.os.Bundle;
+import android.widget.ImageView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.util.CodeCreator;
+import com.bochat.app.app.util.ResourceUtils;
+import com.bochat.app.common.contract.bill.GCSpecialCodeContract;
+import com.bochat.app.mvp.view.BaseActivity;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/4/26  17:40
+ * Description : 专用码
+ */
+@Route(path = RouteTable.MINE_GC_SPECIAL_CODE)
+public class GCSpecialCodeActivity extends BaseActivity<GCSpecialCodeContract.Presenter> implements GCSpecialCodeContract.View {
+    
+    @Inject
+    GCSpecialCodeContract.Presenter presenter;
+
+    @BindView(R.id.iv_code)
+    ImageView imageView;
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected GCSpecialCodeContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_mine_gc_special_code);
+    }
+    
+    @Override
+    public void updateQRCode(String content) {
+        imageView.setImageBitmap(CodeCreator.createQRCode(content, ResourceUtils.dip2px(this,R.dimen.dp_160),
+                ResourceUtils.dip2px(this, R.dimen.dp_160), null));
+    }
+    
+    
+    
+}

@@ -1,0 +1,117 @@
+package com.bochat.app.business.main.conversation;
+
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.common.model.IGroupModule;
+import com.bochat.app.common.router.Router;
+import com.bochat.app.common.router.RouterGroupAddManager;
+import com.bochat.app.common.router.RouterGroupDetail;
+import com.bochat.app.common.router.RouterSearchFriend;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.GroupMemberEntity;
+import com.bochat.app.model.bean.GroupMemberListEntity;
+import com.bochat.app.model.util.LogUtil;
+import com.bochat.app.mvp.presenter.BasePresenter;
+import com.bochat.app.common.contract.conversation.GroupAddManagerContract;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+/**
+ * create by guoying ${Date} and ${Month}
+ */
+public class GroupAddManagerPresenter extends BasePresenter<GroupAddManagerContract.View> implements GroupAddManagerContract.Presenter {
+    @Inject
+    IGroupModule groupModule;
+    private List<GroupMemberEntity> memberEntityList = new ArrayList<>();
+    private String groupId;
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+
+    }
+
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        RouterGroupAddManager extra = getExtra(RouterGroupAddManager.class);
+        memberEntityList.clear();
+        if (extra != null){
+            groupId = extra.getGroupId();
+            List<GroupMemberEntity> list = extra.getList();
+            for (int i = 0;i<list.size();i++){
+                if (list.get(i).getRole() == 1){
+                    memberEntityList.add(list.get(i));
+
+                }
+            }
+        }
+        LogUtil.LogDebug("ggyy"," 22222");
+        if (memberEntityList != null){
+
+            getView().onUpdateMemberList(memberEntityList);
+
+        }
+    }
+
+    @Override
+    public void addManagerCommit(final String tageId) {
+        LogUtil.LogDebug("ggyy","addManagercompile" +tageId+" "+groupId);
+
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<CodeEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<CodeEntity> emitter) throws Exception {
+                try {
+                    CodeEntity entity = groupModule.addGroupManager(groupId,tageId);
+                    if(entity.getRetcode() != 0){
+                        CodeEntity codeEntity = new CodeEntity();
+                        codeEntity.setCode(entity.getCode());
+                        codeEntity.setMsg(entity.getMsg());
+                        codeEntity.setRetcode(entity.getRetcode());
+                        emitter.onError(new RxErrorThrowable(codeEntity));
+                        return;
+                    }
+
+                    emitter.onNext(entity);
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<CodeEntity>() {
+            @Override
+            public void accept(CodeEntity entity) throws Exception {
+                getView().hideLoading("");
+                getView().finish();
+
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("");
+                getView().finish();
+            }
+        });
+        getView().showLoading(subscribe);
+
+    }
+
+    @Override
+    public void onSearchClick() {
+        Router.navigation(new RouterSearchFriend(
+                RouterSearchFriend.SEARCH_LOCAL | RouterSearchFriend.SEARCH_GROUP_MEMBER,
+                String.valueOf(groupId)), RouterGroupDetail.class);
+    }
+}

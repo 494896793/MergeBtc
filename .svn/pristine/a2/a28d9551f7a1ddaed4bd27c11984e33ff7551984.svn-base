@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/market_quotation_detail_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_background="@color/white"
+        app:top_hasBackBtn="true"
+        app:top_titleText="" />
+
+    <com.flyco.tablayout.SlidingTabLayout
+        android:id="@+id/market_quotation_detail_tab"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:background="@color/white"
+        app:tl_textSelectColor="#222222"
+        app:tl_textsize="@dimen/dp_14"
+        app:tl_indicator_color="#ff0084ff"
+        app:tl_indicator_corner_radius="@dimen/dp_2"
+        app:tl_indicator_height="@dimen/dp_2"
+        app:tl_indicator_width="@dimen/dp_14"
+        app:tl_tab_space_equal="true"
+        app:tl_textUnselectColor="#666666"/>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/market_quotation_detail_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

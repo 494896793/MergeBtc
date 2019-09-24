@@ -1,0 +1,53 @@
+package com.bochat.app.common.model;
+
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.DynamicBannerListEntity;
+import com.bochat.app.model.bean.DynamicNoticeListEntity;
+import com.bochat.app.model.bean.DynamicShopGameListEntity;
+import com.bochat.app.model.bean.DynamicShopTypeListEntity;
+import com.bochat.app.model.bean.DynamicTopShopListEntity;
+import com.bochat.app.model.bean.ProjectIdentificationEntity;
+import com.bochat.app.model.bean.ProtocolBookEntity;
+import com.bochat.app.model.bean.ViewSpotEntity;
+import com.bochat.app.model.bean.ViewSpotListEntity;
+
+/**
+ * 2019/5/5
+ * Author LDL
+ **/
+public interface IDynamicModel {
+
+    /*查询应用商店前四条-首页*/
+    DynamicTopShopListEntity listApplicationHome(String userId);
+
+    /*查询应用商店类型*/
+    DynamicShopTypeListEntity getAppStoreType(String userId);
+
+    /*查询应用商店、推荐游戏列表
+    type:   2 - 应用商店,  3 - 推荐游戏*/
+    DynamicShopGameListEntity listApplication(int start, int offset, int type, int typeId);
+
+    /*查询banner列表
+    type:1：理财通;2：推荐游戏;3:商城；4：动态*/
+    DynamicBannerListEntity listBanner(int type);
+
+    /*查询公告列表
+    type:    1-动态*/
+    DynamicNoticeListEntity listAnnouncement(int start,int offset,int type);
+
+//    获取今日看点列表
+    ViewSpotEntity getInfomationList(int start, int offset, String keyword );
+
+    /*添加项目方合作申请*/
+    CodeEntity addProjectParty(String companyName,String website,String logo,String license);
+
+    /*项目方认证状态*/
+    ProjectIdentificationEntity getProjectParty();
+
+    /*BoChat项目合作协议书*/
+    ProtocolBookEntity getProtocolBook();
+
+    /*查询第三方服务列表*/
+    DynamicTopShopListEntity listAppService();
+
+}

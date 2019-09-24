@@ -1,0 +1,28 @@
+package com.bochat.app.model.modelImpl;
+
+import com.bochat.app.common.model.IMarketQuotationEntrustModel;
+import com.bochat.app.model.bean.AmountEntity;
+import com.bochat.app.model.bean.EntrustApplyListEntity;
+import com.bochat.app.model.bean.HttpClientEntity;
+import com.bochat.app.model.constant.Constan;
+import com.bochat.app.model.net.HttpClient;
+import com.bochat.app.model.net.QuotationHttpClient;
+import com.bochat.app.model.net.RetrofitService;
+import com.bochat.app.model.util.Api;
+import com.bochat.app.model.util.QuotationApi;
+
+public class MarketQuotationEntrustModel implements IMarketQuotationEntrustModel {
+    @Override
+    public EntrustApplyListEntity queryApplyList(int marketId, int type, int pageNum, int pageSize) {
+        EntrustApplyListEntity entrustApplyListEntity = null;
+        HttpClientEntity httpClientEntity = (HttpClientEntity) QuotationHttpClient.getInstance().sends(EntrustApplyListEntity.class, "data", QuotationHttpClient.getInstance().retrofit().create(RetrofitService.class).queryApplyList(QuotationApi.queryApplyList, marketId, type, pageNum, pageSize));
+        if (httpClientEntity.getCode() == Constan.NET_SUCCESS) {
+            entrustApplyListEntity = httpClientEntity.getObj();
+        } else {
+            entrustApplyListEntity.setCode(httpClientEntity.getCode());
+            entrustApplyListEntity.setMsg(httpClientEntity.getMessage());
+            entrustApplyListEntity.setRetcode(httpClientEntity.getCode());
+        }
+        return entrustApplyListEntity;
+    }
+}

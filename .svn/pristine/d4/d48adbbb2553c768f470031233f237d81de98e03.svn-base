@@ -1,0 +1,120 @@
+package com.bochat.app.app.activity.mine;
+
+import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.util.CodeCreator;
+import com.bochat.app.app.util.ResourceUtils;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.app.view.ShareDialog;
+import com.bochat.app.common.contract.mine.InvitationContract;
+import com.bochat.app.common.util.CopyUtil;
+import com.bochat.app.model.bean.InviteCodeEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bumptech.glide.Glide;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/24 17:56
+ * Description :
+ */
+
+@Route(path = RouteTable.MINE_INVITATION)
+public class InvitationActivity extends BaseActivity<InvitationContract.Presenter> implements InvitationContract.View {
+
+    private static final String SHARE_TITLE = "邀请有礼";
+    private static final String SHARE_DESCRIPTION = "邀请链接 [点击复制] ";
+    
+    @Inject
+    InvitationContract.Presenter presenter;
+    
+    @BindView(R.id.qr_card_top_bar)
+    BoChatTopBar boChatTopBar;
+    @BindView(R.id.qr_card_icon)
+    ImageView icon;
+    @BindView(R.id.qr_card_name)
+    TextView name;
+    @BindView(R.id.qr_card_code)
+    ImageView code;
+    @BindView(R.id.qr_card_tips)
+    TextView tips;
+    @BindView(R.id.qr_card_invite_layout)
+    RelativeLayout inviteLayout;
+    @BindView(R.id.qr_card_invite_content)
+    TextView inviteContent;
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected InvitationContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_invitation);
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+        boChatTopBar.setOnClickListener(new BoChatTopBar.OnClickListener() {
+            @Override
+            public void onRightExtButtonClick() {
+                super.onRightExtButtonClick();
+                ShareDialog shareDialog = new ShareDialog(InvitationActivity.this, SHARE_TITLE, 
+                        SHARE_DESCRIPTION + inviteContent.getText().toString(), inviteContent.getText().toString());
+                shareDialog.showPopupWindow();
+
+                
+            }
+        });
+    }
+
+    @Override
+    public void updateInfo(InviteCodeEntity inviteCodeEntity) {
+        Glide.with(this).load(inviteCodeEntity.getHeadImg()).into(icon);
+        name.setText(inviteCodeEntity.getNickname());
+        code.setImageBitmap(createQRCode(inviteCodeEntity.getShareUrl()));
+        tips.setText(String.format(getResources().getString(R.string.mine_invite), 
+                String.valueOf(inviteCodeEntity.getCount())));
+
+        String link = inviteCodeEntity.getShareUrl();
+        
+        inviteContent.setText(link);
+        boChatTopBar.setTitleText("注册送"+inviteCodeEntity.getInviterNum()+"金币 邀请再领"+inviteCodeEntity.getGcNumber()+"金币");
+    }
+
+    private Bitmap createQRCode(String url){
+        return CodeCreator.createQRCode(url, ResourceUtils.dip2px(this,R.dimen.dp_160),
+                ResourceUtils.dip2px(this, R.dimen.dp_160), null);
+    }
+
+    @OnClick(R.id.qr_card_invite_layout)
+    @Override
+    protected void onViewClicked(View view) {
+        super.onViewClicked(view);
+        if(CopyUtil.copy(this, inviteContent.getText().toString())){
+            showTips("复制成功");
+        }
+    }
+    
+    
+    
+    
+}

@@ -1,0 +1,40 @@
+package com.bochat.app.app.activity.dynamic;
+
+import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+
+import com.bochat.app.R;
+import com.bochat.app.common.contract.dynamic.ShakyCenterContract;
+import com.bochat.app.mvp.view.BaseActivity;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+/**
+ * 2019/6/12
+ * Author LDL
+ **/
+public class ShakyCenterActivity extends BaseActivity<ShakyCenterContract.Presenter> implements ShakyCenterContract.View {
+
+    @Inject
+    ShakyCenterContract.Presenter presenter;
+
+    @BindView(R.id.recycler)
+    RecyclerView recycler;
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected ShakyCenterContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_shakycenter);
+    }
+}

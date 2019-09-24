@@ -1,0 +1,152 @@
+package com.bochat.app.app.adapter;
+
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+import com.bochat.app.common.util.ULog;
+import com.bochat.app.model.bean.PrivilegeEntity;
+import com.bochat.app.model.bean.PrivilegeListEntity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.OnClick;
+
+public class PrivilegeAdapter extends RecyclerView.Adapter<PrivilegeAdapter.ViewHolder> implements View.OnClickListener {
+
+    private Context mContext;
+    private List<PrivilegeEntity> mData = new ArrayList<>();
+
+    private OnItemClickListener mListener;
+
+    public PrivilegeAdapter(Context context) {
+        mContext = context;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mListener = listener;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(mContext).inflate(R.layout.privilege_layout_item, parent, false);
+        return new ViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
+        final PrivilegeEntity entity = mData.get(position);
+        int type = entity.getType();
+        int state = entity.getState();
+
+        Drawable backgroundDrawable = null;
+
+        if (type == 1) {
+            backgroundDrawable = mContext.getResources().getDrawable(R.mipmap.bg_privilege_banner_01);
+        } else if (type == 2) {
+            backgroundDrawable = mContext.getResources().getDrawable(R.mipmap.bg_privilege_banner_02);
+        }
+
+        if (state == 1)
+            backgroundDrawable = mContext.getResources().getDrawable(R.mipmap.bg_privilege_expire);
+
+        holder.mPrivilegeState.setText(state == 0 ? "使用中" : "已过期");
+
+        holder.mPrivilegeState.setVisibility(type == 1 ? View.GONE : View.VISIBLE);
+        holder.mPrivilegeRenewButton.setVisibility(type == 1 ? View.GONE : View.VISIBLE);
+
+        holder.mPrivilegeRenewButton.setTextColor(mContext.getResources().getColor(state == 0 ? R.color.privilege_used : R.color.privilege_expire));
+        holder.mPrivilegeState.setBackground(mContext.getResources().getDrawable(state == 0 ? R.drawable.privilege_state_used_shape : R.drawable.privilege_state_expire_shape));
+
+        holder.mPrivilegeName.setText(entity.getName());
+        holder.mPrivilegeTermOfValidity.setText(mContext.getResources().getString(R.string.privilege_valid_time, entity.getValid_time()));
+        holder.mPrivilegeLayout.setBackground(backgroundDrawable);
+
+        holder.mPrivilegeRenewButton.setOnClickListener(this);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null)
+                    mListener.onItemClick(entity);
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return mData.size();
+    }
+
+    public void onRefresh(PrivilegeListEntity entity) {
+        mData.clear();
+        mData.addAll(entity.getItems());
+        notifyDataSetChanged();
+    }
+
+    public void onLoadMore(PrivilegeListEntity entity) {
+        mData.addAll(entity.getItems());
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.privilege_btn) {
+            ULog.d("去续费咯");
+        }
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(PrivilegeEntity entity);
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+
+        /**
+         * 特权卡布局
+         */
+        private LinearLayout mPrivilegeLayout;
+
+        /**
+         * 特权名称
+         */
+        private TextView mPrivilegeName;
+
+        /**
+         * 特权状态
+         */
+        private TextView mPrivilegeState;
+
+        /**
+         * 特权有效期
+         */
+        private TextView mPrivilegeTermOfValidity;
+
+        /**
+         * 续费按钮
+         */
+        private Button mPrivilegeRenewButton;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+
+            mPrivilegeLayout = itemView.findViewById(R.id.privilege_item);
+            mPrivilegeName = itemView.findViewById(R.id.privilege_name);
+            mPrivilegeState = itemView.findViewById(R.id.privilege_state);
+            mPrivilegeTermOfValidity = itemView.findViewById(R.id.privilege_term_of_validity);
+            mPrivilegeRenewButton = itemView.findViewById(R.id.privilege_btn);
+        }
+    }
+}

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:background="#FFFFFF"
+              android:orientation="vertical">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/mine_wallet_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_titleText="钱包"
+        app:top_background="#F2F2F2"
+        app:top_hasExt3Btn="true"
+        app:top_extButton3Text="账单"
+        app:top_hasBackBtn="true"/>
+    
+    <com.flyco.tablayout.SlidingTabLayout
+        android:id="@+id/wallet_mine_tab"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:tl_indicator_width="@dimen/dp_39"
+        app:tl_indicator_color="#FE695E"
+        app:tl_indicator_height="@dimen/dp_3"
+        app:tl_indicator_corner_radius="@dimen/dp_2"
+        app:tl_textSelectColor="#FE695E"
+        app:tl_textsize="@dimen/dp_16"
+        app:tl_textUnselectColor="#000000"
+        app:tl_tab_space_equal="true"
+        android:background="#FFFFFF"/>
+    
+    <android.support.v4.view.ViewPager
+        android:id="@+id/wallet_mine_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>

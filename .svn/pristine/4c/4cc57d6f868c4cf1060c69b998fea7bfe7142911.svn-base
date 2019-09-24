@@ -1,0 +1,110 @@
+package com.bochat.app.app;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/15 10:36
+ * Description :
+ */
+
+public class RouteTable {
+    public static final String USER_SPLASH_SCREEN = "/friendDetail/splash_screen";
+    public static final String USER_LOGIN = "/friendDetail/login";
+    public static final String USER_REGISTER = "/friendDetail/register";
+    public static final String MAIN_BOCHAT = "/main/bochat";
+
+    public static final String CONVERSATION_SINGLE_CHAT = "/conversation/single_chat";
+    public static final String CONVERSATION_GROUP_CHAT = "/conversation/group_chat";
+    public static final String CONVERSATION_QR_CARD = "/conversation/qr_card";
+    public static final String CONVERSATION_ADD_FRIEND = "/conversation/add_friend";
+    public static final String CONVERSATION_ADD_GROUP = "/conversation/add_group";
+
+    public static final String CONVERSATION_SEARCH_FRIEND = "/conversation/search_friend";
+    public static final String CONVERSATION_SELECT_FRIEND = "/conversation/select_friend";
+    public static final String CONVERSATION_SEARCH_CONVERSATION = "/conversation/search_history_conversation";
+    public static final String CONVERSATION_SEARCH_MESSAGE = "/conversation/search_history_message";
+    public static final String CONVERSATION_SEARCH_GROUP = "/conversation/search_group";
+    public static final String CONVERSATION_FRIEND_MANAGE = "/conversation/friend_manage";
+    public static final String CONVERSATION_FRIEND_MANAGE_NOTE = "/conversation/friend_manage_note";
+
+    public static final String CONVERSATION_GROUP_DETAIL = "/conversation/group_detail";
+    public static final String CONVERSATION_GROUP_MANAGE = "/conversation/group_manage";
+    public static final String CONVERSATION_GROUP_MANAGE_EDIT = "/conversation/group_manage_edit";
+    public static final String CONVERSATION_GROUP_MANAGE_EDIT_NAME = "/conversation/group_manage_edit_note";
+    public static final String CONVERSATION_GROUP_MANAGE_FORBIDDEN = "/conversation/group_manage_forbidden";
+    public static final String CONVERSATION_GROUP_MANAGE_UPGRADE = "/conversation/group_manage_upgrade";
+    public static final String CONVERSATION_GROUP_MEMBER = "/conversation/group_member";
+    public static final String CONVERSATION_GROUP_MEMBER_MANAGE = "/conversation/group_member_manage";
+    public static final String CONVERSATION_GROUP_MEMBER_MANAGER = "/conversation/group_member_manager";
+    public static final String CONVERSATION_GROUP_MEMBER_MANAGE_NOTE = "/conversation/group_member_manage_note";
+    public static final String CONVERSATION_GROUP_MANAGE_JOIN_FILTER = "/conversation/group_manage_join_filter";
+    public static final String CONVERSATION_READ_PACKET_DETAIL="/conversation/red_packet/detail";
+    public static final String CONVERSATION_MAIN="/conversation/main";
+
+    public static final String BOOK_APPLY_LIST_DEAL="/book/main/apply/deal";
+    public static final String BOOK_APPLY_LIST="/book/main/apply";
+    public static final String BOOK_ADDRESS = "/book/main";
+    public static final String BOOK_ADDRESS_USER="/book/main/friendDetail";
+    public static final String BOOK_ADDRESS_EDIT_REQUEST = "/book/edit_request";
+    public static final String BOOK_ADDRESS_FRIEND_DETAIL = "/book/friend_detail";
+    public static final String BOOK_ADDRESS_REQUEST_ADD_FRIEND = "/book/request_add_friend";
+    public static final String BOOK_ADDRESS_REQUEST_ADD_GROUP = "/book/request_add_group";
+    public static final String BOOK_ADDRESS_REQUEST_LIST = "/book/request_list";
+    public static final String BOOK_ADDRESS_REQUEST_REFUSE = "/book/request_refuse";
+    public static final String BOOK_ADDRESS_SEARCH_LOCAL_FRIEND = "/book/search_local_friend";
+
+    public static final String MINE_ABOUT_US = "/main/about_us";
+
+    public static final String DYNAMIC_MAIN="/dynamic/main";
+    public static final String DYNAMIC_LIST_APP="/dynamic/listApp";
+    public static final String DYNAMIC_MAIN_NOTICE="/dynamic/main/notice";
+    public static final String DYNAMIC_MAIN_SEND_REDPACKET="/dynamic/main/sendRedPacket";
+    public static final String DYNAMIC_MAIN_NOTICE_DETAIL="/dynamic/main/notice/detail";
+    public static final String DYNAMIC_MAIN_VIEW_SPOT="/dynamic/main/viewspot";
+    public static final String DYNAMIC_MAIN_PROJECT_IDENTIFICATION="/dynamic/main/projectIdentification";
+    public static final String DYNAMIC_MAIN_PROJECT_IDENTIFICATION_RESULT="/dynamic/main/projectIdentification/result";
+    public static final String DYNAMIC_MAIN_PROJECT_IDENTIFICATION_BOOK="/dynamic/main/projectIdentification/book";
+    public static final String DYNAMIC_MAIN_VIEW_SPOT_SEARCH="/dynamic/main/viewspot/search";
+    public static final String DYNAMIC_MAIN_FAST_SPEED="/dynamic/main/fastSpeed";
+    public static final String CRASH_HANDLE = "/main/crash_handle";
+
+    public static final String SCAN_QR_CODE = "/main/scan_qr_code";
+
+    public static final String MINE_TOKEN_DETAIL = "/mine/token_detail";
+    public static final String MINE_TOKEN_TRANSFER = "/mine/token_transfer";
+    public static final String MINE_TOKEN_TRANSFER_PAY = "/mine/token_transfer_pay";
+    public static final String MINE_TOKEN_TRANSFER_RECEIVE = "/mine/token_transfer_receive";
+    public static final String MINE_TOKEN_TRANSFER_SELECT_COIN = "/mine/token_transfer_select_coin";
+    public static final String MINE_WALLET = "/mine/wallet";
+    public static final String MINE_GC_SPECIAL_CODE = "/mine/gc_special_code";
+    public static final String MINE_ORDER_LIST = "/mine/oder_list";
+    public static final String MINE_PROPERTY_CASH_OUT = "/mine/property_cash_out";
+    public static final String MINE_PROPERTY_RECHARGE = "/mine/property_recharge";
+    public static final String MINE_PROPERTY_RECHARGE_RESULT = "/mine/property_recharge_result";
+    public static final String MINE_QUICK_EXCHANGE = "/mine/property_quick_exchange";
+    public static final String MINE_QUICK_EXCHANGE_DETAIL = "/mine/property_quick_exchange_detail";
+    public static final String MINE_QUICK_EXCHANGE_HALL = "/mine/quick_exchange_hall";
+
+    public static final String MINE_BILL = "/mine/bill";
+    public static final String MINE_BILL_DETAIL = "/mine/bill_detail";
+    
+    public static final String MINE_BANK_CARD_LIST = "/mine/bank_card_list";
+    public static final String MINE_BANK_CARD_ADD = "/mine/bank_card";
+    public static final String MINE_BANK_SELECT_BANK = "/mine/select_bank";
+    
+    public static final String MINE_REAL_NAME_AUTH = "/mine/real_name_auth";
+    public static final String MINE_REAL_NAME_INFO = "/mine/real_name_info";
+    public static final String MINE_SETTINGS = "/mine/settings";
+    public static final String MINE_SETTINGS_PHONE_INFO = "/mine/phone_info";
+    public static final String MINE_SETTINGS_SET_PASSWORD = "/mine/set_password";
+    public static final String MINE_SETTINGS_EDIT_PASSWORD = "/mine/edit_password";
+    public static final String MINE_SETTINGS_SET_PAY_PASSWORD = "/mine/set_pay_password";
+    public static final String MINE_SETTINGS_EDIT_PAY_PASSWORD = "/mine/edit_pay_password";
+    public static final String MINE_SETTINGS_GET_CODE = "/mine/get_code";
+    
+    public static final String MINE_USER_INFO = "/mine/user_info";
+    public static final String MINE_INVITATION = "/mine/invitation";
+    
+    public static final String MINE_SEARCH_ADDRESS_BOOK = "/mine/search_address_book";
+    
+    public static final String TEST = "/main/test";
+}

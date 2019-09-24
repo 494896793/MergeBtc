@@ -1,0 +1,57 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 20:27
+ * Description :
+ */
+
+public class TransactionListEntity implements MarketCenterData {
+
+    private String transactionType;
+    private List<TransactionEntity> list = new ArrayList<>();
+
+    @Override
+    public MarketCenterType getType() {
+        return MarketCenterType.TRANSACTION;
+    }
+
+    public String getTransactionType() {
+        return transactionType;
+    }
+
+    public void setTransactionType(String transactionType) {
+        this.transactionType = transactionType;
+    }
+
+    @Override
+    public boolean parseFromJson(JSONObject json) {
+        try {
+            setTransactionType(json.getString("type"));
+
+            if(!json.isNull("data")) {
+                JSONObject data = json.getJSONObject("data");
+                if (!data.isNull("list")) {
+                    JSONArray array = data.getJSONArray("list");
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject jsonObject = array.getJSONObject(i);
+                        list.add(new TransactionEntity(jsonObject));
+                    }
+                }
+            }
+            return true;
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
+
+    public List<TransactionEntity> getList() {
+        return list;
+    }
+}

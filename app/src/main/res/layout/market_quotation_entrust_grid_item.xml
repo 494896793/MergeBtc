@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/dp_14"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/top_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_8"
+        android:layout_marginBottom="@dimen/dp_8"
+        tools:text="买入数量" />
+
+    <TextView
+        android:id="@+id/cell_des"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="260,000.0000" />
+</LinearLayout>

@@ -1,0 +1,100 @@
+package com.bochat.app.app.activity;
+
+import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.EditText;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.ListAppAdapter;
+import com.bochat.app.app.fragment.ListAppFragment;
+import com.bochat.app.app.util.ResourceUtils;
+import com.bochat.app.common.contract.dynamic.SearchAppContract;
+import com.bochat.app.common.router.Router;
+import com.bochat.app.common.router.RouterDynamicWebView;
+import com.bochat.app.common.router.RouterSearchApp;
+import com.bochat.app.model.bean.DynamicShopGameEntity;
+import com.bochat.app.model.bean.DynamicShopGameListEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+
+import java.util.ArrayList;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+@Route(path = RouterSearchApp.PATH)
+public class SearchAppActivity extends BaseActivity<SearchAppContract.Presenter> implements SearchAppContract.View, ListAppAdapter.OnItemClickListener {
+
+    @Inject
+    SearchAppContract.Presenter presenter;
+
+    @BindView(R.id.search_app_edit)
+    EditText mSearchEdit;
+
+    @BindView(R.id.search_app_container)
+    RecyclerView mRecyclerView;
+
+    private ListAppAdapter mAdapter;
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected SearchAppContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void initWidget() {
+        mAdapter = new ListAppAdapter(new ArrayList<DynamicShopGameEntity>(), this);
+        mAdapter.setOnItemClickListener(this);
+
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        mRecyclerView.addItemDecoration(new ListAppFragment.SpacesItemDecoration(ResourceUtils.dip2px(this, R.dimen.dp_15)));
+        mRecyclerView.setAdapter(mAdapter);
+
+        String keyWork = mSearchEdit.getText().toString();
+        presenter.searchApp(keyWork);
+    }
+
+    @OnClick({R.id.search_app_cancel, R.id.search_app_close})
+    @Override
+    protected void onViewClicked(View view) {
+        super.onViewClicked(view);
+        switch (view.getId()) {
+            case R.id.search_app_cancel:
+                finish();
+                break;
+            case R.id.search_app_close:
+                mSearchEdit.setText("");
+                mSearchEdit.clearFocus();
+                break;
+        }
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_search_app_layout);
+    }
+
+    @Override
+    public void searchResult(DynamicShopGameListEntity entity) {
+        mAdapter.onRefresh(entity.getItems());
+        if (entity.getItems() != null) {
+            mAdapter.onRefresh(entity.getItems());
+        }
+    }
+
+    @Override
+    public void onItemClick(int position, DynamicShopGameEntity entity) {
+        Router.navigation(new RouterDynamicWebView(entity.getLink(), true, entity.getName()));
+    }
+}

@@ -1,0 +1,118 @@
+package com.bochat.app.app.activity.bill;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ListView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.common.contract.bill.QuickExchangeHallContract;
+import com.bochat.app.model.bean.SpeedConverListEntity;
+import com.bochat.app.model.bean.SpeedConverListItemEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bumptech.glide.Glide;
+import com.zhy.adapter.abslistview.CommonAdapter;
+import com.zhy.adapter.abslistview.ViewHolder;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/4/26  17:40
+ * Description : 闪兑大厅
+ */
+@Route(path = RouteTable.MINE_QUICK_EXCHANGE_HALL)
+public class QuickExchangeHallActivity extends BaseActivity<QuickExchangeHallContract.Presenter> implements QuickExchangeHallContract.View {
+    
+    @BindView(R.id.quick_exchange_top_bar)
+    BoChatTopBar boChatTopBar;
+    
+    @Inject
+    QuickExchangeHallContract.Presenter presenter;
+
+    @BindView(R.id.quick_exchange_list)
+    ListView listView;
+    
+    private ArrayList<SpeedConverListItemEntity> list;
+    
+    private CommonAdapter<SpeedConverListItemEntity> adapter;
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected QuickExchangeHallContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_mine_quick_exchange_hall);
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+        list = new ArrayList<>();
+
+        adapter = new CommonAdapter<SpeedConverListItemEntity>(this, R.layout.item_mine_quick_exchange, list) {
+            @Override
+            protected void convert(ViewHolder viewHolder, SpeedConverListItemEntity item, int position) {
+                viewHolder.setText(R.id.mine_quick_exchange_user_name, item.getNickname());
+
+                ImageView view = viewHolder.getView(R.id.mine_quick_exchange_user_icon);
+                Glide.with(QuickExchangeHallActivity.this).load(item.getHeadImg()).into(view);
+                viewHolder.setText(R.id.mine_quick_exchange_info, "发起了用 "+item.getConverCurrency()+" 兑换 "+item.getStartCurrency()+" 的闪兑");
+                viewHolder.setText(R.id.mine_quick_exchange_offer_coin_type, "兑换(" + item.getConverCurrency() + ")");
+                viewHolder.setText(R.id.mine_quick_exchange_mine_coin_type, "您需支付(" + item.getStartCurrency() + ")");
+                viewHolder.setText(R.id.mine_quick_exchange_mine_coin_amount, String.format("%.6f", item.getStartNum()));
+                viewHolder.setText(R.id.mine_quick_exchange_offer_coin_amount, String.format("%.6f", item.getConverNum()));
+                viewHolder.setText(R.id.mine_quick_exchange_rate_num, String.valueOf(item.getRatio()));
+                viewHolder.setText(R.id.mine_quick_exchange_user_date, item.getTradeTime());
+            }
+        };
+        
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                presenter.onItemClick(list.get(position));
+            }
+        });
+
+        boChatTopBar.setOnClickListener(new BoChatTopBar.OnClickListener() {
+            @Override
+            public void onTextExtButtonClick() {
+                presenter.onOrderListClick();
+            }
+        });
+    }
+
+    @OnClick({R.id.quick_exchange_enter})
+    @Override
+    protected void onViewClicked(View view) {
+        presenter.onEnterClick();
+    }
+
+    @Override
+    public void updateList(SpeedConverListEntity date) {
+        List<SpeedConverListItemEntity> items = date.getItems();
+        list.clear();
+        if(items != null && !items.isEmpty()){
+            list.addAll(items);
+        }
+        adapter.notifyDataSetChanged();
+    }
+}

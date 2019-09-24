@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:gravity="center_horizontal"
+    android:layout_height="match_parent">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_titleText="实名认证"
+        app:top_background="#F2F2F2"
+        app:top_hasBackBtn="true"/>
+    
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_211"
+        android:background="#F2F2F2"
+        >
+        <ImageView
+            android:id="@+id/mine_real_name_icon"
+            android:layout_width="@dimen/dp_60"
+            android:layout_height="@dimen/dp_60"
+            android:layout_marginTop="@dimen/dp_50"
+            android:layout_centerHorizontal="true"
+            android:src="@mipmap/ic_user_info"
+            android:scaleType="fitXY"/>
+        <TextView
+            android:layout_below="@id/mine_real_name_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:layout_centerHorizontal="true"
+            android:text="实名认证通过"
+            android:textColor="#181818"
+            android:textSize="@dimen/dp_16"/>
+        
+    </RelativeLayout>
+
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/mine_real_name_name"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_hasRightBtn="false"
+        app:item_text="真实姓名"
+        app:item_hasEditText="true"
+        app:item_editTextEnable="false"
+        app:item_editTextHint=""
+        />
+
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/mine_real_name_id"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_hasRightBtn="false"
+        app:item_text="身份证号"
+        app:item_hasEditText="true"
+        app:item_editTextEnable="false"
+        app:item_editTextHint="410542******1245"/>
+    
+</LinearLayout>

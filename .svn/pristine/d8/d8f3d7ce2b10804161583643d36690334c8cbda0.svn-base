@@ -1,0 +1,97 @@
+package com.bochat.app.business.main.mine;
+
+import android.content.Intent;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.mine.AddBankCardContract;
+import com.bochat.app.common.model.IUserModel;
+import com.bochat.app.model.bean.BankCard;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.RealNameAuthEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/05/13 19:28
+ * Description :
+ */
+
+public class BankCardAddPresenter extends BasePresenter<AddBankCardContract.View> implements AddBankCardContract.Presenter {
+    
+    @Inject
+    IUserModel userModel;
+    
+    private String realName = "";
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        RealNameAuthEntity latest = CachePool.getInstance().realNameAuth().getLatest();
+        if(latest != null){
+            realName = CachePool.getInstance().realNameAuth().getLatest().getReal_name();
+        }
+        getView().updateUserName(realName);
+        Intent intent = getView().getViewIntent();
+        if(intent.hasExtra(RouteExtra.BankCard)){
+            getView().updateBank((BankCard) intent.getSerializableExtra(RouteExtra.BankCard));
+        }
+    }
+
+    @Override
+    public void onAddBankCardEnter(final BankCard bank, final String branch, final String cardId) {
+        if(bank == null){
+            getView().showTips("请选择银行");
+            return;
+        }
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<CodeEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<CodeEntity> emitter) throws Exception {
+                try {
+                    CodeEntity entity = userModel.bindBank(bank.getId(), cardId , branch);
+                    if(entity.getRetcode() != 0){
+                        emitter.onError(new RxErrorThrowable(entity));
+                    } else {
+                        emitter.onNext(entity);
+                    }
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<CodeEntity>() {
+            @Override
+            public void accept(CodeEntity entity) throws Exception {
+                getView().hideLoading("添加成功");
+                ARouter.getInstance().build(RouteTable.MINE_BANK_CARD_LIST).navigation();
+                getView().finish();
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("");
+            }
+        });
+        getView().showLoading(subscribe);
+    }
+}

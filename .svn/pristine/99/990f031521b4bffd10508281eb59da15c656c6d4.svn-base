@@ -1,0 +1,18 @@
+package com.bochat.app.common.contract;
+
+import com.bochat.app.mvp.presenter.IBasePresenter;
+import com.bochat.app.mvp.view.IBaseView;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/03 16:24
+ * Description :
+ */
+
+public interface TestContract {
+    interface View extends IBaseView<TestContract.Presenter> {
+    }
+
+    interface Presenter extends IBasePresenter<TestContract.View> {
+    }
+}

@@ -1,0 +1,189 @@
+package com.bochat.app.app.activity.bill;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.common.contract.bill.TokenDetailContract;
+import com.bochat.app.model.bean.CurrencyDetailDataEntity;
+import com.bochat.app.model.bean.CurrencyDetailEntity;
+import com.bochat.app.model.bean.CurrencyTradingDataEntity;
+import com.bochat.app.model.bean.CurrencyTradingItemEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bumptech.glide.Glide;
+import com.zhy.adapter.abslistview.CommonAdapter;
+import com.zhy.adapter.abslistview.ViewHolder;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/4/26  17:40
+ * Description : 币种详情
+ */
+@Route(path = RouteTable.MINE_TOKEN_DETAIL)
+public class TokenDetailActivity extends BaseActivity<TokenDetailContract.Presenter> implements TokenDetailContract.View {
+    
+    @BindView(R.id.mine_token_detail_transfer_top_bar)
+    BoChatTopBar boChatTopBar;
+    
+    @BindView(R.id.mine_token_detail_transfer_detail_icon)
+    ImageView icon;
+    @BindView(R.id.mine_token_detail_transfer_detail_amount)
+    TextView amount;
+    @BindView(R.id.mine_token_detail_transfer_detail_rmb)
+    TextView rmb;
+    @BindView(R.id.mine_token_detail_transfer_detail_address)
+    TextView address;
+    @BindView(R.id.mine_token_detail_transfer_detail_list)
+    ListView listView;
+    
+    @BindView(R.id.sub_layout)
+    LinearLayout subLayout;
+    @BindView(R.id.sub_amount_text)
+    TextView subAmountText;
+    @BindView(R.id.effective_time_text)
+    TextView effectiveTimeText;
+    
+    private ArrayList<CurrencyTradingItemEntity> list = new ArrayList<>();
+
+    private CommonAdapter<CurrencyTradingItemEntity> adapter;
+    
+    private CurrencyTradingDataEntity currencyTradingDataEntity;
+    
+    @Override
+    public void updateInfo(CurrencyDetailDataEntity entity) {
+        CurrencyDetailEntity data = entity.getData();
+        Glide.with(this).load(data.getbIamge()).into(icon);
+        amount.setText(data.getTotalAmount()+data.getbName());
+        rmb.setText("≈"+data.getCnyPrice()+"CNY");
+        address.setText(data.getAddress());
+        boChatTopBar.setTitleText(data.getbName());
+        if(data.getSubAmount() != 0){
+            subLayout.setVisibility(View.VISIBLE);
+            subAmountText.setText("锁定 " + String.format("%.8f", data.getSubAmount()) + data.getbName());
+            effectiveTimeText.setText("锁定时间：" + data.getEffectiveTime());
+        }
+    }
+
+    @Override
+    public void updateTradeList(CurrencyTradingDataEntity data) {
+        currencyTradingDataEntity = data;
+        if(data != null && data.getData() != null && data.getData().getItems() != null){
+            List<CurrencyTradingItemEntity> items = data.getData().getItems();
+            list.clear();
+            list.addAll(items);
+        }
+        adapter.notifyDataSetChanged();
+    }
+    
+    @OnClick({R.id.mine_token_detail_transfer_detail_copy_btn, R.id.mine_token_detail_transfer_btn,
+            R.id.mine_token_detail_receive_btn})
+    @Override
+    protected void onViewClicked(View view) {
+        super.onViewClicked(view);
+        switch (view.getId()) {
+            case R.id.mine_token_detail_transfer_detail_copy_btn:
+                presenter.onCopyClick(address.getText().toString());
+            break;
+            case R.id.mine_token_detail_transfer_btn:
+                presenter.onTransferClick();
+            break;
+            case R.id.mine_token_detail_receive_btn:
+                presenter.onReceiveClick();
+            break;
+        
+            default:
+                break;
+        }
+    }
+
+    @Inject
+    TokenDetailContract.Presenter presenter;
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected TokenDetailContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_mine_token_detail);
+    }
+    
+    private String getTradeType(int tradeType){
+        String type = "";
+        switch (tradeType) {
+            case 1:
+                type = "接收";
+            break;
+            case 2:
+                type = "发送";
+            break;
+            case 8:
+                type = "发送";
+            break;
+            case 9:
+                type = "接收";
+            break;
+        
+            default:
+                break;
+        }
+        return type;
+    }
+    private String getTradeOpe(int tradeType){
+        String type = "+";
+        switch (tradeType) {
+            case 1:
+                type = "+";
+            break;
+            case 2:
+                type = "-";
+            break;
+            case 8:
+                type = "-";
+            break;
+            case 9:
+                type = "+";
+            break;
+        
+            default:
+                break;
+        }
+        return type;
+    }
+    
+    @Override
+    protected void initWidget() {
+        adapter = new CommonAdapter<CurrencyTradingItemEntity>(this, R.layout.item_mine_token_detail, list) {
+            @Override
+            protected void convert(ViewHolder viewHolder, CurrencyTradingItemEntity item, int position) {
+                String num = String.format("%.8f", item.getTradeMoney() - item.getCost());
+                viewHolder.setText(R.id.item_token_action, getTradeType(item.getTradeDepict()));
+                viewHolder.setText(R.id.item_token_amount, getTradeOpe(item.getTradeDepict()) + num + item.getbName());
+                viewHolder.setText(R.id.item_token_date, item.getTime());
+                viewHolder.setText(R.id.item_token_address, item.getTradeAddress());
+            }
+        };
+        listView.setAdapter(adapter);
+    }
+}

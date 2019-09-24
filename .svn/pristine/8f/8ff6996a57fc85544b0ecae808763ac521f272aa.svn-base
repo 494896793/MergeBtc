@@ -1,0 +1,77 @@
+package com.bochat.app.business.main.bill;
+
+import android.content.Intent;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.business.DaggerBusinessComponent;
+import com.bochat.app.common.contract.bill.TokenSelectContract;
+import com.bochat.app.model.bean.TokenEntity;
+import com.bochat.app.model.bean.TokenListEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/4/26 0026 16:15
+ * Description :
+ */
+public class TokenSelectPresenter extends BasePresenter<TokenSelectContract.View> implements TokenSelectContract.Presenter {
+
+    TokenListEntity userCurrencyDataEntity;
+    TokenEntity userCurrencyEntity;
+    String returnUrl;
+    private boolean isStartTokenEntity;
+    private boolean isContainBxTokenEntity;
+    
+    @Override
+    public void initInjector() {
+        DaggerBusinessComponent.create().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        Intent viewIntent = getView().getViewIntent();
+        isStartTokenEntity = viewIntent.getBooleanExtra(RouteExtra.IsStartTokenEntity, true);
+        isContainBxTokenEntity = viewIntent.getBooleanExtra(RouteExtra.IsContainsBXTokenEntity, true);
+        if(viewIntent.hasExtra(RouteExtra.TokenEntity)){
+            userCurrencyEntity = (TokenEntity)viewIntent.getSerializableExtra(RouteExtra.TokenEntity);
+        }
+        if (viewIntent.hasExtra(RouteExtra.TokenEntityList)) {
+            userCurrencyDataEntity = (TokenListEntity)viewIntent.getSerializableExtra(RouteExtra.TokenEntityList);
+            List<TokenEntity> data = userCurrencyDataEntity.getData();
+            if(!data.isEmpty()){
+                ArrayList<TokenEntity> list = new ArrayList<>();
+                for(int i = 0; i < data.size(); i++){
+                    TokenEntity tokenEntity = data.get(i);
+                    if(isContainBxTokenEntity && "BX".equals(tokenEntity.getbName())){
+                        continue;
+                    }
+                    if(userCurrencyEntity != null && tokenEntity.getbId() == userCurrencyEntity.getbId()){
+                        continue;
+                    }
+                    list.add(data.get(i));
+                }
+                getView().updateList(list);
+            }
+        }
+        if (viewIntent.hasExtra(RouteExtra.ReturnUrl)) {
+            returnUrl = viewIntent.getStringExtra(RouteExtra.ReturnUrl);
+        }
+    }
+
+    @Override
+    public void onItemClick(TokenEntity data) {
+        if(returnUrl != null){
+            ARouter.getInstance().build(returnUrl)
+                    .withSerializable(RouteExtra.TokenEntity, data)
+                    .withBoolean(RouteExtra.IsStartTokenEntity, isStartTokenEntity)
+                    .navigation();
+        }
+        getView().finish();
+    }
+}

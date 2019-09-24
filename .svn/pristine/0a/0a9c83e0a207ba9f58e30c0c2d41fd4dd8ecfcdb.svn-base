@@ -1,0 +1,25 @@
+package com.bochat.app.common.router;
+
+import android.app.Activity;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/13 14:32
+ * Description :
+ */
+
+public class Router {
+    public static void navigation(AbstractRouter router){
+        ARouter.getInstance().build(router.getPath())
+                .withSerializable(router.getTAG(), router)
+                .navigation();
+    }
+    
+    public static void navigation(AbstractRouter router, Activity context, int requestCode){
+        ARouter.getInstance().build(router.getPath())
+                .withSerializable(router.getTAG(), router)
+                .navigation(context, requestCode);
+    }
+}

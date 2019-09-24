@@ -1,0 +1,94 @@
+package com.bochat.app.app.adapter;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.bochat.app.R;
+import com.bochat.app.model.bean.DynamicMQEntity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MarketQuotationEntrustAdapter extends RecyclerView.Adapter implements View.OnClickListener {
+
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_NORMAL = 1;
+
+    private Context mContext;
+    private List<DynamicMQEntity> mData = new ArrayList<>();
+
+    private View mHeaderView;
+
+    public MarketQuotationEntrustAdapter(Context context) {
+        mContext = context;
+    }
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (mHeaderView != null && viewType == TYPE_HEADER) {
+            mHeaderView = LayoutInflater.from(mContext).inflate(R.layout.market_quotation_entrust_header_view, parent, false);
+            return new MarketQuotationEntrustAdapter.MarketQuotationEntrustHeaderViewHolder(mHeaderView);
+        }
+        View itemView = LayoutInflater.from(mContext).inflate(R.layout.market_quotation_optional_item, parent, false);
+        return new MarketQuotationEntrustAdapter.MarketQuotationEntrustViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+
+    }
+
+    public void notifyData(List<DynamicMQEntity> data) {
+        mData.addAll(data);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemCount() {
+        return mData != null ? mHeaderView != null ? mData.size() + 1 : mData.size() : 0;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (mHeaderView == null) return TYPE_NORMAL;
+        if (position == 0) return TYPE_HEADER;
+        return TYPE_NORMAL;
+    }
+
+    private int getRealPosition(RecyclerView.ViewHolder holder) {
+        int position = holder.getLayoutPosition();
+        return mHeaderView == null ? position : position - 1;
+    }
+
+    public void setHeaderView(View headerView) {
+        mHeaderView = headerView;
+        notifyItemInserted(0);
+    }
+
+    public View getHeaderView() {
+        return mHeaderView;
+    }
+
+    public class MarketQuotationEntrustViewHolder extends RecyclerView.ViewHolder {
+        public MarketQuotationEntrustViewHolder(View itemView) {
+            super(itemView);
+        }
+    }
+
+    public class MarketQuotationEntrustHeaderViewHolder extends RecyclerView.ViewHolder {
+        public MarketQuotationEntrustHeaderViewHolder(View itemView) {
+            super(itemView);
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+
+    }
+
+}

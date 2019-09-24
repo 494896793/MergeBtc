@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:background="@color/transparent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:background="@color/transparent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:layout_width="@dimen/dp_305"
+        android:layout_height="@dimen/dp_410">
+        <RelativeLayout
+            android:background="@mipmap/popup_bg"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_410">
+            <RelativeLayout
+                android:id="@+id/title_relative"
+                android:layout_marginTop="@dimen/dp_63"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:layout_centerHorizontal="true"
+                    android:id="@+id/head_img"
+                    android:layout_width="@dimen/dp_50"
+                    android:layout_height="@dimen/dp_50" />
+                <TextView
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="@dimen/dp_11"
+                    android:id="@+id/name_text"
+                    android:layout_centerVertical="true"
+                    android:layout_below="@id/head_img"
+                    android:text="艾米分享的糖果盒"
+                    android:layout_width="wrap_content"
+                    android:textColor="#F2E8B5"
+                    android:textSize="@dimen/sp_16"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+            <TextView
+                android:lineSpacingExtra="@dimen/dp_10"
+                android:id="@+id/title_text"
+                android:layout_marginTop="@dimen/dp_40"
+                android:layout_below="@id/title_relative"
+                android:textColor="#F2E8B5"
+                android:text="我是红包附言,我是红包 附言我是红包附言"
+                android:textSize="@dimen/dp_21"
+                android:gravity="center"
+                android:layout_centerHorizontal="true"
+                android:layout_width="@dimen/dp_219"
+                android:layout_height="wrap_content" />
+            <ImageView
+                android:id="@+id/open_redpacket_img"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="@dimen/dp_47"
+                android:background="@mipmap/open_pop_icon"
+                android:layout_width="@dimen/dp_85"
+                android:layout_height="@dimen/dp_85" />
+            <ImageView
+                android:src="@mipmap/logo_pop"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="@dimen/dp_13"
+                android:layout_centerHorizontal="true"
+                android:layout_width="@dimen/dp_52"
+                android:layout_height="@dimen/dp_13" />
+        </RelativeLayout>
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/close_img"
+            android:layout_marginTop="@dimen/dp_25"
+            android:src="@mipmap/redpacket_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>

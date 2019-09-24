@@ -1,0 +1,186 @@
+package com.bochat.app.business.main.conversation;
+
+import android.net.Uri;
+
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.conversation.GroupMemberContract;
+import com.bochat.app.common.model.IGroupModule;
+import com.bochat.app.common.router.Router;
+import com.bochat.app.common.router.RouterConversationDetail;
+import com.bochat.app.common.router.RouterFriendDetail;
+import com.bochat.app.common.router.RouterGroupDetail;
+import com.bochat.app.common.router.RouterGroupMember;
+import com.bochat.app.common.router.RouterSearchFriend;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.model.bean.GroupMemberEntity;
+import com.bochat.app.model.bean.GroupMemberListEntity;
+import com.bochat.app.model.greendao.DBManager;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import io.rong.imkit.RongIM;
+import io.rong.imkit.mention.RongMentionManager;
+import io.rong.imlib.model.UserInfo;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/26 10:52
+ * Description :
+ */
+
+public class GroupMemberPresenter extends BasePresenter<GroupMemberContract.View> implements GroupMemberContract.Presenter{
+    
+    @Inject
+    IGroupModule groupModule;
+    
+    private int groupRole;
+    
+    private long groupId;
+    
+    private boolean isNeedUpdate;
+
+    List<GroupMemberEntity> groupMembers;
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+
+        RouterGroupMember extra = getExtra(RouterGroupMember.class);
+        groupRole = extra.getRole();
+        groupId = Long.valueOf(extra.getGroupId());
+        isNeedUpdate = extra.isNeedUpdate();
+        
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<List<GroupMemberEntity>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<GroupMemberEntity>> emitter) throws Exception {
+                try {
+                    if(isNeedUpdate){
+                        List<GroupMemberEntity> groupMembers = DBManager.getInstance().findGroupMembersByGroupId(groupId);
+                        DBManager.getInstance().getGroupMemberEntityDao().deleteInTx(groupMembers);
+                        groupMembers.clear();
+                        
+                        GroupMemberListEntity listEntity = groupModule.queryGroupMembers(groupId, 0, 0);
+                        if(listEntity.getRetcode() != 0){
+                            emitter.onError(new RxErrorThrowable(listEntity));
+                            return;
+                        }
+                        ArrayList<GroupMemberEntity> memberList = new ArrayList<>();
+                        if(listEntity.getData() != null){
+                            memberList.addAll(listEntity.getData());
+                        }
+                        GroupMemberEntity owner = null;
+                        ArrayList<GroupMemberEntity> managers = new ArrayList<>();
+                        ArrayList<GroupMemberEntity> members = new ArrayList<>();
+                        for(GroupMemberEntity member : memberList){
+                            if(member.getRole() == 3){
+                                owner = member;
+                            } else if(member.getRole() == 2){
+                                managers.add(member);
+                            } else {
+                                members.add(member);
+                            }
+                        }
+                        GroupMemberEntity ownerTitle = new GroupMemberEntity();
+                        ownerTitle.setGroup_id(groupId);
+                        ownerTitle.setRole(4);
+                        ownerTitle.setNickname("群主/管理员("+(1+managers.size())+")");
+                        GroupMemberEntity memberTitle = new GroupMemberEntity();
+                        memberTitle.setGroup_id(groupId);
+                        memberTitle.setRole(4);
+                        memberTitle.setNickname("成员("+(members.size())+")");
+
+                        memberList = new ArrayList<>();
+                        memberList.add(ownerTitle);
+                        memberList.add(owner);
+                        memberList.addAll(managers);
+                        memberList.add(memberTitle);
+                        memberList.addAll(members);
+                        if(!memberList.isEmpty()){
+                            DBManager.getInstance().saveGroupMemberListEntity(memberList);
+                            GroupEntity groupEntity = CachePool.getInstance().group().get(groupId);
+                            groupEntity.setMember_num(listEntity.getData().size());
+                        }
+                    }
+                    groupMembers = DBManager.getInstance().findGroupMembersByGroupId(groupId);
+                    emitter.onNext(groupMembers);
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<GroupMemberEntity>>() {
+            @Override
+            public void accept(List<GroupMemberEntity> entity) throws Exception {
+                if(isActive()){
+                    if(isNeedUpdate){
+                        getView().hideLoading("");
+                    }
+                    loadMore(1);
+                }
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                if(isNeedUpdate && isActive()){
+                    getView().hideLoading("");
+                }
+            }
+        });
+        if(isNeedUpdate){
+            getView().showLoading(subscribe);
+        }
+    }
+
+    @Override
+    public void onItemClick(GroupMemberEntity entity) {
+//        getView().finish();
+//        Router.navigation(new RouterConversationDetail(entity));
+//        RongIM.getInstance().startGroupChat(getView().getViewContext(), groupId+"", groupId+"");
+        Router.navigation(new RouterFriendDetail(
+                String.valueOf(entity.getMember_id())
+                , groupRole
+                , entity.getRole()
+        ));
+    }
+
+    @Override
+    public void onSearchClick() {
+        Router.navigation(new RouterSearchFriend(
+                RouterSearchFriend.SEARCH_LOCAL | RouterSearchFriend.SEARCH_GROUP_MEMBER, 
+                String.valueOf(groupId)), RouterGroupDetail.class);
+    }
+
+    private static final int PAGE_SIZE = 20;
+    
+    @Override
+    public void loadMore(int page) {
+        if(groupMembers != null){
+            int count = page * PAGE_SIZE;
+            if(count >= groupMembers.size()){
+                getView().updateMemberList(page, groupMembers);
+            } else {
+                getView().updateMemberList(page, groupMembers.subList(0, count));
+            }
+        }
+    }
+}

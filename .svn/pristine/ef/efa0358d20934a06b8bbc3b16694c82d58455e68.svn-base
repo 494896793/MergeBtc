@@ -1,0 +1,241 @@
+package com.bochat.app.business.main.dynamic;
+
+import com.bochat.app.R;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.common.contract.dynamic.DynamicContract;
+import com.bochat.app.common.model.IDynamicModel;
+import com.bochat.app.common.model.IThirdServicesModel;
+import com.bochat.app.model.bean.DynamicAdapterEntity;
+import com.bochat.app.model.bean.DynamicBannerListEntity;
+import com.bochat.app.model.bean.DynamicNoticeListEntity;
+import com.bochat.app.model.bean.DynamicTopShopEntity;
+import com.bochat.app.model.bean.DynamicTopShopListEntity;
+import com.bochat.app.model.bean.GameGoEntity;
+import com.bochat.app.model.bean.ProjectIdentificationEntity;
+import com.bochat.app.model.constant.Constan;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+
+/**
+ * 2019/5/7
+ * Author LDL
+ **/
+public class DynamicPresenter extends BasePresenter<DynamicContract.View> implements DynamicContract.Presenter {
+
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Inject
+    IDynamicModel model;
+
+    @Inject
+    IThirdServicesModel thirdServicesModel;
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        getProjectParty();
+        gameLogin();
+    }
+
+    @Override
+    public void loadData(int type){
+        Observable.create(new ObservableOnSubscribe<List<DynamicAdapterEntity>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<DynamicAdapterEntity>> emitter) throws Exception {
+                try{
+                    DynamicBannerListEntity dynamicBannerListEntit=model.listBanner(4);
+//                    DynamicTopShopListEntity dynamicTopShopListEntity=model.listApplicationHome("");
+                    DynamicNoticeListEntity dynamicNoticeListEntity=model.listAnnouncement(1,10,1);
+                    DynamicTopShopListEntity dynamicTopShopListEntity=new DynamicTopShopListEntity();
+                    DynamicTopShopListEntity dynamicTopShopListEntity2=new DynamicTopShopListEntity();
+
+                    List<DynamicTopShopEntity> list=new ArrayList<>();
+                    list.add(new DynamicTopShopEntity(R.mipmap.dynamic_icon_exchange,"闪兑大厅","兑换资产"));
+                    list.add(new DynamicTopShopEntity(R.mipmap.dynamic_icon_spot,"极速闪兑","极速闪兑"));
+                    list.add(new DynamicTopShopEntity(R.mipmap.dynamic_icon_spot,"今日看点","热门资讯"));
+                    list.add(new DynamicTopShopEntity(R.mipmap.dynamic_icon_market,"应用市场","精选DAPP"));
+                    list.add(new DynamicTopShopEntity(R.mipmap.dynamic_icon_apply,"项目申请","项目方认证"));
+                    dynamicTopShopListEntity.setData(list);
+
+                    List<DynamicTopShopEntity> list2=new ArrayList<>();
+                    list2.add(new DynamicTopShopEntity(R.mipmap.dynamic_icon_gamego,"GameGo","游戏大厅"));
+                    list2.add(new DynamicTopShopEntity(R.mipmap.dynamic_icon_bitmall,"BitMall","OTC一键交易"));
+                    list2.add(new DynamicTopShopEntity(R.mipmap.dynamic_icon_luxe,"LUXE","域名注册"));
+                    list2.add(new DynamicTopShopEntity(R.mipmap.dynamic_icon_zilong,"紫隆技研","软件开发"));
+                    dynamicTopShopListEntity2.setData(list2);
+
+                    DynamicAdapterEntity entity=new DynamicAdapterEntity();
+                    DynamicAdapterEntity entity2=new DynamicAdapterEntity();
+                    DynamicAdapterEntity entity3=new DynamicAdapterEntity();
+
+                    entity.setDynamicBannerListEntity(dynamicBannerListEntit);
+                    entity.setDynamicNoticeListEntity(dynamicNoticeListEntity);
+                    entity.setType(0);
+
+                    entity2.setDynamicTopShopListEntity(dynamicTopShopListEntity);
+                    entity2.setType(2);
+                    entity2.setTitle("BoChat服务");
+
+                    entity3.setDynamicTopShopListEntity(dynamicTopShopListEntity2);
+                    entity3.setType(2);
+                    entity3.setTitle("第三方服务");
+
+                    List<DynamicAdapterEntity> dataList=new ArrayList<>();
+                    dataList.add(entity);
+                    dataList.add(entity2);
+                    dataList.add(entity3);
+
+                    if(dynamicBannerListEntit==null){
+                        emitter.onError(new Throwable("获取Banner失败"));
+                    }
+//                    if(dynamicTopShopListEntity==null){
+//                        emitter.onError(new Throwable("获取应用商店失败"));
+//                    }
+                    if(dynamicNoticeListEntity==null){
+                        emitter.onError(new Throwable("获取公告失败"));
+                    }
+                    emitter.onNext(dataList);
+                }catch (Exception e){
+                    emitter.onError(new Throwable("请求失败"));
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<DynamicAdapterEntity>>() {
+            @Override
+            public void accept(List<DynamicAdapterEntity> dynamicAdapterEntity) throws Exception {
+                if(isActive()){
+                    getView().refreshData(dynamicAdapterEntity);
+                }
+            }
+        }, new RxErrorConsumer<Throwable>(this) {
+            @Override
+            public void acceptError(Throwable throwable) {
+//                getView().showTips(throwable.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void getProjectParty(){
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<ProjectIdentificationEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<ProjectIdentificationEntity> emitter) throws Exception {
+                try {
+                    ProjectIdentificationEntity entity=model.getProjectParty();
+
+                    if (entity != null && entity.getCode() == Constan.NET_SUCCESS) {
+
+                        emitter.onNext(entity);
+
+                    } else {
+
+                        emitter.onError(new RxErrorThrowable(entity));
+
+                    }
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<ProjectIdentificationEntity>() {
+            @Override
+            public void accept(ProjectIdentificationEntity entity) throws Exception {
+                if (isActive()) {
+
+                    getView().getProjectStatuSuccess(entity);
+                    getView().hideLoading("");
+
+                }
+            }
+        }, new RxErrorConsumer<Throwable>(this) {
+
+            @Override
+            public void acceptError(Throwable throwable) {
+
+                if (isActive()) {
+                    getView().getProjectStatuSuccess(null);
+                    getView().hideLoading("");
+//                    getView().showTips(throwable.getMessage());
+                }
+
+            }
+
+            @Override
+            public String getDefaultErrorTips() {
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public void gameLogin() {
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<GameGoEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<GameGoEntity> emitter) throws Exception {
+                try {
+                    GameGoEntity entity=thirdServicesModel.gameLogin();
+
+                    if (entity != null && entity.getCode() == Constan.NET_SUCCESS) {
+                        getView().gameGoLogin(entity);
+                        emitter.onNext(entity);
+
+                    } else {
+                        getView().gameGoLogin(null);
+                        emitter.onError(new RxErrorThrowable(entity));
+
+                    }
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<GameGoEntity>() {
+            @Override
+            public void accept(GameGoEntity entity) throws Exception {
+                if (isActive()) {
+
+                    getView().gameGoLogin(entity);
+                    getView().hideLoading("");
+
+                }
+            }
+        }, new RxErrorConsumer<Throwable>(this) {
+
+            @Override
+            public void acceptError(Throwable throwable) {
+
+                if (isActive()) {
+                    getView().gameGoLogin(null);
+                    getView().hideLoading("");
+//                    getView().showTips(throwable.getMessage());
+                }
+
+            }
+
+            @Override
+            public String getDefaultErrorTips() {
+                return null;
+            }
+        });
+    }
+
+}

@@ -1,0 +1,15 @@
+package com.bochat.app.business.main.dynamic;
+
+import com.bochat.app.common.contract.dynamic.DynamicNoticeDetailContract;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+/**
+ * 2019/5/17
+ * Author LDL
+ **/
+public class DynamicNoticeDetailPresenter extends BasePresenter<DynamicNoticeDetailContract.View> implements DynamicNoticeDetailContract.Presenter {
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+}

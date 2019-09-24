@@ -1,0 +1,15 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 14:11
+ * Description :
+ */
+
+public enum MarketCenterType{
+    TRANSACTION,
+    ENTRUST_SELL,
+    ENTRUST_BUY,
+    KLINE
+}
+    

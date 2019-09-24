@@ -1,0 +1,35 @@
+package com.bochat.app.common.contract.book;
+
+import com.bochat.app.common.contract.conversation.AddGroupChatContract;
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.model.zxing.result.ISBNResultHandler;
+import com.bochat.app.mvp.presenter.IBasePresenter;
+import com.bochat.app.mvp.view.IBaseView;
+
+import java.util.List;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/15 15:43
+ * Description : 原型 - 2.通讯录
+ *             : 点击搜索框 {@link Presenter#onSearchBarClick()} 跳转 {@link SearchLocalFriendContract}
+ *             ：点击最新申请 {@link Presenter#onNewRequestBtnClick()} 跳转 {@link ApplyListContract}
+ *             ：点击创建群聊 {@link Presenter#onCreateGroupChatBtnClick()} 跳转 {@link AddGroupChatContract}
+ *             : 点击好友 {@link Presenter#onFriendItemClick(FriendEntity)} 跳转 {@link com.bochat.app.common.contract.conversation.SingleChatContract}
+ *             : 点击群聊 {@link Presenter#onGroupChatItemClick(GroupEntity)} 跳转 {@link com.bochat.app.common.contract.conversation.GroupChatContract}
+ */
+
+public interface AddressBookContract {
+    
+    interface View extends IBaseView<AddressBookContract.Presenter> {
+        public void updateNewRequestCount(String count);
+        public void updateFriendList(List<FriendEntity> list);
+        public void updateGroupChatList(List<GroupEntity> list);
+    }
+
+    interface Presenter extends IBasePresenter<AddressBookContract.View> {
+        public void onSearchBarClick();
+        public void onSearchGroupClick();
+    }
+}

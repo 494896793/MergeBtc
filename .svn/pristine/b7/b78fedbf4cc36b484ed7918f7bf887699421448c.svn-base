@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/qr_card_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_titleText="二维码"
+        app:top_hasBackBtn="true"/>
+    
+    <RelativeLayout
+        android:id="@+id/qr_card_layout"
+        android:layout_width="@dimen/dp_315"
+        android:layout_height="@dimen/dp_400"
+        android:layout_below="@id/qr_card_top_bar"
+        android:layout_marginTop="@dimen/dp_42"
+        android:background="@drawable/shape_qr_card_code"
+        android:layout_centerHorizontal="true">
+        
+        <ImageView
+            android:id="@+id/qr_card_icon"
+            android:layout_width="@dimen/dp_80"
+            android:layout_height="@dimen/dp_80"
+            android:layout_marginLeft="@dimen/dp_20"
+            android:layout_marginTop="@dimen/dp_20"/>
+        <TextView
+            android:id="@+id/qr_card_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/default_text"
+            android:text="2019年哈哈"
+            android:singleLine="true"
+            android:layout_marginTop="@dimen/dp_33"
+            android:layout_toRightOf="@id/qr_card_icon"
+            android:layout_marginLeft="@dimen/dp_20"
+            />
+        <TextView
+            android:id="@+id/qr_card_area"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="深圳"
+            android:textColor="#999999"
+            android:textSize="@dimen/dp_16"
+            android:layout_toRightOf="@id/qr_card_icon"
+            android:layout_marginLeft="@dimen/dp_20"
+            android:layout_below="@id/qr_card_name"
+            android:layout_marginTop="@dimen/dp_3"
+            />
+        <ImageView
+            android:id="@+id/qr_card_code"
+            android:layout_width="@dimen/dp_230"
+            android:layout_height="@dimen/dp_230"
+            android:layout_below="@id/qr_card_icon"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/dp_15"
+            android:scaleType="fitXY"/>
+        
+        <TextView
+            android:id="@+id/qr_card_tips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/dp_14"
+            android:textColor="#999999"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/dp_20"
+            android:layout_centerHorizontal="true"
+            android:text="扫一扫上面的二维码图案，加我好友"/>
+    </RelativeLayout>
+    
+    
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/qr_card_invite_layout"
+        android:layout_width="@dimen/dp_315"
+        android:layout_height="@dimen/dp_85"
+        android:layout_below="@+id/qr_card_layout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dp_22"
+        android:background="@drawable/shape_qr_card_code_bottom"> 
+        <TextView
+            android:id="@+id/qr_card_invite_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="邀请链接 [点击复制]"
+            android:textColor="#4F5A7B"
+            android:textSize="@dimen/dp_14"
+            android:layout_marginTop="@dimen/dp_10"/>
+        <TextView
+            android:id="@+id/qr_card_invite_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#4F5A7B"
+            android:textSize="@dimen/dp_14"
+            android:gravity="center_horizontal"
+            android:layout_below="@id/qr_card_invite_title"
+            android:paddingLeft="@dimen/dp_30"
+            android:paddingRight="@dimen/dp_30"
+            android:text="http://www.地址.com/h5注册页.html?code=123456"
+            />
+    </RelativeLayout>
+</RelativeLayout>

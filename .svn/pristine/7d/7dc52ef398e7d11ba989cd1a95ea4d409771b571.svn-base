@@ -1,0 +1,112 @@
+package com.bochat.app.app.activity.dynamic;
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.util.TypedValue;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.MarketQuotationPagerAdapter;
+import com.bochat.app.app.fragment.dynamic.KChatFragment;
+import com.bochat.app.app.fragment.dynamic.MarketQuotationBuyAndSellFragment;
+import com.bochat.app.app.fragment.dynamic.MarketQuotationEntrustFragment;
+import com.bochat.app.app.util.ResourceUtils;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.common.contract.dynamic.MarketQuotationDetailContract;
+import com.bochat.app.common.router.RouterMarketQuotationDetail;
+import com.bochat.app.model.bean.DynamicMQEntity;
+import com.bochat.app.model.bean.MarketInfoEntity;
+import com.bochat.app.model.modelImpl.MarketCenter.TransactionEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.flyco.tablayout.SlidingTabLayout;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+@Route(path = RouterMarketQuotationDetail.PATH)
+public class MarketQuotationDetailActivity extends BaseActivity<MarketQuotationDetailContract.Presenter> implements MarketQuotationDetailContract.View {
+
+    @Inject
+    MarketQuotationDetailContract.Presenter presenter;
+
+    @BindView(R.id.market_quotation_detail_top_bar)
+    BoChatTopBar mTopBar;
+
+    @BindView(R.id.market_quotation_detail_tab)
+    SlidingTabLayout tabLayout;
+
+    @BindView(R.id.market_quotation_detail_view_pager)
+    ViewPager viewPager;
+
+    private String[] titles = {"买入", "卖出", "委托", "K线"};
+
+    private MarketQuotationPagerAdapter mAdapter;
+    private List<Fragment> fragmentList;
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+
+        fragmentList = new ArrayList<>();
+
+        RouterMarketQuotationDetail router = (RouterMarketQuotationDetail) getIntent().getSerializableExtra(RouterMarketQuotationDetail.TAG);
+        TransactionEntity entity = router.getEntity();
+//        mTopBar.setTitleText(entity.getSellerCurrencyName());
+
+        MarketQuotationBuyAndSellFragment sellFragment = new MarketQuotationBuyAndSellFragment();
+        Bundle sellArguments = new Bundle();
+        sellArguments.putBoolean(MarketQuotationBuyAndSellFragment.IS_SELL, true);
+        sellFragment.setArguments(sellArguments);
+
+        fragmentList.add(new MarketQuotationBuyAndSellFragment());
+        fragmentList.add(sellFragment);
+        fragmentList.add(new MarketQuotationEntrustFragment());
+        fragmentList.add(new KChatFragment());
+        mAdapter = new MarketQuotationPagerAdapter(getSupportFragmentManager(), fragmentList, titles);
+        viewPager.setAdapter(mAdapter);
+        tabLayout.setViewPager(viewPager);
+        tabLayout.getTitleView(0).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_16));
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                if (i != 0)
+                    tabLayout.getTitleView(0).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_14));
+                if (i != 1)
+                    tabLayout.getTitleView(1).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_14));
+                if (i != 2)
+                    tabLayout.getTitleView(2).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_14));
+
+                tabLayout.getTitleView(i).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_16));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected MarketQuotationDetailContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_market_quotation_detail_layout);
+    }
+}

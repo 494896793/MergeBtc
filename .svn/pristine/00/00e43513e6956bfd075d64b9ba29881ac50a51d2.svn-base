@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F2F2"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/mine_top_area"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="match_parent"
+        android:paddingTop="@dimen/dp_20"
+        android:layout_height="@dimen/dp_154"
+        android:background="#FFFFFFFF">
+
+        <com.bochat.app.app.view.SpImageView
+            android:id="@+id/mine_main_icon"
+            android:layout_width="@dimen/dp_80"
+            android:layout_height="@dimen/dp_80"
+            android:layout_marginLeft="@dimen/dp_15"
+            android:layout_marginTop="@dimen/dp_27"
+            android:layout_marginBottom="@dimen/dp_27"/>
+
+
+        <TextView
+            android:id="@+id/mine_main_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_15"
+            android:layout_marginTop="@dimen/dp_41"
+            android:layout_toRightOf="@id/mine_main_icon"
+            android:maxLines="2"
+            android:maxLength="15"
+            android:textSize="@dimen/dp_18" />
+
+        <TextView
+            android:id="@+id/mine_main_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_15"
+            android:layout_marginTop="@dimen/dp_70"
+            android:layout_marginBottom="@dimen/dp_42"
+            android:layout_toRightOf="@id/mine_main_icon"
+            android:textSize="@dimen/dp_16" />
+
+        <RelativeLayout
+            android:id="@+id/mine_code_area"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_width="@dimen/dp_120"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true">
+            <ImageView
+                android:id="@+id/mine_main_code"
+                android:layout_width="@dimen/dp_48"
+                android:layout_height="@dimen/dp_48"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="@dimen/dp_41"
+                android:layout_marginTop="@dimen/dp_43"
+                android:layout_marginRight="@dimen/dp_25"
+                android:src="@mipmap/ic_qr_code"/>
+        </RelativeLayout>
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/mine_main_wallet"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:layout_marginTop="@dimen/dp_15"
+        android:background="#FFFFFFFF"
+        android:gravity="center_vertical">
+
+
+        <ImageView
+            android:id="@+id/iv_wallet"
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_marginLeft="@dimen/dp_16"
+            android:src="@mipmap/ic_wallet" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_7"
+            android:layout_toRightOf="@+id/iv_wallet"
+            android:text="钱包"
+            android:textSize="@dimen/dp_16" />
+
+
+        <ImageView
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_15"
+            android:src="@mipmap/ic_arrow_right_gray24" />
+
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1"
+        android:layout_marginLeft="@dimen/dp_16"
+        android:background="#DFDFDF" />
+
+    <RelativeLayout
+        android:id="@+id/mine_main_bill"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:background="#FFFFFFFF"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/iv_bill"
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_marginLeft="@dimen/dp_16"
+            android:src="@mipmap/ic_bill" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_7"
+            android:layout_toRightOf="@+id/iv_bill"
+            android:text="账单"
+            android:textSize="@dimen/dp_16" />
+
+        <ImageView
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_15"
+            android:src="@mipmap/ic_arrow_right_gray24" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1"
+        android:layout_marginLeft="@dimen/dp_16"
+        android:background="#DFDFDF" />
+
+    <RelativeLayout
+        android:id="@+id/mine_main_bank_card"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:background="#FFFFFFFF"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/iv_bank_card"
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_marginLeft="@dimen/dp_16"
+            android:src="@mipmap/ic_bank_card" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_7"
+            android:layout_toRightOf="@+id/iv_bank_card"
+            android:text="银行卡"
+            android:textSize="@dimen/dp_16" />
+
+
+        <ImageView
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_15"
+            android:src="@mipmap/ic_arrow_right_gray24" />
+
+    </RelativeLayout>
+
+
+
+    <RelativeLayout
+        android:layout_marginTop="@dimen/dp_10"
+        android:id="@+id/mine_main_invite"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:background="#FFFFFFFF"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/iv_invite"
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_marginLeft="@dimen/dp_16"
+            android:src="@mipmap/ic_invite" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_7"
+            android:layout_toRightOf="@+id/iv_invite"
+            android:text="邀请有礼"
+            android:textSize="@dimen/dp_16" />
+
+        <ImageView
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_15"
+            android:src="@mipmap/ic_arrow_right_gray24" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/mine_main_user_information"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:layout_marginTop="@dimen/dp_10"
+        android:background="#FFFFFFFF"
+        android:gravity="center_vertical">
+
+
+        <ImageView
+            android:id="@+id/iv_information"
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_marginLeft="@dimen/dp_16"
+            android:src="@mipmap/ic_information" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_7"
+            android:layout_toRightOf="@+id/iv_information"
+            android:text="个人信息"
+            android:textSize="@dimen/dp_16" />
+
+
+        <ImageView
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_15"
+            android:src="@mipmap/ic_arrow_right_gray24" />
+    </RelativeLayout>
+
+    
+    <RelativeLayout
+        android:layout_marginTop="@dimen/dp_10"
+        android:id="@+id/mine_main_real_name_auth"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:background="#FFFFFFFF"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/iv_real_name_authentication"
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_marginLeft="@dimen/dp_16"
+            android:src="@mipmap/ic_iv_real_name_authentication" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_7"
+            android:layout_toRightOf="@+id/iv_real_name_authentication"
+            android:text="实名认证"
+            android:textSize="@dimen/dp_16" />
+
+        <ImageView
+            android:id="@+id/iv_arrow"
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_15"
+            android:src="@mipmap/ic_arrow_right_gray24" />
+
+        <TextView
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/dp_10"
+            android:layout_toLeftOf="@+id/iv_arrow"
+            android:text="未认证"
+            android:textColor="#999999"
+            android:textSize="@dimen/dp_16" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1"
+        android:background="#DFDFDF" />
+
+    <RelativeLayout
+        android:id="@+id/mine_main_settings"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:background="#FFFFFFFF"
+        android:gravity="center_vertical">
+
+
+        <ImageView
+            android:id="@+id/iv_setting"
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_marginLeft="@dimen/dp_16"
+            android:src="@mipmap/ic_setting" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_7"
+            android:layout_toRightOf="@+id/iv_setting"
+            android:text="设置"
+            android:textSize="@dimen/dp_16" />
+
+
+        <ImageView
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_15"
+            android:src="@mipmap/ic_arrow_right_gray24" />
+
+    </RelativeLayout>
+</LinearLayout>

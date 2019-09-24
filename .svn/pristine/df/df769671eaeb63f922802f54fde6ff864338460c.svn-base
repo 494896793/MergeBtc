@@ -1,0 +1,59 @@
+package com.bochat.app.app.view;
+
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+
+/**
+ * 2019/5/17
+ * Author LDL
+ **/
+public class FirstLoginDialog extends DialogFragment implements View.OnClickListener {
+
+    private TextView enter_text;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view=inflater.inflate(R.layout.dialog_first_login,null);
+        enter_text=view.findViewById(R.id.enter_text);
+        enter_text.setOnClickListener(this);
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        setCancelable(false);
+        Window window = getDialog().getWindow();
+        WindowManager.LayoutParams params = window.getAttributes();
+        params.gravity = Gravity.CENTER;
+        window.setAttributes(params);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        //设置边距
+        DisplayMetrics dm = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+        getDialog().getWindow().setLayout(getResources().getDimensionPixelSize(R.dimen.dp_200), getResources().getDimensionPixelSize(R.dimen.dp_280));
+    }
+
+    @Override
+    public void onClick(View v) {
+        dismiss();
+    }
+}

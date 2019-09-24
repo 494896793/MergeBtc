@@ -1,0 +1,49 @@
+package com.bochat.app.business.main.dynamic;
+
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.common.contract.dynamic.ProjectIdentificationResultContract;
+import com.bochat.app.common.model.IDynamicModel;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.ProjectIdentificationEntity;
+import com.bochat.app.model.constant.Constan;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+/**
+ * 2019/5/27
+ * Author LDL
+ **/
+public class ProjectIdentificationResultPresenter extends BasePresenter<ProjectIdentificationResultContract.View> implements ProjectIdentificationResultContract.Presenter {
+
+    @Inject
+    IDynamicModel dynamicModel;
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        if(getView().getViewIntent().hasExtra(RouteExtra.ProjectIdentificationEntity)){
+            ProjectIdentificationEntity entity= (ProjectIdentificationEntity) getView().getViewIntent().getSerializableExtra(RouteExtra.ProjectIdentificationEntity);
+            if(entity!=null){
+                getView().refreshData(entity);
+            }
+        }
+
+    }
+    
+}

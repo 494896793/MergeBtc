@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_64">
+
+        <com.bochat.app.app.view.BoChatTopBar
+            android:id="@+id/dynamic_notice_flash_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:top_background="#FFFFFF"
+            app:top_hasBackBtn="true"/>
+        <com.flyco.tablayout.SlidingTabLayout
+            android:id="@+id/dynamic_notice_flash_sliding"
+            android:layout_width="@dimen/dp_165"
+            android:layout_height="@dimen/dp_44"
+            app:tl_indicator_width="@dimen/dp_18"
+            app:tl_indicator_color="#0084FF"
+            app:tl_indicator_height="@dimen/dp_2"
+            app:tl_indicator_corner_radius="@dimen/dp_2"
+            app:tl_textSelectColor="#222222"
+            app:tl_textsize="@dimen/dp_16"
+            app:tl_textUnselectColor="#000000"
+            app:tl_textBold="SELECT"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            app:tl_tab_space_equal="true"
+
+            android:background="#FFFFFF"/>
+
+
+    </RelativeLayout>
+
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/dynamic_notice_flash_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+
+
+</LinearLayout>

@@ -1,0 +1,180 @@
+package com.bochat.app.app.fragment.dynamic;
+
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.MarketQuotationOptionalAdapter;
+import com.bochat.app.common.router.Router;
+import com.bochat.app.common.router.RouterMarketQuotationDetail;
+import com.bochat.app.model.bean.DynamicMQEntity;
+import com.bochat.app.mvp.view.BaseFragment;
+import com.bochat.app.common.contract.dynamic.MarketQuotationOptionalContract;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+public class MarketQuotationOptionalFragment extends BaseFragment<MarketQuotationOptionalContract.Presenter> implements MarketQuotationOptionalContract.View,
+        MarketQuotationOptionalAdapter.OnMarketQuotationHeaderClickListener,
+        MarketQuotationOptionalAdapter.OnMarketQuotationItemClickListener {
+
+    @Inject
+    MarketQuotationOptionalContract.Presenter presenter;
+
+    @BindView(R.id.quotation_optional_list)
+    RecyclerView mOptionalListView;
+
+    @BindView(R.id.quotation_no_data)
+    ImageView mOptionalNotData;
+
+    boolean isNotData = false;
+    private int id;
+    private View lastSortClickView;
+
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected MarketQuotationOptionalContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_market_quotation_optional, container, false);
+    }
+
+    public void setId(int id){
+        this.id=id;
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+
+        mOptionalListView.setLayoutManager(new LinearLayoutManager(getViewContext()));
+        mOptionalListView.setItemAnimator(new DefaultItemAnimator());
+
+        MarketQuotationOptionalAdapter adapter = new MarketQuotationOptionalAdapter(getViewContext());
+        mOptionalListView.setAdapter(adapter);
+
+        adapter.setMarketQuotationHeaderClickListener(this);
+        adapter.setOnMarketQuotationItemClickListener(this);
+
+        List<DynamicMQEntity> datas = new ArrayList<>();
+        if (isNotData) {
+            View headerView = LayoutInflater.from(getViewContext()).inflate(R.layout.market_quotation_optional_header_view, null);
+            adapter.setHeaderView(headerView);
+            DynamicMQEntity one = new DynamicMQEntity("XLM / ETH", 420046, "0.00016668", "0.22", 1, "0.48");
+            DynamicMQEntity two = new DynamicMQEntity("BTC / ETH", 420046, "0.00016668", "0.22", 0, "0.48");
+            DynamicMQEntity three = new DynamicMQEntity("SNTC / ETH", 420046, "0.00016668", "0.22", 0, "0.48");
+            DynamicMQEntity four = new DynamicMQEntity("XLM / ETH", 420046, "0.00016668", "0.22", 1, "0.48");
+            DynamicMQEntity five = new DynamicMQEntity("BX / ETH", 420046, "0.00016668", "0.22", 0, "0.48");
+            datas.add(one);
+            datas.add(two);
+            datas.add(three);
+            datas.add(four);
+            datas.add(five);
+            adapter.notifyData(datas);
+        }
+        mOptionalNotData.setVisibility(datas.size() == 0 ? View.VISIBLE : View.GONE);
+
+    }
+
+    public void setTestNoData(boolean noData) {
+        isNotData = noData;
+    }
+
+    @Override
+    public void onItemClick(View view, DynamicMQEntity entity) {
+        RouterMarketQuotationDetail router = new RouterMarketQuotationDetail();
+        router.setEntity(entity);
+        Router.navigation(router);
+    }
+
+    @Override
+    public void onClickSort(View view) {
+        initSortTextColor(view);
+    }
+
+    @Override
+    public void onClickNewPrice(View view) {
+        initSortTextColor(view);
+    }
+
+    @Override
+    public void onClickUpAndDown(View view) {
+        initSortTextColor(view);
+    }
+
+    private void initSortTextColor(View view){
+        View view1 =mOptionalListView.getChildAt(0);
+        LinearLayout linearLayout=view1.findViewById(R.id.dynamic_mk_header_default_sort);
+        TextView default_sort=linearLayout.findViewById(R.id.dynamic_mk_header_default_sort_text);
+
+        LinearLayout dynamic_mk_header_new_price=view1.findViewById(R.id.dynamic_mk_header_new_price);
+        TextView dynamic_mk_header_new_price_text=dynamic_mk_header_new_price.findViewById(R.id.dynamic_mk_header_new_price_text);
+
+        LinearLayout dynamic_mk_header_stock_index=view1.findViewById(R.id.dynamic_mk_header_stock_index);
+        TextView dynamic_mk_header_stock_index_text=dynamic_mk_header_stock_index.findViewById(R.id.dynamic_mk_header_stock_index_text);
+
+        switch (view.getId()){
+            case R.id.dynamic_mk_header_default_sort:
+                default_sort.setTextColor(getResources().getColor(R.color.color_0084FF));
+                dynamic_mk_header_new_price_text.setTextColor(getResources().getColor(R.color.color_999999));
+                dynamic_mk_header_stock_index_text.setTextColor(getResources().getColor(R.color.color_999999));
+
+                Drawable drawable = getResources().getDrawable(R.mipmap.ic_quotation_lower);
+                drawable.setBounds(0,0,drawable.getMinimumWidth(),drawable.getMinimumHeight());
+                dynamic_mk_header_new_price_text.setCompoundDrawables(null,null,drawable,null);
+
+                Drawable drawable2 = getResources().getDrawable(R.mipmap.ic_quotation_lower);
+                drawable2.setBounds(0,0,drawable2.getMinimumWidth(),drawable2.getMinimumHeight());
+                dynamic_mk_header_stock_index_text.setCompoundDrawables(null,null,drawable2,null);
+                break;
+            case R.id.dynamic_mk_header_new_price:
+                default_sort.setTextColor(getResources().getColor(R.color.color_999999));
+                dynamic_mk_header_new_price_text.setTextColor(getResources().getColor(R.color.color_0084FF));
+                dynamic_mk_header_stock_index_text.setTextColor(getResources().getColor(R.color.color_999999));
+
+                Drawable drawable3 = getResources().getDrawable(R.mipmap.ic_quotation_upper);
+                drawable3.setBounds(0,0,drawable3.getMinimumWidth(),drawable3.getMinimumHeight());
+                dynamic_mk_header_new_price_text.setCompoundDrawables(null,null,drawable3,null);
+
+                Drawable drawable4 = getResources().getDrawable(R.mipmap.ic_quotation_lower);
+                drawable4.setBounds(0,0,drawable4.getMinimumWidth(),drawable4.getMinimumHeight());
+                dynamic_mk_header_stock_index_text.setCompoundDrawables(null,null,drawable4,null);
+                break;
+            case R.id.dynamic_mk_header_stock_index:
+                default_sort.setTextColor(getResources().getColor(R.color.color_999999));
+                dynamic_mk_header_new_price_text.setTextColor(getResources().getColor(R.color.color_999999));
+                dynamic_mk_header_stock_index_text.setTextColor(getResources().getColor(R.color.color_0084FF));
+
+                Drawable drawable5 = getResources().getDrawable(R.mipmap.ic_quotation_lower);
+                drawable5.setBounds(0,0,drawable5.getMinimumWidth(),drawable5.getMinimumHeight());
+                dynamic_mk_header_new_price_text.setCompoundDrawables(null,null,drawable5,null);
+
+                Drawable drawable6 = getResources().getDrawable(R.mipmap.ic_quotation_upper);
+                drawable6.setBounds(0,0,drawable6.getMinimumWidth(),drawable6.getMinimumHeight());
+                dynamic_mk_header_stock_index_text.setCompoundDrawables(null,null,drawable6,null);
+                break;
+        }
+        lastSortClickView=view;
+    }
+
+}

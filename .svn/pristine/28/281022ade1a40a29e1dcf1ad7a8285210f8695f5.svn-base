@@ -1,0 +1,100 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import org.json.JSONObject;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 13:49
+ * Description :
+ */
+
+public class KLineCommand implements MarketCenterCommand {
+
+    private String marketId;
+    private KLineType kLineType;
+    private long startId;
+    private long offset;
+
+    public KLineCommand(String marketId, KLineType kLineType, long startId, long offset) {
+        this.marketId = marketId;
+        this.kLineType = kLineType;
+        this.startId = startId;
+        this.offset = offset;
+    }
+
+    @Override
+    public MarketCenterType getType() {
+        return MarketCenterType.KLINE;
+    }
+
+    @Override
+    public JSONObject convertToJson() {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("marketId", marketId);
+            json.put("kLineType", kLineType);
+            return json;
+        } catch (Exception ignore){
+        }
+        return null;
+    }
+
+    public String getMarketId() {
+        return marketId;
+    }
+
+    public KLineType getKLineType() {
+        return kLineType;
+    }
+
+    public long getStartId() {
+        return startId;
+    }
+
+    public long getOffset() {
+        return offset;
+    }
+
+    public enum KLineType{
+
+        INSTANT(0),
+        MIN5(1),
+        MIN30(2),
+        HOUR(3),
+        DAY(4),
+        WEEK(5);
+
+        private int type;
+        
+        KLineType(int type) {
+            this.type = type;
+        }
+
+        public int getType() {
+            return type;
+        }
+        
+        public static KLineType search(int type){
+            switch (type) {
+                case 1:
+                    return MIN5;
+                
+                case 2:
+                    return MIN30;
+               
+                case 3:
+                    return HOUR;
+                
+                case 4:
+                    return DAY;
+                
+                case 5:
+                    return WEEK;
+                    
+                default:
+                    return INSTANT;
+            }
+        }
+    }
+}
+

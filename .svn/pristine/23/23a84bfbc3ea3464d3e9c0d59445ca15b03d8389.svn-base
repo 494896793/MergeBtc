@@ -1,0 +1,33 @@
+package com.bochat.app.common.contract.conversation;
+
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.model.bean.GroupMemberEntity;
+import com.bochat.app.mvp.presenter.IBasePresenter;
+import com.bochat.app.mvp.view.IBaseView;
+
+import java.util.List;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/16 10:42
+ * Description    
+ * */
+
+public interface GroupDetailContract {
+    
+    interface View extends IBaseView<GroupDetailContract.Presenter> {
+        public void updateGroupChatDetail(GroupEntity groupInfo, List<GroupMemberEntity> groupMembers, boolean isJoin, boolean isManager, boolean  isNotification);
+    }
+
+    interface Presenter extends IBasePresenter<GroupDetailContract.View> {
+        public void onGroupMemberClick();
+        public void onAddMemberClick();
+        public void onGroupManageClick();
+        public void onSearchHistoryClick();
+        public void onChangeNotificationClick(boolean isOpen);
+        public void onInvitationClick();
+        public void onEnterBtnClick();
+        public void onQRCodeClick();
+        public void onClearHistoryClick();
+    }
+}

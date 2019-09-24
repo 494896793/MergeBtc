@@ -1,0 +1,44 @@
+package com.bochat.app.model.util;
+
+/**
+ * Created by cookie on 2017/5/22 15:13.
+ *
+ * @author LDL
+ */
+//All request API
+public class QuotationApi {
+
+    public static final String BASE_URL = "http://api-trade.bochat.net/";//生产
+//        public static final String BASE_URL = "http://47.244.177.24:8787/";//开发
+//    public static final String BASE_URL = "http://192.168.0.108:8787/";//李达荣
+//    public static final String BASE_URL = "http://192.168.0.30:8787/";//曾文
+//        public static final String BASE_URL = "http://192.168.0.22:8787/";//蒋
+//    public static final String BASE_URL = "http://192.168.0.57:8787/";//徐昶
+//    public static final String BASE_URL = "http://192.168.0.224:8787/";//熊定坤
+    
+    public static final String WS_SERVER_URI = "ws://api-trade.bochat.net/websocket";
+//    public static final String WS_SERVER_URI = "ws://192.168.0.22:8787/websocket";
+//    public static final String WS_SERVER_URI = "ws://192.168.0.57:8787/websocket";
+//    public static final String WS_SERVER_URI = "ws://192.168.0.108:8787/websocket";
+
+    /*获取交易区块*/
+    public static final String getPationInfo = "app/marketInfo/getPationInfo";
+    /*委托查询*/
+    public static final String queryApplyList = "app/entrust/queryApplyList";
+    /*交易币种选择*/
+    public static final String queryByCurrency = "app/entrust/queryByCurrency";
+    /*查询货币可用资产*/
+    public static final String listResidueAmount = "app/entrust/listResidueAmount";
+    /*买入卖出货币操作*/
+    public static final String saleBuying = "app/entrust/saleBuying";
+    /*是否收藏货币对*/
+    public static final String isCollect = "app/entrust/isCollect";
+    /* 查询市场交易规则 */
+    public static final String queryTradingRules = "app/entrust/queryTradingRules";
+    /* 查询当前用户是否收藏交易对 */
+    public static final String queryCollection = "app/entrust/queryCollection";
+    /*获取问题和答案*/
+    public static final String queryKLineRecord = "/app/marketInfo/queryKLineRecord";
+    /* 委托撤销 */
+    public static final String revoke = "app/entrust/revoke";
+}

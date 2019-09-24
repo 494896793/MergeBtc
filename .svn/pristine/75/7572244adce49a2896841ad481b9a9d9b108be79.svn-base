@@ -1,0 +1,37 @@
+package com.bochat.app.model.bean;
+
+import java.io.Serializable;
+
+/**
+ * 2019/6/26
+ * Author LDL
+ **/
+public class PationInfoEntity extends CodeEntity {
+
+    private int id;
+    private String partition_name;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getPartition_name() {
+        return partition_name;
+    }
+
+    public void setPartition_name(String partition_name) {
+        this.partition_name = partition_name;
+    }
+
+    @Override
+    public String toString() {
+        return "PationInfoEntity{" +
+                "id=" + id +
+                ", partition_name='" + partition_name + '\'' +
+                '}';
+    }
+}

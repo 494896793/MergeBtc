@@ -1,0 +1,172 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 13:48
+ * Description :
+ */
+
+public class EntrustSellCommand implements MarketCenterCommand {
+
+    private String marketId;
+
+    
+    
+    public EntrustSellCommand(String marketId) {
+        this.marketId = marketId;
+    }
+
+    @Override
+    public MarketCenterType getType() {
+        return MarketCenterType.ENTRUST_SELL;
+    }
+
+    @Override
+    public JSONObject convertToJson() {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("marketId", marketId);
+            json.put("type", "1");
+            return json;
+        } catch (Exception ignore){
+        }
+        return null;
+    }
+    
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Demo demo = new Demo();
+        demo.init();
+        int input = scanner.nextInt();
+        while(input != 886){
+            if (input == 1){
+                demo.loadMore();
+            } else {
+                demo.input(input);
+            }
+            input = scanner.nextInt();
+        }
+    }
+    
+    private static class Demo{
+        
+        private static final int PAGE_SIZE = 5;
+        
+        private int messStart;
+        private int clearStart;
+        private int clearEnd;
+        private int messEnd;
+        
+        private List<Integer> startList = new ArrayList<>(PAGE_SIZE);
+        private List<Integer> clearList = new ArrayList<>();
+        private List<Integer> endList = new ArrayList<>();
+        
+        private void init(){
+            clearList.add(1000);
+            clearList.add(1001);
+            clearList.add(1002);
+            computeClear();
+            syncMessStart();
+            syncMessEnd();
+        }
+        
+        private void computeClear(){
+            if(clearList == null || clearList.isEmpty()){
+                clearStart = 0;
+                clearEnd = 0;
+                return;
+            }
+            clearStart = clearList.get(0);
+            clearEnd = clearList.get(clearList.size() - 1);
+        }
+        
+        private void syncMessStart(){
+            messStart = clearStart;
+        }
+        
+        private void syncMessEnd(){
+            messEnd = clearEnd;
+        }
+        
+        public void loadMore(){
+            if(messStart == clearStart){
+                messStart -= PAGE_SIZE;
+                startList = new ArrayList<>(PAGE_SIZE);
+            }
+            System.out.println("load more "+ clearStart + " -> " + messStart);
+        }
+        
+//        public void input(List<Integer> values){
+//            for(Integer value : values){
+//                if(messStart - value > 0 && messStart - value <= PAGE_SIZE){
+//                    startList.add(messStart - value - 1, value);
+//                }
+//            }
+//            for(Integer value : startList){
+//                if(value == 0){
+//                    dump();
+//                    System.out.println("start still mess after input");
+//                    return;
+//                }
+//            }
+//            startList.addAll(clearList);
+//            clearList = new ArrayList<>(startList);
+//            computeClear();
+//            syncMessStart();
+//            dump();
+//            System.out.println("start clear after input");
+//        }
+        
+        public void input(Integer input){
+            if(messStart == clearStart){
+                System.out.println("start already clear, drop input");
+                return;
+            }
+            System.out.println("start 1 " + messStart);
+            if(input - messStart > 0 && input - messStart <= PAGE_SIZE){
+                startList.add(input - messStart -  - 1, input);
+            }
+            for(Integer value : startList){
+                System.out.println("start " + value);
+                if(value == null){
+                    dump();
+                    System.out.println("start still mess after input");
+                    return;
+                }
+            }
+            if(startList.size() < 5){
+                dump();
+                System.out.println("start still mess after input");
+                return;
+            }
+            startList.addAll(clearList);
+            clearList = new ArrayList<>(startList);
+            computeClear();
+            syncMessStart();
+            dump();
+            System.out.println("start clear after input");
+        }
+        
+        private void dump(){
+            dump("start", startList);
+            dump("clear", clearList);
+            dump("end  ", endList);
+        }
+        
+        private void dump(String tag, List<Integer> list){
+            StringBuilder builder = new StringBuilder();
+            builder.append(tag).append(" : ");
+            for(Integer integer : list){
+                builder.append(integer).append(",");
+            }
+            builder.append(";");
+            System.out.println(builder.toString());
+        }
+    }
+}

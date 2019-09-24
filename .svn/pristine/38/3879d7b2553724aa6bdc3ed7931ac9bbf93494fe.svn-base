@@ -1,0 +1,24 @@
+package com.bochat.app.business.main.bill;
+
+
+import com.bochat.app.business.DaggerBusinessComponent;
+import com.bochat.app.common.contract.bill.TokenTransferPayContract;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+
+/**
+ *
+ */
+public class TokenTransferPayPresenter extends BasePresenter<TokenTransferPayContract.View> implements TokenTransferPayContract.Presenter {
+
+
+    @Override
+    public void onMineData() {
+
+    }
+
+    @Override
+    public void initInjector() {
+        DaggerBusinessComponent.create().inject(this);
+    }
+}

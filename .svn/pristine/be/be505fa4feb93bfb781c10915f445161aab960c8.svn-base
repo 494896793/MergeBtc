@@ -1,0 +1,108 @@
+package com.bochat.app.model.bean;
+
+public class PrivilegeEntity extends CodeEntity {
+
+    /**
+     * 特权Id
+     */
+    private long id;
+
+    /**
+     * 特权名称
+     */
+    private String name;
+
+    /**
+     * 特权有效期 2019/7/10-2019/7/12 yyyy/MM/dd-yyyy/MM/dd
+     */
+    private String valid_time;
+
+    /**
+     * 特权状态 0使用中或1已过期
+     */
+    private int state;
+
+    /**
+     * 特权类型 1.BX生息 2.红包大厅
+     */
+    private int type;
+
+    /**
+     * 是否跳转H5 0不是 1是
+     */
+    private int describes;
+
+    /**
+     * 跳转地址
+     */
+    private String url;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getValid_time() {
+        return valid_time;
+    }
+
+    public void setValid_time(String valid_time) {
+        this.valid_time = valid_time;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public int getDescribes() {
+        return describes;
+    }
+
+    public void setDescribes(int describes) {
+        this.describes = describes;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    @Override
+    public String toString() {
+        return "PrivilegeEntity{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", valid_time='" + valid_time + '\'' +
+                ", state=" + state +
+                ", type=" + type +
+                ", describes=" + describes +
+                ", url='" + url + '\'' +
+                '}';
+    }
+}

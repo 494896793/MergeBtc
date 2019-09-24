@@ -1,0 +1,186 @@
+package com.bochat.app.app.fragment;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+
+import com.bochat.app.R;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.app.view.PlusMorePopupWindow;
+import com.bochat.app.common.contract.conversation.ConversationContract;
+import com.bochat.app.model.event.ConversationRefreshEvent;
+import com.bochat.app.mvp.view.BaseFragment;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+import io.rong.imkit.fragment.ConversationListFragment;
+import io.rong.imkit.widget.adapter.ConversationListAdapter;
+import io.rong.imlib.model.Conversation;
+
+/**
+ * Author      : LDL
+ * CreateDate  : 2019/04/12 09:30
+ * Description :
+ */
+
+public class ConversationFragment extends BaseFragment<ConversationContract.Presenter> implements ConversationContract.View{
+    
+    @Inject
+    ConversationContract.Presenter presenter;
+    
+    @BindView(R.id.bochat_dialog_layout)
+    RelativeLayout dialogLayout;
+
+    @BindView(R.id.bochat_topbar)
+    BoChatTopBar boChatTopBar;
+    
+    PlusMorePopupWindow plusMorePopupWindow;
+    
+    ConversationListFragment fragment;
+
+
+
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+    
+    @Override
+    protected ConversationContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_conversation, container, false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i("=======","========onResume:");
+        if(fragment!=null){
+            fragment.onRestoreUI();
+        }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void onEventMainThread(ConversationRefreshEvent event){
+        if(fragment!=null){
+            fragment.onRestoreUI();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        loadConversations();
+
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+                //申请权限，字符串数组内是一个或多个要申请的权限，1是申请权限结果的返回参数，在onRequestPermissionsResult可以得知申请结果
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.CAMERA,}, 1);
+        }
+    }
+
+    @Override
+    protected void initWidget() {
+        boChatTopBar.setOnClickListener(new BoChatTopBar.OnClickListener() {
+            @Override
+            public void onLeftExtButtonClick() {
+                presenter.onQRScanClick();
+            }
+
+            @Override
+            public void onRightExtButtonClick() {
+                showPlusMorePopupWindow(dialogLayout);
+            }
+
+            @Override
+            public void onTextExtButtonClick() {
+                
+            }
+        });
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    @OnClick({R.id.bochat_search_layout})
+    @Override
+    protected void onViewClicked(View view) {
+        super.onViewClicked(view);
+        presenter.onSearchHistoryClick();
+    }
+
+    private void showPlusMorePopupWindow(View view) {
+        if (plusMorePopupWindow == null) {
+            plusMorePopupWindow = new PlusMorePopupWindow(getContext());
+            plusMorePopupWindow.setOnPlusMoreItemClickListener(new PlusMorePopupWindow.OnPlusMoreItemClickListener() {
+
+                @Override
+                public void onCreateGroupChatItemClick(View view) {
+                    presenter.onCreateGroupBtnClick();
+                }
+
+                @Override
+                public void onAddFriendItemClick(View view) {
+                    presenter.onSearchFriendBtnClick();
+                }
+            });
+        }
+        if (!plusMorePopupWindow.isShowing()) {
+            plusMorePopupWindow.showPopupWindow(view);
+        }
+    }
+
+    /**
+     * 加载 会话列表 ConversationListFragment
+     */
+    private void loadConversations() {
+        fragment = new ConversationListFragment();
+//        String url="rong://com.bochat.app/conversation/group?targetId=12345";
+        Uri uri = Uri.parse("rong://" + "com.bochat.app").buildUpon()
+                .appendPath("conversation")
+                .appendQueryParameter(Conversation.ConversationType.PRIVATE.getName(), "false") //设置私聊会话非聚合显示
+                .appendQueryParameter(Conversation.ConversationType.GROUP.getName(), "false")//设置群组会话聚合显示
+                .appendQueryParameter(Conversation.ConversationType.DISCUSSION.getName(), "false")//设置讨论组会话非聚合显示
+                .appendQueryParameter(Conversation.ConversationType.SYSTEM.getName(), "false")//设置系统会话非聚合显示
+                .build();
+        fragment.setUri(uri);
+        FragmentTransaction fragmentTransaction=getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.conversationlist, fragment);
+        fragmentTransaction.commit();
+    }
+}

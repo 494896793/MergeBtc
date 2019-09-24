@@ -1,0 +1,85 @@
+package com.bochat.app.app.fragment.dynamic;
+
+import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.MarketQuotationEntrustAdapter;
+import com.bochat.app.model.bean.DynamicMQEntity;
+import com.bochat.app.mvp.view.BaseFragment;
+import com.bochat.app.common.contract.dynamic.MarketQuotationEntrustContract;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+public class MarketQuotationEntrustFragment extends BaseFragment<MarketQuotationEntrustContract.Presenter> implements MarketQuotationEntrustContract.View {
+
+    @Inject
+    MarketQuotationEntrustContract.Presenter presenter;
+
+    @BindView(R.id.dynamic_entrust_list)
+    RecyclerView mEntrustListView;
+
+    @BindView(R.id.dynamic_entrust_no_data)
+    ImageView mEntrustNotData;
+
+    boolean isNotData = false;
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+        mEntrustListView.setLayoutManager(new LinearLayoutManager(getViewContext()));
+        mEntrustListView.setItemAnimator(new DefaultItemAnimator());
+
+        MarketQuotationEntrustAdapter adapter = new MarketQuotationEntrustAdapter(getViewContext());
+        mEntrustListView.setAdapter(adapter);
+
+        List<DynamicMQEntity> datas = new ArrayList<>();
+        if (isNotData) {
+            View headerView = LayoutInflater.from(getViewContext()).inflate(R.layout.market_quotation_entrust_header_view, null);
+            adapter.setHeaderView(headerView);
+            DynamicMQEntity one = new DynamicMQEntity("XLM / ETH", 420046, "0.00016668", "0.22", 1, "0.48");
+            DynamicMQEntity two = new DynamicMQEntity("BTC / ETH", 420046, "0.00016668", "0.22", 0, "0.48");
+            DynamicMQEntity three = new DynamicMQEntity("SNTC / ETH", 420046, "0.00016668", "0.22", 0, "0.48");
+            DynamicMQEntity four = new DynamicMQEntity("XLM / ETH", 420046, "0.00016668", "0.22", 1, "0.48");
+            DynamicMQEntity five = new DynamicMQEntity("BX / ETH", 420046, "0.00016668", "0.22", 0, "0.48");
+            datas.add(one);
+            datas.add(two);
+            datas.add(three);
+            datas.add(four);
+            datas.add(five);
+            adapter.notifyData(datas);
+        }
+        mEntrustNotData.setVisibility(datas.size() == 0 ? View.VISIBLE : View.GONE);
+
+    }
+
+    public void setTestNoData(boolean noData) {
+        isNotData = noData;
+    }
+
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected MarketQuotationEntrustContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_market_quotation_entrust_layout, null);
+    }
+}

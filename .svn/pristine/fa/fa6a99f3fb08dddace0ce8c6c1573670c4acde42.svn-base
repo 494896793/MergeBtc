@@ -1,0 +1,78 @@
+package com.bochat.app.business.main.book;
+
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.common.contract.book.GroupApplyContract;
+import com.bochat.app.common.model.IGroupModule;
+import com.bochat.app.model.bean.GroupApplyServerEntity;
+import com.bochat.app.model.bean.GroupApplyServerListEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+/**
+ * 2019/4/22
+ * Author LDL
+ **/
+public class GroupApplyPresenter extends BasePresenter<GroupApplyContract.View> implements GroupApplyContract.Presenter {
+    
+    @Inject
+    IGroupModule groupModule;
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+    
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<GroupApplyServerListEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<GroupApplyServerListEntity> emitter) throws Exception {
+                try {
+                    GroupApplyServerListEntity entity = groupModule.queryGroupApplys(0, 10);
+                    if(entity.getRetcode() != 0){
+                        emitter.onError(new RxErrorThrowable(entity));
+                    }
+                    emitter.onNext(entity);
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<GroupApplyServerListEntity>() {
+            @Override
+            public void accept(GroupApplyServerListEntity entity) throws Exception {
+                getView().hideLoading("");
+                getView().updateList(entity.getItems());
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("");
+            }
+        });
+        getView().showLoading(subscribe);
+        
+    }
+    
+    @Override
+    public void onApply(GroupApplyServerEntity item) {
+         getView().showTips("111");
+    }
+
+    @Override
+    public void onRefuse(GroupApplyServerEntity item) {
+        getView().showTips("222");
+    }
+}

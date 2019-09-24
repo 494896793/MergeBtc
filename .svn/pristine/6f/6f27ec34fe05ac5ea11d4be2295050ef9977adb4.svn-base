@@ -1,0 +1,498 @@
+package com.bochat.app.app.fragment.dynamic;
+
+import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.KChatHistoryAdapter;
+import com.bochat.app.app.adapter.KChatTitleAdapter;
+import com.bochat.app.app.view.kline.KData;
+import com.bochat.app.app.view.kline.KLineView;
+import com.bochat.app.common.contract.dynamic.KChatContract;
+import com.bochat.app.model.modelImpl.MarketCenter.KLineCommand;
+import com.bochat.app.model.modelImpl.MarketCenter.KLineEntity;
+import com.bochat.app.model.modelImpl.MarketCenter.KLineInstantEntity;
+import com.bochat.app.model.modelImpl.MarketCenter.KLineItemEntity;
+import com.bochat.app.model.util.NumUtils;
+import com.bochat.app.mvp.view.BaseFragment;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+/**
+ * 2019/6/19
+ * Author LDL
+ **/
+public class KChatFragment extends BaseFragment<KChatContract.Presenter> implements KChatContract.View, KLineView.DataMoveListener {
+
+    @Inject
+    KChatContract.Presenter presenter;
+
+    @BindView(R.id.recycler)
+    RecyclerView recycler;
+
+    @BindView(R.id.mKLineView)
+    KLineView mKLineView;
+
+    @BindView(R.id.history_recycler)
+    RecyclerView history_recycler;
+
+    @BindView(R.id.have_data_relative)
+    RelativeLayout have_data_relative;
+
+    @BindView(R.id.no_data_relative)
+    RelativeLayout no_data_relative;
+
+    @BindView(R.id.price_max)
+    TextView price_max;
+
+    @BindView(R.id.exchange_text)
+    TextView exchange_text;
+
+    @BindView(R.id.exchange_person_text)
+    TextView exchange_person_text;
+
+    @BindView(R.id.exchange_total)
+    TextView exchange_total;
+
+    @BindView(R.id.price_min)
+    TextView price_min;
+
+    @BindView(R.id.price_volume)
+    TextView price_volume;
+    
+    private KChatHistoryAdapter historyAdapter;
+    private KChatTitleAdapter adapter;
+    private List<String> titles = new ArrayList<>();
+    private KChatTitleAdapter.KChatTitleViewHolder lastHolder;
+    private int startId = 0;
+    private int offset = 300;
+    private String marketId;
+    private String nowChoose = "5分钟";
+    private int isFirstEnter = -1;
+    private KLineEntity currentKLine;
+
+    private List<KData> realTimeList = new ArrayList<>();
+    private List<KData> recordList = new ArrayList<>();
+    
+    
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected KChatContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_kchat, null);
+        return view;
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+        initRecyclerView();
+        marketId = getArguments().getString("marketId");
+//        marketId="37";
+        //初始化控件加载数据
+        mKLineView.setDataMoveListener(this);
+        //设置十字线移动模式，默认为0：固定指向收盘价
+        mKLineView.setCrossHairMoveMode(KLineView.CROSS_HAIR_MOVE_OPEN);
+        mKLineView.initKDataList(clearErrorData());
+//        mKLineView.initKDataList(getKDataList(10));
+        
+        /**
+         * 当控件显示数据属于总数据量的前三分之一时，会自动调用该接口，用于预加载数据，保证控件操作过程中的流畅性，
+         * 虽然做了预加载，当总数据量较小时，也会出现用户滑到左边界了，但数据还未获取到，依然会有停顿。
+         * 所以数据量越大，越不会出现停顿，也就越流畅
+         */
+        mKLineView.setOnRequestDataListListener(new KLineView.OnRequestDataListListener() {
+            @Override
+            public void requestData() {
+                Log.i("==========", "====================requestData");
+                //延时3秒执行，模拟网络请求耗时
+//                mHandler.postDelayed(dataListAddRunnable, 500);
+            }
+        });
+    }
+
+    private void initRecyclerView() {
+        titles.add("5分钟");
+        titles.add("30分钟");
+        titles.add("1小时");
+        titles.add("1天");
+        titles.add("1周");
+        recycler.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        adapter = new KChatTitleAdapter(getActivity(), titles);
+        adapter.setOnItemClickListener(new KChatTitleAdapter.OnItemClickListener() {
+            @Override
+            public void OnItemClick(final int position, String title) {
+                if (position == recycler.getChildCount() - 1) {
+                    no_data_relative.setVisibility(View.VISIBLE);
+                    have_data_relative.setVisibility(View.GONE);
+                } else {
+                    no_data_relative.setVisibility(View.GONE);
+                    have_data_relative.setVisibility(View.VISIBLE);
+                }
+                //第一个先初始化
+                View view0 = recycler.getChildAt(0);
+                KChatTitleAdapter.KChatTitleViewHolder holder0 = (KChatTitleAdapter.KChatTitleViewHolder) recycler.getChildViewHolder(view0);
+                holder0.title_text.setTextColor(getResources().getColor(R.color.color_999999));
+
+                View view = recycler.getChildAt(position);
+                if (lastHolder != null) {
+                    lastHolder.title_text.setTextColor(getResources().getColor(R.color.color_999999));
+                }
+                KChatTitleAdapter.KChatTitleViewHolder holder = (KChatTitleAdapter.KChatTitleViewHolder) recycler.getChildViewHolder(view);
+                holder.title_text.setTextColor(getResources().getColor(R.color.color_0084FF));
+                lastHolder = holder;
+                if (!nowChoose.equals(title)) {
+                    List<KData> refresh=new ArrayList<>();
+                    KData kData=new KData();
+                    kData.setClosePrice(0);
+                    kData.setOpenPrice(0);
+                    kData.setMinPrice(0);
+                    kData.setMaxPrice(0);
+                    refresh.add(kData);
+                    mKLineView.initKDataList(refresh);
+                    startId = 0;
+                    offset = 300;
+                    isFirstEnter = -1;
+                    realTimeList.clear();
+                    recordList.clear();
+                    getChooseData(title, false);
+                }
+                nowChoose = title;
+            }
+        });
+        nowChoose = "5分钟";
+        recycler.setAdapter(adapter);
+
+        historyAdapter = new KChatHistoryAdapter(getActivity(), new ArrayList<KLineInstantEntity.TradeItemEntity>());
+        history_recycler.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        history_recycler.setAdapter(historyAdapter);
+    }
+
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //退出页面时停止子线程并置空，便于回收，避免内存泄露
+        mKLineView.cancelQuotaThread();
+    }
+
+    private List<KData> dataFormate(List<KLineItemEntity> items) {
+        List<KData> list = new ArrayList<>();
+        for (int i = 0; i < items.size(); i++) {
+            KData kData = new KData();
+            if (TextUtils.isEmpty(items.get(i).getStart()))
+                kData.setOpenPrice(Double.valueOf(items.get(i).getStart()));
+            kData.setClosePrice(Double.valueOf(items.get(i).getEnd()));
+            kData.setMaxPrice(Double.valueOf(items.get(i).getMax()));
+            kData.setMinPrice(Double.valueOf(items.get(i).getMin()));
+//            kData.setVolume(Double.valueOf(items.get(i).get));
+        }
+        return list;
+    }
+
+    private void updateTrade(KLineEntity kLineEntity){
+        if (kLineEntity.getInstantEntity().getTradeItems().size() != 0) {
+            no_data_relative.setVisibility(View.GONE);
+            have_data_relative.setVisibility(View.VISIBLE);
+            historyAdapter.refreshData(kLineEntity.getInstantEntity().getTradeItems());
+        } else {
+            no_data_relative.setVisibility(View.VISIBLE);
+            have_data_relative.setVisibility(View.GONE);
+        }
+    }
+    
+    private void updateTop(KLineEntity kLineEntity){
+        exchange_text.setText(kLineEntity.getInstantEntity().getFinalPrice());
+        if (!TextUtils.isEmpty(kLineEntity.getInstantEntity().getRateToRMB())) {
+            exchange_total.setText("≈ ￥" + NumUtils.CointNum(Double.valueOf(kLineEntity.getInstantEntity().getRateToRMB()), 2));
+        }
+        exchange_person_text.setText(kLineEntity.getInstantEntity().getRate());
+        price_max.setText(kLineEntity.getInstantEntity().getMaxPrice24H());
+        price_min.setText(kLineEntity.getInstantEntity().getMinPrice24H());
+        price_volume.setText(kLineEntity.getInstantEntity().getAmplitude24H());
+    }
+    
+    private void updateMA(KLineEntity kLineEntity){
+        if (nowChoose.equals(titles.get(0))) {
+            mKLineView.setTopMa("MA:" + kLineEntity.getInstantEntity().getMin5().getMaxValue1(), "MA:" + kLineEntity.getInstantEntity().getMin5().getMaxValue2(), "MA:" + kLineEntity.getInstantEntity().getMin5().getMaxValue3());
+            mKLineView.setBottomMa("MA:" + kLineEntity.getInstantEntity().getMin5().getMaxValue1(), "MA:" + kLineEntity.getInstantEntity().getMin5().getMaxValue2(), "MA:" + kLineEntity.getInstantEntity().getMin5().getMaxValue3());
+        } else if (nowChoose.equals(titles.get(1))) {
+            mKLineView.setTopMa("MA:" + kLineEntity.getInstantEntity().getMin30().getMaxValue1(), "MA:" + kLineEntity.getInstantEntity().getMin30().getMaxValue2(), "MA:" + kLineEntity.getInstantEntity().getMin30().getMaxValue3());
+            mKLineView.setBottomMa("MA:" + kLineEntity.getInstantEntity().getMin30().getMaxValue1(), "MA:" + kLineEntity.getInstantEntity().getMin30().getMaxValue2(), "MA:" + kLineEntity.getInstantEntity().getMin30().getMaxValue3());
+        } else if (nowChoose.equals(titles.get(2))) {
+            mKLineView.setTopMa("MA:" + kLineEntity.getInstantEntity().getHour().getMaxValue1(), "MA:" + kLineEntity.getInstantEntity().getHour().getMaxValue2(), "MA:" + kLineEntity.getInstantEntity().getHour().getMaxValue3());
+            mKLineView.setBottomMa("MA:" + kLineEntity.getInstantEntity().getHour().getMaxValue1(), "MA:" + kLineEntity.getInstantEntity().getHour().getMaxValue2(), "MA:" + kLineEntity.getInstantEntity().getHour().getMaxValue3());
+        } else if (nowChoose.equals(titles.get(3))) {
+            mKLineView.setTopMa("MA:" + kLineEntity.getInstantEntity().getDay().getMaxValue1(), "MA:" + kLineEntity.getInstantEntity().getDay().getMaxValue2(), "MA:" + kLineEntity.getInstantEntity().getDay().getMaxValue3());
+            mKLineView.setBottomMa("MA:" + kLineEntity.getInstantEntity().getDay().getMaxValue1(), "MA:" + kLineEntity.getInstantEntity().getDay().getMaxValue2(), "MA:" + kLineEntity.getInstantEntity().getDay().getMaxValue3());
+        } else {
+            mKLineView.setTopMa("MA:" + kLineEntity.getInstantEntity().getWeek().getMaxValue1(), "MA:" + kLineEntity.getInstantEntity().getWeek().getMaxValue2(), "MA:" + kLineEntity.getInstantEntity().getWeek().getMaxValue3());
+            mKLineView.setBottomMa("MA:" + kLineEntity.getInstantEntity().getWeek().getMaxValue1(), "MA:" + kLineEntity.getInstantEntity().getWeek().getMaxValue2(), "MA:" + kLineEntity.getInstantEntity().getWeek().getMaxValue3());
+        }
+    }
+    
+    private KData makeKData(KLineItemEntity itemEntity){
+        KData kData = new KData();
+        kData.setId(itemEntity.getId());
+        kData.setMaxPrice(Double.valueOf(itemEntity.getMax()));
+        kData.setMinPrice(Double.valueOf(itemEntity.getMin()));
+        kData.setOpenPrice(Double.valueOf(itemEntity.getStart()));
+        kData.setClosePrice(Double.valueOf(itemEntity.getEnd()));
+        kData.setVolume(Double.valueOf(itemEntity.getNum()));
+        kData.setTime(itemEntity.getCreateTimeStamp());
+        return kData;
+    }
+    
+    @Override
+    public void getData(final KLineEntity kLineEntity, final boolean isFind) {
+        Log.i("=======", "=======kLineEntity:" + kLineEntity.toString());
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                      
+                //实时数据
+                if (kLineEntity.getkLineType() == KLineCommand.KLineType.INSTANT) {
+                    if (kLineEntity.getInstantEntity() != null) {
+                        
+                        currentKLine = kLineEntity;
+                        
+                        updateTrade(kLineEntity);
+                        
+                        updateTop(kLineEntity);
+
+                        updateMA(kLineEntity);
+                       
+                        if (kLineEntity.getInstantEntity().getMin5() != null) {
+                            
+                            KData kData;
+                            if (nowChoose.equals(titles.get(0))) {
+                                kData = makeKData(kLineEntity.getInstantEntity().getMin5());
+                                if (isFirstEnter == -1 && realTimeList.size() == 0) {
+                                    startId = (int) kLineEntity.getInstantEntity().getMin5().getId();
+                                    presenter.get5MINData(startId, offset, marketId, false);
+                                }
+                            } else if (nowChoose.equals(titles.get(1))) {
+                                kData = makeKData(kLineEntity.getInstantEntity().getMin30());
+                                if (isFirstEnter == -1 && realTimeList.size() == 0) {
+                                    startId = (int) kLineEntity.getInstantEntity().getMin30().getId();
+                                    presenter.get30MINData(startId, offset, marketId, false);
+                                }
+                            } else if (nowChoose.equals(titles.get(2))) {
+                                kData = makeKData(kLineEntity.getInstantEntity().getHour());
+                                if (isFirstEnter == -1 && realTimeList.size() == 0) {
+                                    startId = (int) kLineEntity.getInstantEntity().getHour().getId();
+                                    presenter.getHOURData(startId, offset, marketId, false);
+                                }
+                            } else if (nowChoose.equals(titles.get(3))) {
+                                kData = makeKData(kLineEntity.getInstantEntity().getDay());
+                                if (isFirstEnter == -1 && realTimeList.size() == 0) {
+                                    startId = (int) kLineEntity.getInstantEntity().getDay().getId();
+                                    presenter.getDAYData(startId, offset, marketId, false);
+                                }
+                            } else {
+                                kData = makeKData(kLineEntity.getInstantEntity().getWeek());
+                                if (isFirstEnter == -1 && realTimeList.size() == 0) {
+                                    startId = (int) kLineEntity.getInstantEntity().getWeek().getId();
+                                    presenter.getWEEKData(startId, offset, marketId, false);
+                                }
+                            }
+                            if(realTimeList.isEmpty()){
+                                realTimeList.add(kData);
+                            } else {
+                                KData last = realTimeList.get(realTimeList.size() - 1);
+                                if(kData.getId() > last.getId()){
+                                    realTimeList.add(realTimeList.size() - 1, kData);
+                                }
+                            }
+                        }
+                        
+                        if (realTimeList.size() != 0) {
+                            if (isFirstEnter != -1) {
+                                if (mKLineView.getData() == null || mKLineView.getData().size() == 0) {
+                                    mKLineView.initKDataList(realTimeList);
+                                } else {
+                                    mKLineView.resetDataList(clearErrorData(), true);
+                                }
+                            } else {
+                                mKLineView.initKDataList(clearErrorData());
+                            }
+                        }
+                    } else {
+                        if (historyAdapter.getData() == null || historyAdapter.getData().size() == 0) {
+                            no_data_relative.setVisibility(View.VISIBLE);
+                            have_data_relative.setVisibility(View.GONE);
+                        }
+                    }
+//                        if (kLineEntity.getListEntity() != null) {
+//                            if (!TextUtils.isEmpty(kLineEntity.getListEntity().getStartId())) {
+//                                startId = Integer.valueOf(kLineEntity.getListEntity().getStartId());
+//                            }
+//                        }
+                    //历史记录
+                } else {
+                    isFirstEnter = 1;
+                    if (kLineEntity.getListEntity() != null && kLineEntity.getListEntity().getItems() != null && kLineEntity.getListEntity().getItems().size() != 0) {
+                        List<KLineItemEntity> items = kLineEntity.getListEntity().getItems();
+                        int total = mKLineView.getTotleSize();
+                        for (int i = 0; i < items.size(); i++) {
+                            KData kData = new KData();
+                            kData.setId(items.get(i).getId());
+                            kData.setOpenPrice(Double.valueOf(items.get(i).getStart()));
+                            kData.setClosePrice(Double.valueOf(items.get(i).getEnd()));
+                            kData.setMaxPrice(Double.valueOf(items.get(i).getMax()));
+                            kData.setMinPrice(Double.valueOf(items.get(i).getMin()));
+                            kData.setTime(new Date().getTime());
+                            kData.setVolume(Double.valueOf(items.get(i).getMax()) - Double.valueOf(items.get(i).getMin()));
+                            recordList.add(kData);
+                        }
+                        if (total == 0) {
+                            mKLineView.initKDataList(recordList);
+                        } else {
+                            if (recordList.size() != 0) {
+                                mKLineView.resetDataList(clearErrorData(), true);
+                            }
+                        }
+                    }
+                }
+            }
+            
+        });
+    }
+
+    private List<KData> clearErrorData() {
+        List<KData> newDatas = new ArrayList<>();
+        if (recordList.size() == 0 && realTimeList.size() == 0) {
+
+        } else if (recordList.size() != 0 && realTimeList.size() == 0) {
+            newDatas = recordList;
+
+        } else if (recordList.size() == 0) {
+            newDatas = realTimeList;
+
+        } else {
+            newDatas.addAll(recordList);
+            newDatas.addAll(realTimeList);
+        }
+        
+        if (isFirstEnter == -1) {
+            newDatas = new ArrayList<>();
+            KData kData = new KData();
+            kData.setMaxPrice(0);
+            kData.setMinPrice(0);
+            kData.setOpenPrice(0);
+            kData.setClosePrice(0);
+            newDatas.add(kData);
+        }
+
+        Log.i("=========", "=========newDatas:" + newDatas.toString());
+        return newDatas;
+    }
+
+    private void getChooseData(String title, boolean isFind) {
+        if(currentKLine == null){
+            return;
+        }
+        if (title.equals("5分钟")) {
+            presenter.get5MINData((int)currentKLine.getInstantEntity().getMin5().getId(), offset, marketId, isFind);
+        } else if (title.equals("30分钟")) {
+            presenter.get30MINData((int)currentKLine.getInstantEntity().getMin30().getId(), offset, marketId, isFind);
+        } else if (title.equals("1小时")) {
+            presenter.getHOURData((int)currentKLine.getInstantEntity().getHour().getId(), offset, marketId, isFind);
+        } else if (title.equals("1天")) {
+            presenter.getDAYData((int)currentKLine.getInstantEntity().getDay().getId(), offset, marketId, isFind);
+        } else {
+            presenter.getWEEKData((int)currentKLine.getInstantEntity().getWeek().getId(), offset, marketId, isFind);
+        }
+    }
+
+    
+    
+    
+    @Override
+    public void onDataMove(boolean mLeftMove, boolean mRightMove) {
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*模拟K线数据*/
+    private List<KData> getKDataList(double num) {
+        long start = System.currentTimeMillis();
+
+        Random random = new Random();
+        List<KData> dataList = new ArrayList<>();
+        double openPrice = 100;
+        double closePrice;
+        double maxPrice;
+        double minPrice;
+        double volume;
+
+        for (int x = 0; x < num * 10; x++) {
+            for (int i = 0; i < 12; i++) {
+                start += 60 * 1000 * 5;
+                closePrice = openPrice + getAddRandomDouble();
+                maxPrice = closePrice + getAddRandomDouble();
+                minPrice = openPrice - getSubRandomDouble();
+                volume = random.nextInt(100) * 1000 + random.nextInt(10) * 10 + random.nextInt(10) + random.nextDouble();
+                dataList.add(new KData(start, openPrice, closePrice, maxPrice, minPrice, volume));
+                openPrice = closePrice;
+            }
+
+            for (int i = 0; i < 8; i++) {
+                start += 60 * 1000 * 5;
+                closePrice = openPrice - getSubRandomDouble();
+                maxPrice = openPrice + getAddRandomDouble();
+                minPrice = closePrice - getSubRandomDouble();
+                volume = random.nextInt(100) * 1000 + random.nextInt(10) * 10 + random.nextInt(10) + random.nextDouble();
+                dataList.add(new KData(start, openPrice, closePrice, maxPrice, minPrice, volume));
+                openPrice = closePrice;
+            }
+        }
+        long end = System.currentTimeMillis();
+        return dataList;
+    }
+
+    private double getAddRandomDouble() {
+        Random random = new Random();
+        return random.nextInt(5) * 5 + random.nextDouble();
+    }
+
+    private double getSubRandomDouble() {
+        Random random = new Random();
+        return random.nextInt(5) * 5 - random.nextDouble();
+    }
+}

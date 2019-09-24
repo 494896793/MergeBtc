@@ -1,0 +1,191 @@
+package com.bochat.app.business.main.conversation;
+
+import android.content.Intent;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.common.contract.conversation.FriendManageContract;
+import com.bochat.app.common.util.ALog;
+import com.bochat.app.mvp.presenter.BasePresenter;
+import com.bochat.app.mvp.view.ResultTipsType;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import io.rong.imlib.RongIMClient;
+import io.rong.imlib.model.Conversation;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/29 09:23
+ * Description :
+ */
+
+public class FriendManagePresenter extends BasePresenter<FriendManageContract.View> implements FriendManageContract.Presenter{
+   
+    String conversationId;
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        Intent viewIntent = getView().getViewIntent();
+        if(viewIntent.hasExtra(RouteExtra.ConversationId_String)){
+            conversationId = viewIntent.getStringExtra(RouteExtra.ConversationId_String);
+            
+            Disposable subscribe = Observable.create(new ObservableOnSubscribe<Boolean>() {
+                @Override
+                public void subscribe(final ObservableEmitter<Boolean> emitter) throws Exception {
+                    try {
+                        RongIMClient.getInstance().getConversationNotificationStatus(Conversation.ConversationType.PRIVATE,
+                                conversationId,
+                                new RongIMClient.ResultCallback<Conversation.ConversationNotificationStatus>() {
+                                    @Override
+                                    public void onSuccess(Conversation.ConversationNotificationStatus conversationNotificationStatus) {
+                                        ALog.d("get notification success " + conversationNotificationStatus);
+                                        emitter.onNext(conversationNotificationStatus == Conversation.ConversationNotificationStatus.DO_NOT_DISTURB);
+                                        emitter.onComplete();
+                                    }
+
+                                    @Override
+                                    public void onError(RongIMClient.ErrorCode errorCode) {
+                                        emitter.onNext(false);
+                                        emitter.onComplete();
+                                    }
+                                });
+                    } catch (Exception e) {
+                        emitter.onError(e);
+                        e.printStackTrace();
+                    }
+                }
+            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Boolean>() {
+                @Override
+                public void accept(Boolean entity) throws Exception {
+                    if(isActive()){
+                        getView().updateNotification(entity);
+                        getView().hideLoading("");
+                    }
+                }
+            }, new RxErrorConsumer<Throwable>(this)  {
+                @Override
+                public void acceptError(Throwable object) {
+                    getView().hideLoading("");
+                }
+            });
+            getView().showLoading(subscribe);
+        }
+    }
+
+    @Override
+    public void onEditNoteClick() {
+        if(isFriendEntityValid()){
+            ARouter.getInstance().build(RouteTable.CONVERSATION_FRIEND_MANAGE_NOTE).navigation();
+        }
+    }
+
+    @Override
+    public void onSearchHistoryClick() {
+        if(isFriendEntityValid()){
+            ARouter.getInstance().build(RouteTable.CONVERSATION_SEARCH_MESSAGE)
+                    .withString(RouteExtra.FriendId_String, conversationId).navigation();
+        }
+    }
+
+    @Override
+    public void onInvitationClick() {
+        getView().showTips("onInvitationClick");
+        if(isFriendEntityValid()){
+//            ARouter.getInstance().build(RouteTable.CONVERSATION_GROUP_IN).navigation();
+        }
+    }
+
+    @Override
+    public void onForbiddenSwitch(boolean isForbidden) {
+        if(isFriendEntityValid()){
+            RongIMClient.getInstance().setConversationNotificationStatus(Conversation.ConversationType.PRIVATE,
+                    conversationId,
+                    isForbidden ? Conversation.ConversationNotificationStatus.DO_NOT_DISTURB : Conversation.ConversationNotificationStatus.NOTIFY,
+                    new RongIMClient.ResultCallback<Conversation.ConversationNotificationStatus>() {
+                        @Override
+                        public void onSuccess(Conversation.ConversationNotificationStatus conversationNotificationStatus) {
+                            ALog.d("set notification success");
+                        }
+
+                        @Override
+                        public void onError(RongIMClient.ErrorCode errorCode) {
+                            ALog.d("set notification fail");
+                        }
+                    });
+        }
+    }
+
+    @Override
+    public void onDeleteFriendClick() {
+        getView().showTips("onDeleteFriendClick");
+        if(isFriendEntityValid()){
+//            ARouter.getInstance().build(RouteTable.CONVERSATION_GROUP_MEMBER_MANAGE_NOTE).navigation();
+        }
+    }
+
+    @Override
+    public void onClearHistoryClick() {
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> emitter) throws Exception {
+                try {
+                    RongIMClient.getInstance().cleanHistoryMessages(Conversation.ConversationType.PRIVATE, conversationId, 0, false, new RongIMClient.OperationCallback() {
+                        @Override
+                        public void onSuccess() {
+                            emitter.onNext(true);
+                            emitter.onComplete();
+                        }
+
+                        @Override
+                        public void onError(RongIMClient.ErrorCode errorCode) {
+                            emitter.onNext(false);
+                            emitter.onComplete();
+                        }
+                    });
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean entity) throws Exception {
+                if(isActive()){
+                    getView().hideLoading("");
+                    if(entity){
+                        getView().showTips(new ResultTipsType("成功", true));
+                    } else {
+                        getView().showTips(new ResultTipsType("失败", false));
+                    }
+                }
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                if(isActive()){
+                    getView().hideLoading("");
+                    getView().showTips(new ResultTipsType("失败", false));
+                }
+            }
+        });
+        getView().showLoading(subscribe);
+    }
+  
+    private boolean isFriendEntityValid(){
+        return conversationId != null;
+    }
+}

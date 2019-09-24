@@ -1,0 +1,115 @@
+package com.bochat.app.app.fragment.dynamic;
+
+import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.MarketQuotationOptionalAdapter;
+import com.bochat.app.common.router.Router;
+import com.bochat.app.common.router.RouterMarketQuotationDetail;
+import com.bochat.app.model.bean.DynamicMQEntity;
+import com.bochat.app.mvp.view.BaseFragment;
+import com.bochat.app.common.contract.dynamic.MarketQuotationOptionalContract;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+public class MarketQuotationOptionalFragment extends BaseFragment<MarketQuotationOptionalContract.Presenter> implements MarketQuotationOptionalContract.View,
+        MarketQuotationOptionalAdapter.OnMarketQuotationHeaderClickListener,
+        MarketQuotationOptionalAdapter.OnMarketQuotationItemClickListener {
+
+    @Inject
+    MarketQuotationOptionalContract.Presenter presenter;
+
+    @BindView(R.id.quotation_optional_list)
+    RecyclerView mOptionalListView;
+
+    @BindView(R.id.quotation_no_data)
+    ImageView mOptionalNotData;
+
+    boolean isNotData = false;
+
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected MarketQuotationOptionalContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_market_quotation_optional, container, false);
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+
+        mOptionalListView.setLayoutManager(new LinearLayoutManager(getViewContext()));
+        mOptionalListView.setItemAnimator(new DefaultItemAnimator());
+
+        MarketQuotationOptionalAdapter adapter = new MarketQuotationOptionalAdapter(getViewContext());
+        mOptionalListView.setAdapter(adapter);
+
+        adapter.setMarketQuotationHeaderClickListener(this);
+        adapter.setOnMarketQuotationItemClickListener(this);
+
+        List<DynamicMQEntity> datas = new ArrayList<>();
+        if (isNotData) {
+            View headerView = LayoutInflater.from(getViewContext()).inflate(R.layout.market_quotation_optional_header_view, null);
+            adapter.setHeaderView(headerView);
+            DynamicMQEntity one = new DynamicMQEntity("XLM / ETH", 420046, "0.00016668", "0.22", 1, "0.48");
+            DynamicMQEntity two = new DynamicMQEntity("BTC / ETH", 420046, "0.00016668", "0.22", 0, "0.48");
+            DynamicMQEntity three = new DynamicMQEntity("SNTC / ETH", 420046, "0.00016668", "0.22", 0, "0.48");
+            DynamicMQEntity four = new DynamicMQEntity("XLM / ETH", 420046, "0.00016668", "0.22", 1, "0.48");
+            DynamicMQEntity five = new DynamicMQEntity("BX / ETH", 420046, "0.00016668", "0.22", 0, "0.48");
+            datas.add(one);
+            datas.add(two);
+            datas.add(three);
+            datas.add(four);
+            datas.add(five);
+            adapter.notifyData(datas);
+        }
+        mOptionalNotData.setVisibility(datas.size() == 0 ? View.VISIBLE : View.GONE);
+
+    }
+
+    public void setTestNoData(boolean noData) {
+        isNotData = noData;
+    }
+
+    @Override
+    public void onItemClick(View view, DynamicMQEntity entity) {
+        RouterMarketQuotationDetail router = new RouterMarketQuotationDetail();
+        router.setEntity(entity);
+        Router.navigation(router);
+    }
+
+    @Override
+    public void onClickSort(View view) {
+
+    }
+
+    @Override
+    public void onClickNewPrice(View view) {
+
+    }
+
+    @Override
+    public void onClickUpAndDown(View view) {
+
+    }
+}

@@ -1,0 +1,328 @@
+package com.bochat.app.business.main.bill;
+
+
+import android.content.Intent;
+
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.business.DaggerBusinessComponent;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.bill.QuickExchangeDetailContract;
+import com.bochat.app.common.model.IIMModel;
+import com.bochat.app.common.model.ISpeedConverModel;
+import com.bochat.app.common.model.IUserModel;
+import com.bochat.app.common.util.ALog;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.model.bean.SendSpeedEntity;
+import com.bochat.app.model.bean.SpeedConverListItemEntity;
+import com.bochat.app.model.bean.SpeedConverOrderDetailEntity;
+import com.bochat.app.model.bean.SpeedConverOrderItem;
+import com.bochat.app.model.bean.SpeedConverStatusEntity;
+import com.bochat.app.model.bean.SpeedConverTradingEntity;
+import com.bochat.app.model.bean.UserEntity;
+import com.bochat.app.model.greendao.DBManager;
+import com.bochat.app.model.rong.SpeedConverMessage;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+import static com.bochat.app.app.RouteExtra.BIT_ID;
+import static com.bochat.app.app.RouteExtra.ConversationIsGroup;
+import static com.bochat.app.app.RouteExtra.ConversationReceiveId;
+import static com.bochat.app.app.RouteExtra.FROM_PAGE;
+import static com.bochat.app.app.RouteExtra.ORDERID;
+import static com.bochat.app.app.RouteExtra.SpeedConverOrRepacket;
+
+
+/**
+ *
+ */
+public class QuickExchangeDetailPresenter extends BasePresenter<QuickExchangeDetailContract.View> implements QuickExchangeDetailContract.Presenter {
+
+    @Inject
+    ISpeedConverModel speedConverModel;
+
+    @Inject
+    IIMModel iimModel;
+
+    @Inject
+    IUserModel userModel;
+
+
+    private boolean isGroup;
+    private long relevanceId;
+    private int type;
+    private int bidId;
+    private int orderId;
+    private String from;
+    SpeedConverListItemEntity speedConverListItemEntity;
+    private FriendEntity friendEntity;
+    private GroupEntity groupEntity;
+    private SpeedConverMessage message;
+    private SpeedConverOrderDetailEntity entity;
+
+    private int orderType;
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+
+        Intent intent = getView().getViewIntent();
+        from=intent.getStringExtra(FROM_PAGE);
+        orderId=intent.getIntExtra(ORDERID,0);
+        bidId=intent.getIntExtra(BIT_ID,0);
+        type=intent.getIntExtra(SpeedConverOrRepacket,1001);
+        isGroup=intent.getBooleanExtra(ConversationIsGroup,false);
+        relevanceId=intent.getLongExtra(ConversationReceiveId,0);
+        if(intent.hasExtra(RouteExtra.SpeedConverMessage)){
+            message=intent.getParcelableExtra(RouteExtra.SpeedConverMessage);
+        }
+
+        orderType = intent.getIntExtra(RouteExtra.OrderType,1);
+        
+        if(intent.hasExtra(RouteExtra.SpeedConverListItemEntity)) {
+            speedConverListItemEntity = (SpeedConverListItemEntity)intent.getSerializableExtra(RouteExtra.SpeedConverListItemEntity);
+            orderId = speedConverListItemEntity.getId();
+        }
+        if(intent.hasExtra(RouteExtra.FriendEntity)){
+            isGroup=false;
+            friendEntity= (FriendEntity) intent.getSerializableExtra(RouteExtra.FriendEntity);
+            sendConverPrivateOrGroup(friendEntity.getId()+"",friendEntity.getNickname());
+        }else if(intent.hasExtra(RouteExtra.GroupEntity)){
+            isGroup=true;
+            groupEntity= (GroupEntity) intent.getSerializableExtra(RouteExtra.GroupEntity);
+            sendConverPrivateOrGroup(groupEntity.getGroup_id()+"",groupEntity.getGroup_name());
+        }
+        
+        if(intent.hasExtra(RouteExtra.SpeedConverOrderItem)){
+            SpeedConverOrderItem item = (SpeedConverOrderItem)intent.getSerializableExtra(RouteExtra.SpeedConverOrderItem);
+            speedConverListItemEntity = new SpeedConverListItemEntity();
+            speedConverListItemEntity.setId(item.getId());
+            orderId = item.getId();
+        }
+        getView().hideSendToFriend(message == null);
+        
+//        if(message == null){
+//            message = new SpeedConverMessage();
+//            message.setConverbName(speedConverListItemEntity.getConverCurrency());
+//            message.setConverNum(speedConverListItemEntity.getConverNum());
+//            message.getConvertId(speedConverListItemEntity.get);
+//            message.setStartbName(speedConverListItemEntity.getStartCurrency());
+//            message.setStartId(speedConverListItemEntity.getFromId());
+//            
+//            sendSpeedEntity.setConverCurrency(message.getConverbName());
+//            sendSpeedEntity.setConverNum(message.getConverNum());
+//            sendSpeedEntity.setId(Integer.valueOf(message.getOrderId()));
+//            sendSpeedEntity.setStartCurrency(message.getStartbName());
+//            sendSpeedEntity.setStartUserId(Integer.valueOf(message.getFromId()));
+//        }
+        
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<SpeedConverOrderDetailEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<SpeedConverOrderDetailEntity> emitter) throws Exception {
+                try {
+                    entity = speedConverModel.myTradeDetail(speedConverListItemEntity.getId(), orderType);
+                    if(entity.getRetcode() != 0){
+                        emitter.onError(new RxErrorThrowable(entity));
+                        return;
+                    }
+                    emitter.onNext(entity);
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<SpeedConverOrderDetailEntity>() {
+            @Override
+            public void accept(SpeedConverOrderDetailEntity entity) throws Exception {
+                getView().hideLoading("");
+                getView().updateInfo(entity);
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("");
+            }
+        });
+        getView().showLoading(subscribe);
+    }
+
+    public void sendConverPrivateOrGroup(final String targetId, final String nikeName){
+        final SendSpeedEntity sendSpeedEntity=new SendSpeedEntity();
+        sendSpeedEntity.setConverCurrency(message.getConverbName());
+        sendSpeedEntity.setConverNum(message.getConverNum());
+        sendSpeedEntity.setId(Integer.valueOf(message.getOrderId()));
+        sendSpeedEntity.setStartCurrency(message.getStartbName());
+        sendSpeedEntity.setStartUserId(Integer.valueOf(message.getFromId()));
+        sendSpeedEntity.setTradeStatus(1);
+        sendSpeedEntity.setTradeTime(speedConverListItemEntity.getTradeTime());
+
+
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<Object>() {
+            @Override
+            public void subscribe(ObservableEmitter<Object> emitter) throws Exception {
+                try {
+                    boolean isRighte=iimModel.sendSpeedConver(targetId,message.getStartId(),message.getConvertId(),sendSpeedEntity,isGroup);
+                    if(!isRighte){
+                        emitter.onError(new RxErrorThrowable(entity));
+                    }else {
+                        emitter.onNext(entity);
+                        emitter.onComplete();
+                        friendEntity=null;
+                        groupEntity=null;
+                    }
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Object>() {
+            @Override
+            public void accept(Object entity) throws Exception {
+                getView().hideLoading("");
+//                if(isGroup){
+//                    RongIM.getInstance().startConversation(MainApplication.getInstance(), Conversation.ConversationType.GROUP,targetId,nikeName);
+//                }else{
+//                    RongIM.getInstance().startConversation(MainApplication.getInstance(),Conversation.ConversationType.PRIVATE,targetId,nikeName);
+//                }
+                getView().finish();
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("发送失败");
+            }
+        });
+        getView().showLoading(subscribe);
+    }
+
+    public void update(){
+
+    }
+
+    @Override
+    public void initInjector() {
+        DaggerBusinessComponent.create().inject(this);
+    }
+
+    @Override
+    public void onEnter(final String password) {
+
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<SpeedConverTradingEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<SpeedConverTradingEntity> emitter) throws Exception {
+                try {
+                    SpeedConverTradingEntity entity = speedConverModel.speedConverTrading(orderId, password);;
+                    if(entity.getRetcode() != 0){
+                        emitter.onError(new RxErrorThrowable(entity));
+                        return;
+                    }
+                    UserEntity userEntity= CachePool.getInstance().user().getLatest();
+                    
+                    if(from != null){
+                        FriendEntity friendEntity=userModel.getFriendInfo(relevanceId+"",-1,-1).getItems().get(0);
+                        boolean isRight=iimModel.getGroupRedPacket(isGroup,type,relevanceId+"",userEntity.getId()+""
+                                ,userEntity.getNickname(),relevanceId+"",friendEntity.getNickname(),entity.getConverId()+"",2);
+                        if(isRight){
+                            SpeedConverStatusEntity speedConverStatusEntity=new SpeedConverStatusEntity();
+                            speedConverStatusEntity.setId(entity.getConverId());
+                            speedConverStatusEntity.setStatus(2);
+                            DBManager.getInstance().saveOrUpdateSpeedConverStatu(speedConverStatusEntity);
+                            emitter.onNext(entity);
+                            emitter.onComplete();
+                        }else{
+                            emitter.onError(new RxErrorThrowable(entity));
+                        }
+                    } else {
+                        emitter.onNext(entity);
+                        emitter.onComplete();
+                    }
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<SpeedConverTradingEntity>() {
+            @Override
+            public void accept(SpeedConverTradingEntity entity) throws Exception {
+                getView().hideLoading("兑换成功");
+                entity.setStatus(2);
+                if(from!=null){
+                    getView().finish();
+                }else {
+                    onViewRefresh();
+                }
+                from=null;
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("");
+            }
+        });
+        getView().showLoading(subscribe);
+    }
+
+    @Override
+    public void onCancel() {  
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<CodeEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<CodeEntity> emitter) throws Exception {
+                try {
+                    CodeEntity codeEntity = speedConverModel.cancelConverTrading(orderId);
+                    if(codeEntity.getRetcode() != 0){
+                        emitter.onError(new RxErrorThrowable(codeEntity));
+                        return;
+                    }
+                    boolean isRight=iimModel.cancelExchange(relevanceId+"",isGroup,orderId+"");
+//                    boolean isRight=iimModel.getGroupRedPacket(isGroup,type,relevanceId+"",speedConverListItemEntity.getFromId(),speedConverListItemEntity.getFromUserName(),speedConverListItemEntity.getFromId(),speedConverListItemEntity.getFromUserName(),speedConverListItemEntity.getId()+"",3);
+                    if(isRight){
+                        SpeedConverStatusEntity speedConverStatusEntity=new SpeedConverStatusEntity();
+                        speedConverStatusEntity.setId(orderId);
+                        speedConverStatusEntity.setStatus(3);
+                        DBManager.getInstance().saveOrUpdateSpeedConverStatu(speedConverStatusEntity);
+                        emitter.onNext(codeEntity);
+                        emitter.onComplete();
+                    }else{
+                        emitter.onError(new RxErrorThrowable(codeEntity));
+                    }
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<CodeEntity>() {
+            @Override
+            public void accept(CodeEntity entity) throws Exception {
+                SpeedConverTradingEntity entity1=new SpeedConverTradingEntity();
+                entity1.setStatus(3);
+                if(from!=null){
+                    getView().finish();
+                }
+                getView().hideLoading("撤销成功");
+                onViewRefresh();
+                from=null;
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("");
+            }
+        });
+        getView().showLoading(subscribe);
+        
+        ALog.d("");
+    }
+}

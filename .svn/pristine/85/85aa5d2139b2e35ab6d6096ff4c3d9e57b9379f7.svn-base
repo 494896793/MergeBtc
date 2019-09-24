@@ -1,0 +1,174 @@
+package com.bochat.app.app.activity;
+
+import android.Manifest;
+import android.os.Bundle;
+import android.os.SystemClock;
+import android.support.annotation.Nullable;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.common.contract.SplashScreenContract;
+import com.bochat.app.common.router.Router;
+import com.bochat.app.common.router.RouterDynamicWebView;
+import com.bochat.app.common.router.RouterLogin;
+import com.bochat.app.common.router.RouterSplashScreen;
+import com.bochat.app.model.bean.AdvertEntity;
+import com.bochat.app.model.bean.AdvertListEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/10 14:08
+ * Description :
+ */
+@Route(path = RouterSplashScreen.PATH)
+@SuppressWarnings({"CheckResult", "ResultOfMethodCallIgnored"})
+public class SplashScreenActivity extends BaseActivity<SplashScreenContract.Presenter> implements SplashScreenContract.View {
+
+    private static final int SPLASH_SECONDS = 5;
+    private static final int SPLASH_DELAY = 2;
+    @Inject
+    SplashScreenContract.Presenter presenter;
+
+    @BindView(R.id.splash_screen_skip_btn)
+    Button button;
+
+    @BindView(R.id.splash_screen)
+    RelativeLayout mSplashScreen;
+
+//    @BindView(R.id.splash_bg)
+//    ImageView mSplashBackground;
+
+    @BindView(R.id.splash_logo)
+    ImageView mSplashLogo;
+
+    @Inject
+    RxPermissions rxPermissions;
+
+    private boolean isSkip = false;
+    private List<AdvertEntity> mAds;
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected SplashScreenContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_splash_screen);
+    }
+
+    @Override
+    @OnClick({R.id.splash_screen_skip_btn})
+    protected void onViewClicked(View view) {
+        skipSplashScreen();
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestPermissions();
+    }
+
+    private void requestPermissions() {
+        rxPermissions.request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        if (!aBoolean) {
+                            finish();
+                        } else {
+                            presenter.getAdvertPageList();
+//                            countBackWards();
+                        }
+                    }
+                });
+    }
+
+    private void skipSplashScreen() {
+        isSkip = true;
+        presenter.onSkipButtonClick();
+    }
+
+    /**
+     * 倒计时
+     */
+    private void countBackWards() {
+        Observable.intervalRange(1, SPLASH_SECONDS, 0, 1, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        button.setText(getResources().getString(R.string.splash_seconds_fmt, SPLASH_SECONDS - aLong));
+                    }
+                })
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        skipSplashScreen();
+                    }
+                })
+                .subscribe();
+    }
+
+    @Override
+    public void obtainAdvertList(AdvertListEntity entity) {
+        mAds = entity.getData();
+        if (mAds != null && mAds.size() > 0) {
+            presenter.setupAdvert(mAds, SPLASH_DELAY);
+            countBackWards();
+        } else {
+            SystemClock.sleep(1000);
+            Router.navigation(new RouterLogin());
+        }
+    }
+
+    @Override
+    public void loadAdvert(final AdvertEntity entity) {
+        final ImageView imageView = new ImageView(this);
+        imageView.setLayoutParams(mSplashScreen.getLayoutParams());
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = entity.getPictureUrl();
+                Router.navigation(new RouterDynamicWebView(url, ""));
+            }
+        });
+        mSplashScreen.addView(imageView);
+        Glide.with(this)
+                .load(entity.getImage())
+                .transition(DrawableTransitionOptions.withCrossFade((SPLASH_SECONDS / mAds.size()) * 1000))
+                .centerCrop()
+                .into(imageView);
+    }
+
+    @Override
+    public boolean isComplete() {
+        return isSkip;
+    }
+
+}

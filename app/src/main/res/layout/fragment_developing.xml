@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/developing_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    
+    <ImageView
+        android:layout_width="@dimen/dp_150"
+        android:layout_height="@dimen/dp_150"
+        android:src="@mipmap/ic_developing"
+        android:scaleType="fitXY"
+        android:layout_centerInParent="true" />
+    
+    <Button
+        android:id="@+id/developing_out_btn"
+        android:layout_width="@dimen/dp_250"
+        android:layout_height="@dimen/dp_44"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:text="退出登录"
+        android:textColor="#FFFFFF"
+        android:textSize="@dimen/dp_16"
+        android:background="@drawable/shape_login_btn"
+        android:layout_marginBottom="@dimen/dp_30"/>
+</RelativeLayout>

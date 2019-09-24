@@ -1,0 +1,112 @@
+package com.bochat.app.model.bean;
+
+public class EntrustApplyEntity extends CodeEntity {
+    private int id;
+    private int userId;
+    private int marketId;
+    private int price;
+    private float num;
+    private double serviceChange;
+    private int state;
+    private int type;
+    private String turnoverNum;
+    private String turnoverMoney;
+    private String trustTime;
+    private String revokeTime;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setMarketId(int marketId) {
+        this.marketId = marketId;
+    }
+
+    public int getMarketId() {
+        return marketId;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public float getNum() {
+        return num;
+    }
+
+    public void setNum(float num) {
+        this.num = num;
+    }
+
+    public double getServiceChange() {
+        return serviceChange;
+    }
+
+    public void setServiceChange(double serviceChange) {
+        this.serviceChange = serviceChange;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public String getTurnoverMoney() {
+        return turnoverMoney;
+    }
+
+    public void setTurnoverMoney(String turnoverMoney) {
+        this.turnoverMoney = turnoverMoney;
+    }
+
+    public String getTrustTime() {
+        return trustTime;
+    }
+
+    public void setTrustTime(String trustTime) {
+        this.trustTime = trustTime;
+    }
+
+    public String getTurnoverNum() {
+        return turnoverNum;
+    }
+
+    public void setTurnoverNum(String turnoverNum) {
+        this.turnoverNum = turnoverNum;
+    }
+
+    public String getRevokeTime() {
+        return revokeTime;
+    }
+
+    public void setRevokeTime(String revokeTime) {
+        this.revokeTime = revokeTime;
+    }
+}

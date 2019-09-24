@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/dynamic_left_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_14"
+            android:layout_marginTop="@dimen/dp_16"
+            android:layout_marginEnd="@dimen/dp_14"
+            android:layout_marginBottom="@dimen/dp_16">
+
+            <RelativeLayout
+                android:id="@+id/dynamic_buy_price_edit_container"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="@dimen/dp_40"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="@dimen/dp_16"
+                android:background="@drawable/market_quotation_edit_shape"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/dynamic_bs_price_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/dynamic_bs_price_edit_right"
+                    android:background="@null"
+                    android:inputType="numberDecimal"
+                    android:padding="@dimen/dp_8"
+                    android:textSize="@dimen/sp_14" />
+
+                <TextView
+                    android:id="@+id/dynamic_bs_price_edit_right"
+                    android:layout_width="@dimen/dp_50"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:gravity="center"
+                    tools:text="ETH" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/dynamic_buy_count_edit_container"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="@dimen/dp_40"
+                android:layout_below="@id/dynamic_buy_price_edit_container"
+                android:layout_marginBottom="@dimen/dp_10"
+                android:background="@drawable/market_quotation_edit_shape">
+
+                <EditText
+                    android:id="@+id/dynamic_bs_count_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/dynamic_bs_count_edit_right"
+                    android:background="@null"
+                    android:inputType="numberDecimal"
+                    android:padding="@dimen/dp_8"
+                    android:textSize="@dimen/sp_14" />
+
+                <TextView
+                    android:id="@+id/dynamic_bs_count_edit_right"
+                    android:layout_width="@dimen/dp_50"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:gravity="center"
+                    tools:text="BX" />
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/dynamic_can_buy_text"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/dynamic_buy_count_edit_container"
+                android:layout_marginBottom="@dimen/dp_18"
+                android:gravity="end"
+                android:textColor="@color/color_999999"
+                tools:text="可买BX 100,000.0022" />
+
+            <RadioGroup
+                android:id="@+id/dynamic_buy_radio_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/dynamic_can_buy_text"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="@dimen/dp_13"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/percent_25"
+                    style="@style/MarketQuotationRadioButton.CustomStyle"
+                    android:text="@string/market_quotation_percent_25" />
+
+                <RadioButton
+                    android:id="@+id/percent_50"
+                    style="@style/MarketQuotationRadioButton.CustomStyle"
+                    android:text="@string/market_quotation_percent_50" />
+
+                <RadioButton
+                    android:id="@+id/percent_75"
+                    style="@style/MarketQuotationRadioButton.CustomStyle"
+                    android:text="@string/market_quotation_percent_75" />
+
+                <RadioButton
+                    android:id="@+id/percent_100"
+                    style="@style/MarketQuotationRadioButton.CustomStyle"
+                    android:layout_marginEnd="0dp"
+                    android:text="@string/market_quotation_percent_100" />
+            </RadioGroup>
+
+            <RelativeLayout
+                android:id="@+id/dynamic_expected_turnover"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/dynamic_buy_radio_group"
+                android:layout_centerHorizontal="true">
+
+                <TextView
+                    android:id="@+id/dynamic_expected_turnover_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/market_quotation_bs_expected_turnover"
+                    android:textColor="@color/color_222222"
+                    android:textSize="@dimen/sp_11" />
+
+                <TextView
+                    android:id="@+id/dynamic_expected_turnover_result"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:textColor="@color/color_222222"
+                    android:textSize="@dimen/sp_11"
+                    tools:text="0.000000ETH" />
+
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/dynamic_buy_or_sell_btn"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="@dimen/dp_40"
+                android:layout_below="@id/dynamic_expected_turnover"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/dp_22"
+                android:background="#F14348"
+                android:textColor="@color/white"
+                android:textSize="@dimen/sp_14"
+                tools:text="买入" />
+
+            <View
+                android:id="@+id/dynamic_divider"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="1dp"
+                android:layout_below="@id/dynamic_buy_or_sell_btn"
+                android:layout_marginTop="@dimen/dp_48"
+                android:layout_marginBottom="@dimen/dp_36"
+                android:background="@drawable/market_quotation_divider_shape" />
+
+            <FrameLayout
+                android:id="@+id/dynamic_balance_x"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="@dimen/dp_40"
+                android:layout_below="@id/dynamic_divider"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="@dimen/dp_20"
+                android:background="@drawable/market_quotation_balance_shape"
+                android:padding="@dimen/dp_8">
+
+                <TextView
+                    android:id="@+id/dynamic_balance_currentR_left_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/color_999999"
+                    android:textSize="@dimen/sp_14"
+                    tools:text="可用XX" />
+
+                <TextView
+                    android:id="@+id/dynamic_balance_currentR_right_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|end"
+                    android:textColor="#000022"
+                    android:textSize="@dimen/sp_14"
+                    tools:text="100,000.0022" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/dynamic_balance_bx"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="@dimen/dp_40"
+                android:layout_below="@id/dynamic_balance_x"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/market_quotation_balance_shape"
+                android:padding="@dimen/dp_8">
+
+                <TextView
+                    android:id="@+id/dynamic_balance_currentL_left_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/color_999999"
+                    android:textSize="@dimen/sp_14"
+                    tools:text="可用BX" />
+
+                <TextView
+                    android:id="@+id/dynamic_balance_currentL_right_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|end"
+                    android:textColor="#000022"
+                    android:textSize="@dimen/sp_14"
+                    tools:text="100,000.0022" />
+
+            </FrameLayout>
+
+            <Button
+                android:id="@+id/dynamic_recharge_btn"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="@dimen/dp_40"
+                android:layout_below="@id/dynamic_balance_bx"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/dp_37"
+                android:layout_marginBottom="@dimen/dp_35"
+                android:background="#0084FF"
+                android:text="@string/market_quotation_bs_recharge"
+                android:textColor="@color/white"
+                android:textSize="@dimen/sp_14" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@id/dynamic_left_container"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/dp_14"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:text="价格"
+                    android:textColor="@color/color_999999"
+                    android:textSize="@dimen/sp_11" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:text="数量"
+                    android:textColor="@color/color_999999"
+                    android:textSize="@dimen/sp_11" />
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/dynamic_right_bs_list_sell"
+                android:layout_width="match_parent"
+                android:layout_height="240dp"
+                android:layout_marginTop="@dimen/dp_16"
+                android:layout_marginEnd="@dimen/dp_14" />
+
+            <LinearLayout
+                android:id="@+id/dynamic_average_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_4"
+                android:layout_marginBottom="@dimen/dp_14"
+                android:layout_marginEnd="@dimen/dp_14"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/dynamic_bs_right_entrust_count"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:text="0.00016668 ETH"
+                    android:textColor="#4FCC7A"
+                    android:textSize="@dimen/sp_14" />
+
+                <TextView
+                    android:id="@+id/dynamic_bs_right_entrust_equal_to"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:text="≈ ￥0.24"
+                    android:textColor="@color/color_999999"
+                    android:textSize="@dimen/sp_11" />
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/dynamic_right_bs_list_buy"
+                android:layout_width="match_parent"
+                android:layout_height="240dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="@dimen/dp_14" />
+        </LinearLayout>
+
+    </RelativeLayout>
+</ScrollView>

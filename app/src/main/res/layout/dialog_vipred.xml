@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:id="@+id/relative"
+        android:background="@mipmap/experience_bg"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_355">
+        <TextView
+            android:id="@+id/go_vip_text"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/dp_22"
+            android:textSize="@dimen/dp_16"
+            android:textColor="#E43A00"
+            android:text="立即去开通"
+            android:gravity="center_horizontal"
+            android:paddingTop="@dimen/dp_11"
+            android:textStyle="bold"
+            android:background="@mipmap/popup_btn"
+            android:layout_width="@dimen/dp_226"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+    <Button
+        android:id="@+id/coin_close"
+        android:layout_width="@dimen/dp_35"
+        android:layout_height="@dimen/dp_35"
+        android:layout_margin="@dimen/dp_15"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:background="@mipmap/home_popup_close" />
+</LinearLayout>

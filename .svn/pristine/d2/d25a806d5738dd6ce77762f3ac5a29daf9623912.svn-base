@@ -1,0 +1,637 @@
+package com.bochat.app.app.activity;
+
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.FileProvider;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.BuildConfig;
+import com.bochat.app.MainApplication;
+import com.bochat.app.R;
+import com.bochat.app.app.fragment.RedPacketDialogFragment;
+import com.bochat.app.app.fragment.RedPacketOpenDialogFragment;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.conversation.ConversationDetailContract;
+import com.bochat.app.common.router.Router;
+import com.bochat.app.common.router.RouterBoChat;
+import com.bochat.app.common.router.RouterConversationDetail;
+import com.bochat.app.common.router.RouterDynamicSendRedPacket;
+import com.bochat.app.common.router.RouterQuickExchange;
+import com.bochat.app.common.router.RouterQuickExchangeDetail;
+import com.bochat.app.common.router.RouterRedPacketDetail;
+import com.bochat.app.common.util.SharePreferenceUtil;
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.model.bean.GroupMemberEntity;
+import com.bochat.app.model.bean.RedPacketMessageClickEvent;
+import com.bochat.app.model.bean.RedPacketPeopleEntity;
+import com.bochat.app.model.bean.RedPacketRecordListEntity;
+import com.bochat.app.model.bean.RedPacketStatuEntity;
+import com.bochat.app.model.bean.SendSpeedEntity;
+import com.bochat.app.model.bean.SpeedConverListItemEntity;
+import com.bochat.app.model.bean.UserEntity;
+import com.bochat.app.model.event.AddGroupEvent;
+import com.bochat.app.model.event.ConversationDetailRefreshEvent;
+import com.bochat.app.model.event.ConversationRefreshEvent;
+import com.bochat.app.model.event.MessageListAdapterEvent;
+import com.bochat.app.model.event.SpeedConverMessageEvent;
+import com.bochat.app.model.greendao.DBManager;
+import com.bochat.app.model.rong.MyExtensionModule;
+import com.bochat.app.model.rong.RedPacketMessage;
+import com.bochat.app.model.rong.RongRedPacketMessageProvider;
+import com.bochat.app.model.util.Api;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bochat.app.mvp.view.ResultTipsType;
+import com.jaeger.library.StatusBarUtil;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import crossoverone.statuslib.StatusUtil;
+import io.rong.imkit.RongIM;
+import io.rong.imkit.fragment.ConversationFragment;
+import io.rong.imkit.mention.IMentionedInputListener;
+import io.rong.imkit.mention.RongMentionManager;
+import io.rong.imkit.model.UIMessage;
+import io.rong.imkit.widget.adapter.MessageListAdapter;
+import io.rong.imlib.model.Conversation;
+import io.rong.imlib.model.UserInfo;
+
+import static com.bochat.app.model.constant.Constan.CHOOSE_PHOTO;
+import static com.bochat.app.model.constant.Constan.USE_CAMERA;
+
+/**
+ * 2019/4/12
+ * Author LDL
+ **/
+@Route(path = RouterConversationDetail.PATH)
+public class ConversationDetailActivity extends BaseActivity<ConversationDetailContract.Presenter> implements ConversationDetailContract.View, RongRedPacketMessageProvider.OnItemClick, MyExtensionModule.OnRedPacketClick
+        , RedPacketDialogFragment.OnGetRedPacket, MyExtensionModule.OnPhotoBtClickListenner, MyExtensionModule.OnCameraBtClickListenner, MyExtensionModule.OnSpeedConverBtClickListenner {
+
+    private String targetId; //目标 Id
+    private Conversation.ConversationType conversationType; //会话类型
+    private String title;
+    private boolean isgroup;
+    private RedPacketDialogFragment dialogFragment;
+    private RedPacketOpenDialogFragment openDialogFragment;
+    private RedPacketMessage message;
+    private UserEntity userEntity;
+    private UIMessage uiMessage;
+    private ConversationFragment conversationFragment;
+    private String paths;
+    private File file;
+    private String newPath;
+    private RedPacketStatuEntity redPacketStatuEntity;
+    private RedPacketPeopleEntity redPacketPeopleEntity;
+    private RedPacketRecordListEntity redPacketRecordListEntity;
+    private String dialogTag;
+
+    @Inject
+    ConversationDetailContract.Presenter presenter;
+
+    @BindView(R.id.bochat_topbar)
+    BoChatTopBar bochat_topbar;
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected ConversationDetailContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_conversation);
+    }
+
+    @Subscribe
+    public void onEventMainThread(ConversationRefreshEvent event) {
+        if (conversationFragment != null) {
+            conversationFragment.onRestoreUI();
+        }
+    }
+
+    @Subscribe
+    public void onEventMainThread(ConversationDetailRefreshEvent event) {
+        if (conversationFragment != null&&event.getType()==2) {
+            conversationFragment.onRestoreUI();
+        }
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        notifyMessageUi();
+    }
+
+    @Subscribe
+    public void onEventMainThread(RedPacketMessageClickEvent event) {
+        message = event.getMessage();
+        uiMessage = event.getUiMessage();
+        redPacketStatuEntity = DBManager.getInstance().getRedPacketById(Integer.valueOf(message.getPacketID()));
+
+        dialogFragment.setMessage(message);
+        presenter.queryTakeRecord(Integer.valueOf(event.getMessage().getPacketID()), 1, 10);
+    }
+
+    @Subscribe
+    public void onEventMainThread(SpeedConverMessageEvent event) {
+   
+        SpeedConverListItemEntity speedConverListItemEntity = new SpeedConverListItemEntity();
+        speedConverListItemEntity.setId(Integer.valueOf(event.message.getOrderId()));
+        speedConverListItemEntity.setFromId(event.message.getFromId());
+        speedConverListItemEntity.setFromUserName(event.message.getFromUserName());
+        
+        Router.navigation( new RouterQuickExchangeDetail(
+                
+                Integer.valueOf(event.message.getOrderId()),
+                
+                RouterQuickExchangeDetail.ORDER_TYPE_START,
+                
+                new RouterQuickExchangeDetail.QuickExchangeMessage(
+                        Long.valueOf(targetId),
+                        event.message.getStartId(), 
+                        "",isgroup,
+                        Long.valueOf(event.message.getFromId())
+                )));
+    }
+
+
+
+    @Override
+    protected void initWidget() {
+        initData();
+        userEntity = CachePool.getInstance().user().getLatest();
+        MainApplication.getInstance().getRedPacketProvider().setOnItemClick(this);
+        MainApplication.getInstance().getMyExtensionModule().setOnRedPacketClick(this);
+        MainApplication.getInstance().getMyExtensionModule().setOnCameraBtClickListenner(this);
+        MainApplication.getInstance().getMyExtensionModule().setOnPhotoBtClickListenner(this);
+        MainApplication.getInstance().getMyExtensionModule().setOnSpeedConverBtClickListenner(this);
+        dialogFragment = new RedPacketDialogFragment();
+        dialogFragment.setGetRedPacket(this);
+        dialogFragment.show(getSupportFragmentManager(), "");
+        dialogFragment.dismiss();
+        openDialogFragment = new RedPacketOpenDialogFragment();
+        bochat_topbar.setReturnBtVisible(true);
+        bochat_topbar.setTitleText(title);
+        bochat_topbar.setOnClickListener(new BoChatTopBar.OnClickListener() {
+            @Override
+            public void onLeftExtButtonClick() {
+                presenter.onFlashExchangeBtnClick();
+            }
+
+            @Override
+            public void onRightExtButtonClick() {
+                switch (conversationType) {
+                    case PRIVATE:
+                        presenter.onSettingBtnClick(targetId, true);
+                        break;
+                    case GROUP:
+                        presenter.onSettingBtnClick(targetId, false);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            @Override
+            public boolean onBackButtonClick() {
+                gotoConversationList();
+                return true;
+            }
+        });
+        bochat_topbar.getExtBtn2().setBackground(getResources().getDrawable(isgroup ? R.mipmap.ic_group_icon : R.mipmap.ic_private_chat_icon));
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                gotoConversationList();
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    public void notifyMessageUi() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (conversationFragment != null) {
+                    MessageListAdapter adapter = conversationFragment.getMessageAdapter();
+                    if (adapter != null) {
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            }
+        });
+    }
+
+    @Subscribe
+    public void onEventMainThread(MessageListAdapterEvent messageListAdapterEvent) {
+        notifyMessageUi();
+    }
+
+
+    @Subscribe
+    public void onEventMainThread(final AddGroupEvent event) {
+
+    }
+
+    private void gotoConversationList() {
+        Router.navigation(new RouterBoChat(0));
+    }
+
+    private void initData() {
+        try {
+            /* 从 intent 携带的数据里获取 targetId 和会话类型*/
+            Intent intent = getIntent();
+            targetId = intent.getData().getQueryParameter("targetId");
+            title = intent.getData().getQueryParameter("title");
+            SharePreferenceUtil.saveString("targetId", targetId);
+            SharePreferenceUtil.saveString("title", title);
+            conversationType = Conversation.ConversationType.valueOf(intent.getData().getLastPathSegment().toUpperCase(Locale.US));
+            if (conversationType == Conversation.ConversationType.PRIVATE) {
+                isgroup = false;
+            } else if (conversationType == Conversation.ConversationType.GROUP) {
+                isgroup = true;
+            }
+            if (conversationFragment == null) {
+                conversationFragment = new ConversationFragment();
+                FragmentManager fm = getSupportFragmentManager();
+                FragmentTransaction transaction = fm.beginTransaction();
+                transaction.replace(R.id.conversation, conversationFragment);
+                transaction.commitAllowingStateLoss();
+            }
+            if(isgroup){
+                RongIM.getInstance().setGroupMembersProvider(new RongIM.IGroupMembersProvider(){
+
+                    @Override
+                    public void getGroupMembers(String s, RongIM.IGroupMemberCallback iGroupMemberCallback) {
+                        iGroupMemberCallback.onGetGroupMembersResult(initGroupMember(s));
+                    }
+                });
+            }
+//            RongMentionManager.getInstance().setMentionedInputListener(new IMentionedInputListener(){
+//
+//                @Override
+//                public boolean onMentionedInput(Conversation.ConversationType conversationType, String s) {
+//                    return false;
+//                }
+//            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    private List<UserInfo> initGroupMember(String groupId){
+        List<UserInfo> userInfos=new ArrayList<>();
+        List<GroupMemberEntity> list=DBManager.getInstance().findGroupMembersByGroupId(Long.valueOf(groupId));
+        for(int i=0;i<list.size();i++){
+            userInfos.add(new UserInfo(list.get(i).getMember_id()+"",list.get(i).getNickname(),Uri.parse(list.get(i).getHead_img())));
+        }
+        return userInfos;
+    }
+
+    @Override
+    public void redPacketMessageItemClick(View view, int position, RedPacketMessage content, UIMessage message) {
+    }
+
+    @Override
+    public void getWelfareSuccess(RedPacketPeopleEntity entity) {
+        redPacketPeopleEntity = entity;
+
+        DBManager.getInstance().saveOrUpdateRedPacketPeopleEntity(redPacketPeopleEntity);
+        dialogFragment.stopAnimation();
+        dialogFragment.dismiss();
+        if (message.getFromId().equals(userEntity.getId() + "")) {
+            Router.navigation(new RouterRedPacketDetail(
+                    userEntity, redPacketRecordListEntity, redPacketStatuEntity, message));
+        } else {
+            presenter.getFriendUserInfo(message.getFromId());
+        }
+    }
+
+    @Override
+    public void getWelfareFailed(String msg) {
+        dialogFragment.stopAnimation();
+        dialogFragment.dismiss();
+//        showTips(msg);
+    }
+
+    public void showRedDialog() {
+       try{
+           dialogTag=""+ System.currentTimeMillis();
+           dialogFragment = new RedPacketDialogFragment();
+           dialogFragment.setGetRedPacket(this);
+           dialogFragment.setMessage(message);
+           if(!dialogFragment.isAdded()&&getSupportFragmentManager().findFragmentByTag(dialogTag)==null){
+               dialogFragment.show(getSupportFragmentManager(), dialogTag);
+               dialogFragment.dismiss();
+           }else{
+               getSupportFragmentManager().beginTransaction().remove(dialogFragment).commit();
+           }
+       }catch (Exception e){
+           e.printStackTrace();
+       }
+    }
+
+    @Override
+    public void queryTakeRecordSuccess(RedPacketRecordListEntity entity) {
+        redPacketRecordListEntity = entity;
+        if (redPacketStatuEntity == null) {
+            redPacketStatuEntity = new RedPacketStatuEntity();
+            redPacketStatuEntity.setBidName(message.getbName());
+            redPacketStatuEntity.setId(Long.valueOf(message.getPacketID()));
+            redPacketStatuEntity.setCount(message.getCount());
+            redPacketStatuEntity.setCoin(message.getCoin());
+            redPacketStatuEntity.setStatus(0);
+            if (entity == null || entity.getItems() == null || entity.getItems().size() == 0) {
+                redPacketStatuEntity.setReadyGet(0);
+            } else {
+                for (int i = 0; i < entity.getItems().size(); i++) {
+                    if (entity.getItems().get(i).getId()==userEntity.getId()) {
+                        redPacketStatuEntity.setStatus(1);
+                        break;
+                    }
+                }
+                redPacketStatuEntity.setReadyGet(entity.getItems().size());
+            }
+        }
+        if (entity == null || entity.getItems() == null) {
+            if (uiMessage.getConversationType() == Conversation.ConversationType.GROUP) {
+                redPacketStatuEntity.setReadyGet(0);
+                DBManager.getInstance().saveOrUpdateRedPacket(redPacketStatuEntity);
+                if (message != null) {
+                    if (dialogFragment.isAdded()) {
+                        showRedDialog();
+                    } else {
+                        dialogFragment.show(getSupportFragmentManager(), "");
+                    }
+                }
+            } else {
+                if (message.getFromId().equals(userEntity.getId() + "")) {
+                    Router.navigation(new RouterRedPacketDetail(userEntity, redPacketRecordListEntity, redPacketStatuEntity, message));
+                    
+                } else {
+                    redPacketStatuEntity.setReadyGet(0);
+                    DBManager.getInstance().saveOrUpdateRedPacket(redPacketStatuEntity);
+                    if (message != null) {
+                        if (dialogFragment.isAdded()) {
+                            showRedDialog();
+                        } else {
+                            dialogFragment.show(getSupportFragmentManager(), "");
+                        }
+                    }
+                }
+            }
+        } else {
+            redPacketStatuEntity.setReadyGet(entity.getItems().size());
+            DBManager.getInstance().saveOrUpdateRedPacket(redPacketStatuEntity);
+            RedPacketStatuEntity statuEntity = DBManager.getInstance().getRedPacketById(Integer.valueOf(message.getPacketID()));
+            statuEntity.setStatus(entity.getCount());
+            DBManager.getInstance().saveOrUpdateRedPacket(statuEntity);
+            if (conversationType == Conversation.ConversationType.PRIVATE) {
+                if (message.getFromId().equals(userEntity.getId() + "")) {
+                    Router.navigation(new RouterRedPacketDetail(userEntity, redPacketRecordListEntity, redPacketStatuEntity, message));
+                } else {
+                    presenter.getFriendUserInfo(message.getFromId());
+                }
+            } else {
+                if (statuEntity != null && statuEntity.getStatus() == 1) {
+                    if (message.getFromId().equals(userEntity.getId() + "")) {
+                        RedPacketPeopleEntity packetPeopleEntity = null;
+                        for (int i = 0; i < entity.getItems().size(); i++) {
+                            if (entity.getItems().get(i).getId()==userEntity.getId()) {
+                                packetPeopleEntity = new RedPacketPeopleEntity();
+                                packetPeopleEntity.setReceive_money(entity.getItems().get(i).getReceive_money());
+                                break;
+                            }
+                        }
+                        Router.navigation(new RouterRedPacketDetail(
+                                userEntity, redPacketRecordListEntity, redPacketStatuEntity, message));
+                    } else {
+                        presenter.getFriendUserInfo(message.getFromId());
+                    }
+                } else {
+                    UserEntity userEntity2 = CachePool.getInstance().user().getLatest();
+                    for(int i=0;i<entity.getItems().size();i++){
+                        if(userEntity2.getId()==entity.getItems().get(i).getId()){
+                            statuEntity.setStatus(1);
+                            entity.setCount(1);
+                            break;
+                        }
+                    }
+                    if (entity.getCount() == 0) {    //未领取
+                        if (dialogFragment.isAdded()) {
+                            showRedDialog();
+                        } else {
+                            dialogFragment.show(getSupportFragmentManager(), "");
+                        }
+                    } else if (entity.getCount() == 1) {     //已领完
+                        if (message.getFromId().equals(userEntity.getId() + "")) {
+                            Router.navigation(new RouterRedPacketDetail(userEntity, redPacketRecordListEntity, redPacketStatuEntity, message));
+                        } else {
+                            presenter.getFriendUserInfo(message.getFromId());
+                        }
+                    } else {
+                        showTips("已失效");
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void queryTakeRecordFailed(String msg) {
+
+    }
+
+    @Override
+    public void sendSpeedConverSuccess(SendSpeedEntity entity) {
+
+    }
+
+    @Override
+    public void getUserInfo(UserEntity userEntity) {
+        if (TextUtils.isEmpty(userEntity.getHeadImg())) {
+            userEntity.setHeadImg(Api.DEFAULT_HEAD);
+        }
+        List<RedPacketPeopleEntity> list = DBManager.getInstance().findAllRedPacketPeople();
+        if (redPacketPeopleEntity == null) {
+            if(!TextUtils.isEmpty(message.getPacketID())){
+                redPacketPeopleEntity = DBManager.getInstance().findRedPacketPeopleById(Integer.valueOf(message.getPacketID()));
+            }
+        }
+        if (isgroup) {
+            Router.navigation(new RouterRedPacketDetail(
+                    userEntity, redPacketRecordListEntity, redPacketStatuEntity, message));
+        } else {
+            Router.navigation(new RouterRedPacketDetail(
+                    userEntity, redPacketRecordListEntity, redPacketStatuEntity, message));
+        }
+    }
+
+    @Override
+    public void getUserInfoFailed() {
+        List<RedPacketPeopleEntity> list = DBManager.getInstance().findAllRedPacketPeople();
+        if (redPacketPeopleEntity == null) {
+            redPacketPeopleEntity = DBManager.getInstance().findRedPacketPeopleById((int) this.userEntity.getId());
+        }
+        Router.navigation(new RouterRedPacketDetail(
+                userEntity, redPacketRecordListEntity, redPacketStatuEntity, message));
+    }
+
+    @Override
+    public void sendImgSuccess() {
+        try {
+            if (newPath != null) {
+                File tempareFile = new File(newPath);
+                if (tempareFile.exists()) {
+                    tempareFile.delete();
+                }
+            }
+            newPath = null;
+            paths = null;
+            file = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void setStatusBarColor() {
+        StatusUtil.setSystemStatus(this, false, true);
+        StatusBarUtil.setColorNoTranslucent(this, Color.parseColor("#FFFFFF"));
+    }
+
+    @Override
+    public void onRedPacketOnclick() {
+        Router.navigation(new RouterDynamicSendRedPacket(isgroup, targetId));
+    }
+
+    @Override
+    public void onOpenRedPacket(RedPacketMessage message) {
+        dialogFragment.startAnimation();
+        presenter.getWelfare(message, Integer.valueOf(message.getPacketID()), userEntity.getNickname(), targetId);
+    }
+
+    @Override
+    public void onPhotoClick() {
+        getPhoto();
+    }
+
+    @Override
+    public void onCameraClick() {
+        useCamera();
+    }
+
+    private void useCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
+                + "/bochat/images/" + System.currentTimeMillis() + ".jpg");
+        file.getParentFile().mkdirs();
+        Uri tempPhotoUri = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            tempPhotoUri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".FileProvider", file);
+        } else {
+            tempPhotoUri = Uri.fromFile(file);
+        }
+        //添加权限
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, tempPhotoUri);
+        startActivityForResult(intent, USE_CAMERA);
+
+    }
+
+    private void getPhoto() {
+        //在这里跳转到手机系统相册里面
+        Intent intent = new Intent(
+                Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, CHOOSE_PHOTO);
+    }
+
+    @Override
+    public void onSpeedConverClick() {
+        Router.navigation(new RouterQuickExchange("conversation", isgroup, Long.valueOf(targetId)));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try{
+            if (requestCode == USE_CAMERA && resultCode == RESULT_OK) {
+                Log.e("TAG", "---------" + FileProvider.getUriForFile(this, "com.bochat.app.FileProvider", file));
+                paths = file.getAbsolutePath();
+//            imageView.setImageBitmap(BitmapFactory.decodeFile(file.getAbsolutePath()));
+                //在手机相册中显示刚拍摄的图片
+                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                Uri contentUri = Uri.fromFile(file);
+                mediaScanIntent.setData(contentUri);
+                sendBroadcast(mediaScanIntent);
+            }
+            if (requestCode == CHOOSE_PHOTO && resultCode == RESULT_OK) {
+                Uri selectedImage = data.getData(); //获取系统返回的照片的Uri
+                String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                Cursor cursor = getContentResolver().query(selectedImage,
+                        filePathColumn, null, null, null);//从系统表中查询指定Uri对应的照片
+                cursor.moveToFirst();
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                paths = cursor.getString(columnIndex); //获取照片路径
+                cursor.close();
+            }
+            if(!TextUtils.isEmpty(paths)){
+                if (paths.toLowerCase().contains("jpg") || paths.toLowerCase().contains("png")
+                        || paths.toLowerCase().contains("jpeg") || paths.toLowerCase().contains("bmp")) {
+                    if (resultCode == RESULT_OK) {
+                        presenter.sendImgMsg(conversationType, targetId, paths);
+                    }
+                } else {
+                    showTips(new ResultTipsType("只能选择图片哦", false));
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+}

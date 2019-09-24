@@ -1,0 +1,229 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import android.os.Handler;
+import android.os.HandlerThread;
+
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.model.IMarketCenterModel;
+import com.bochat.app.common.util.ALog;
+import com.bochat.app.common.util.ULog;
+import com.bochat.app.model.bean.UserEntity;
+import com.bochat.app.model.util.QuotationApi;
+import com.bochat.security.Encrypt;
+
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONObject;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 09:27
+ * Description :
+ */
+
+public class MarketCenterModel implements IMarketCenterModel {
+
+    private static MarketCenterModel marketCenterModel = new MarketCenterModel();
+
+    private HandlerThread handlerThread;
+    private Handler handler;
+
+    private HashMap<MarketCenterType, ArrayList<MarketCenterObserver>> listenerMap = new HashMap<>();
+
+    private WebSocketClient webSocket;
+    
+    private HashMap<MarketCenterType, MarketCenterCommand> commandMap = new HashMap<>();
+    
+    private MarketCenterModel() {
+        handlerThread = new HandlerThread(MarketCenterModel.class.getSimpleName() + "1288");
+        handlerThread.start();
+        handler = new Handler(handlerThread.getLooper());
+        checkAlive(0);
+    }
+
+    public static MarketCenterModel getInstance() {
+        return marketCenterModel;
+    }
+    
+    @Override
+    public <T extends MarketCenterData> int addObserver(Class<T> tClass, MarketCenterObserver<T> listener) {
+        try {
+            MarketCenterType type = tClass.newInstance().getType();
+            ArrayList<MarketCenterObserver> listenerArray = listenerMap.get(type);
+            if (listenerArray == null) {
+                listenerArray = new ArrayList<>();
+                listenerMap.put(type, listenerArray);
+            }
+            listenerArray.add(listener);
+
+            return listenerArray.size();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public <T extends MarketCenterData> int removeObserver(Class<T> tClass, MarketCenterObserver<T> listener) {
+        try {
+            MarketCenterType type = tClass.newInstance().getType();
+            ArrayList<MarketCenterObserver> listenerArray = listenerMap.get(type);
+            if (listenerArray == null || listenerArray.isEmpty()) {
+                return 0;
+            }
+            listenerArray.remove(listener);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public SendCommandResult sendCommand(MarketCenterCommand command) {
+        try {
+            ULog.d("sendCommand:%s", command.convertToJson().toString());
+            ALog.d("发送命令 " + command.convertToJson().toString());
+            commandMap.put(command.getType(), command);
+            webSocket.send(command.convertToJson().toString());
+            return new SendCommandResult(command, true, "消息发送成功");
+        } catch (Exception ignore) {
+        }
+        return new SendCommandResult(command, false, "消息发送失败，已加入消息队列");
+    }
+
+    @Override
+    public void sendCommand(final MarketCenterCommand command, final SendCommandCallback callback) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                callback.onComplete(sendCommand(command));
+            }
+        });
+    }
+
+    @Override
+    public void destroy() {
+        listenerMap.clear();
+        webSocket.close();
+        webSocket = null;
+    }
+    
+    private void initSync(){
+        try {
+            UserEntity userEntity = CachePool.getInstance().user().getLatest();
+            String token = userEntity.getToken();
+            long time = System.currentTimeMillis();
+            int random = (int) (Math.random() * 1000000);
+
+            Map<String, String> httpHeaders = new HashMap<>();
+            httpHeaders.put("Authorization", token);
+            httpHeaders.put("timestamp", String.valueOf(time));
+            httpHeaders.put("nonce", String.valueOf(random));
+            httpHeaders.put("sign", Encrypt.nativeSHA1(String.valueOf(time), String.valueOf(random)));
+
+            webSocket = new WebSocketClient(new URI(QuotationApi.WS_SERVER_URI), httpHeaders) {
+
+                @Override
+                public void onOpen(ServerHandshake handshake) {
+                    ALog.d("已连接");
+                }
+
+                @Override
+                public void onMessage(String message) {
+                    ALog.d("收到消息");
+                    ALog.v("收到消息:" + message);
+                    try {
+                        JSONObject jsonObject = new JSONObject(message);
+                        String channel = jsonObject.getString("channel");
+                        MarketCenterType centerType = MarketCenterType.search(channel);
+                        if (centerType == null) {
+                            ALog.d("消息类型错误");
+                            return;
+                        }
+                        ArrayList<MarketCenterObserver> list = listenerMap.get(centerType);
+                        if (list == null || list.isEmpty()) {
+                            ALog.d(centerType + " 观察者列表为空");
+                            return;
+                        }
+                        MarketCenterData data = centerType.getClazz().newInstance();
+
+                        data.parseFromJson(jsonObject);
+                        for (MarketCenterObserver observer : list) {
+                            observer.onReceive(data);
+                        }
+                        ALog.d(centerType + " 消息分发完成 [观察者数量" + list.size() + "]");
+                    } catch (Exception e) {
+                        ALog.d(e.getLocalizedMessage());
+                    }
+                }
+
+                @Override
+                public void onClose(int code, String reason, boolean remote) {
+                    ALog.d("连接关闭 " + reason + " " + code);
+                }
+
+                @Override
+                public void onError(Exception ex) {
+                    ALog.d("连接错误 " + ex.getMessage());
+                }
+            };
+            if(webSocket.connectBlocking()){
+                return;
+            }
+        } catch (Exception ignore) {
+        }
+        webSocket = null;
+    }
+    
+    private void reconnectSync(){
+        if(webSocket != null){
+            try {
+                webSocket.reconnectBlocking();
+                if(webSocket.reconnectBlocking()){
+                    ALog.d("重连成功");
+                    if(!commandMap.isEmpty()){
+                        ALog.d("重发命令");
+                        for(MarketCenterCommand command : commandMap.values()){
+                            sendCommand(command);
+                        }
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    private int count = 0;
+    
+    private void checkAlive(long delay) {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (webSocket == null) {
+                    ALog.d("未连接，开始连接");
+                    initSync();
+                } else if (!webSocket.isOpen()) {
+                    ALog.d("连接已断开，重新连接");
+                    reconnectSync();
+                } else if (count++ > 5) {
+                    count = 0;
+//                    ALog.d("测试命令");
+//                    webSocket.send("6666");
+                } else {
+                    ALog.d("连接正常");
+                }
+                checkAlive(2000);
+            }
+        }, delay);
+    }
+}

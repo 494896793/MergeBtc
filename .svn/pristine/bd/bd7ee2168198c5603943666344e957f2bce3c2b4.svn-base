@@ -1,0 +1,200 @@
+package com.bochat.app.app.fragment;
+
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.AddressGroupAdapter;
+import com.bochat.app.common.contract.book.AddressGroupContract;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.model.event.PinYinEvent;
+import com.bochat.app.model.util.PinYinUtil;
+import com.bochat.app.mvp.view.BaseFragment;
+import com.liaoinstan.springview.container.DefaultFooter;
+import com.liaoinstan.springview.container.DefaultHeader;
+import com.liaoinstan.springview.widget.SpringView;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+/**
+ * 2019/4/19
+ * Author LDL
+ **/
+
+public class AddressGroupFragment extends BaseFragment<AddressGroupContract.Presenter> implements AddressGroupContract.View, SpringView.OnFreshListener {
+
+    @Inject
+    AddressGroupContract.Presenter presenter;
+
+    @BindView(R.id.recycler)
+    RecyclerView recycler;
+
+    @BindView(R.id.springView)
+    SpringView springView;
+    
+    private AddressGroupAdapter adapter;
+    private List<AddressGroupAdapter.PinYinGroupEntity> list;
+    private String[] letter={"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+    
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected AddressGroupContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void onEventMainThread(PinYinEvent pinYinEvent){
+        if(list!=null&&list.size()>0){
+            for(int i=0;i<list.size();i++){
+                if(list.get(i).getFirstPinYin().substring(0,1).toUpperCase().equals(pinYinEvent.firstPinYin)){
+                    LinearLayoutManager llm = (LinearLayoutManager) recycler.getLayoutManager();
+                    llm.scrollToPositionWithOffset(i, 0);
+                    llm.setStackFromEnd(false);
+                    break;
+                }
+            }
+        }
+    }
+    
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view=inflater.inflate(R.layout.fragment_address_user,container,false);
+        return view;
+    }
+
+    @Override
+    protected void initWidget() {
+        initSpringView();
+        initRecyclerView();
+        onRefresh();
+    }
+
+    private void initRecyclerView(){
+        list = new ArrayList<>();
+        adapter=new AddressGroupAdapter(getActivity(), list);
+        adapter.setOnItemClickListenner(new AddressGroupAdapter.OnItemClickListener(){
+            @Override
+            public void onItemClick(int position, GroupEntity groupEntity) {
+                presenter.onItemClick(groupEntity);
+            }
+        });
+        recycler.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false));
+        recycler.setAdapter(adapter);
+    }
+
+    private void initSpringView(){
+        springView.setListener(this);
+        springView.setHeader(new DefaultHeader(getContext()));
+        springView.setFooter(new DefaultFooter(getContext()));
+    }
+
+    @Override
+    public void onRefresh() {
+        presenter.queryMyGroupList();
+    }
+
+    @Override
+    public void onLoadmore() {
+        presenter.queryMyGroupList();
+    }
+
+    @Override
+    public void onViewRefresh(List<GroupEntity> groupList) {
+        springView.onFinishFreshAndLoad();
+        if(groupList!=null){
+            adapter.refreshData(formatFriendList(groupList));
+        }
+    }
+
+    private List<AddressGroupAdapter.PinYinGroupEntity> formatFriendList(List<GroupEntity> input){
+        List<AddressGroupAdapter.PinYinGroupEntity> sourceList = new ArrayList<>();
+        List<AddressGroupAdapter.PinYinGroupEntity> temperaList = new ArrayList<>();
+        if(input!=null){
+            for(int i=0; i<input.size(); i++){
+                if(input.get(i).getGroup_name()!=null){
+                    AddressGroupAdapter.PinYinGroupEntity entity = new AddressGroupAdapter.PinYinGroupEntity(input.get(i));
+                    entity.setFirstPinYin(PinYinUtil.getFirstSpell(entity.getGroupEntity().getGroup_name()));
+                    sourceList.add(entity);
+                }
+            }
+            ArrayList<String> letters = new ArrayList<>();
+            for(int i = 0; i < letter.length; i++){
+                boolean hasLetterDiv=false;
+                for(int j = 0; j < sourceList.size(); j++){
+                    if(!TextUtils.isEmpty(sourceList.get(j).getFirstPinYin())){
+                        if(sourceList.get(j).getFirstPinYin().substring(0,1).toUpperCase().equals(letter[i])){
+                            if(!hasLetterDiv){
+                                AddressGroupAdapter.PinYinGroupEntity groupEntity=new AddressGroupAdapter.PinYinGroupEntity();
+                                groupEntity.setFirstPinYin(letter[i]);
+                                groupEntity.setType(0);
+                                temperaList.add(groupEntity);
+                                hasLetterDiv=true;
+                                letters.add(letter[i]);
+                            }
+                            sourceList.get(j).setType(1);
+                            temperaList.add(sourceList.get(j));
+                        }
+                    }
+                }
+            }
+            EventBus.getDefault().post(letters);
+            AddressGroupAdapter.PinYinGroupEntity groupEntity = new AddressGroupAdapter.PinYinGroupEntity();
+            groupEntity.setFirstPinYin("#");
+            groupEntity.setType(0);
+            temperaList.add(groupEntity);
+
+            List<AddressGroupAdapter.PinYinGroupEntity> otherList = new ArrayList<>();
+            for(AddressGroupAdapter.PinYinGroupEntity entity : sourceList){
+                if(!temperaList.contains(entity)){
+                    entity.setType(1);
+                    otherList.add(entity);
+                }
+            }
+            Collections.sort(otherList, new Comparator<Object>() {
+                @Override
+                public int compare(Object o1, Object o2) {
+                    String nick1 = ((AddressGroupAdapter.PinYinGroupEntity)o1).getGroupEntity().getGroup_name();
+                    String nick2 = ((AddressGroupAdapter.PinYinGroupEntity)o2).getGroupEntity().getGroup_name();
+                    int f1 = TextUtils.isEmpty(nick1) ? 0 : nick1.charAt(0);
+                    int f2 = TextUtils.isEmpty(nick2) ? 0 : nick2.charAt(0);
+                    return f1 == f2 ? 0 : f1 < f2 ? 1 : -1;
+                }
+            });
+            temperaList.addAll(otherList);
+        }
+        this.list = temperaList;
+        return temperaList;
+    }
+}

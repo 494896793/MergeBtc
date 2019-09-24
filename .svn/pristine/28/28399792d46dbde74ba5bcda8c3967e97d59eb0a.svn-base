@@ -1,0 +1,139 @@
+package com.bochat.app.model.bean;
+
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Id;
+
+import java.io.Serializable;
+
+/**
+ * 2019/4/29
+ * Author LDL
+ **/
+@Entity(
+        nameInDb = "table_currency_detail"
+)
+public class CurrencyDetailEntity extends CodeEntity implements Serializable {
+
+    @Id
+    private long bid;
+    private String totalAmount;
+    private String cnyPrice;
+    private String address;
+    private String bName;
+    private String bIamge;
+    private String effectiveTime;
+    private double subAmount;
+
+    @Generated(hash = 1872041185)
+    public CurrencyDetailEntity(long bid, String totalAmount, String cnyPrice,
+            String address, String bName, String bIamge, String effectiveTime,
+            double subAmount) {
+        this.bid = bid;
+        this.totalAmount = totalAmount;
+        this.cnyPrice = cnyPrice;
+        this.address = address;
+        this.bName = bName;
+        this.bIamge = bIamge;
+        this.effectiveTime = effectiveTime;
+        this.subAmount = subAmount;
+    }
+
+    @Generated(hash = 1721921721)
+    public CurrencyDetailEntity() {
+    }
+
+    @Override
+    public String toString() {
+        return "CurrencyDetailEntity{" +
+                "totalAmount='" + totalAmount + '\'' +
+                ", cnyPrice='" + cnyPrice + '\'' +
+                ", address='" + address + '\'' +
+                ", bName='" + bName + '\'' +
+                ", bid='" + bid + '\'' +
+                ", bIamge='" + bIamge + '\'' +
+                ", effectiveTime='" + effectiveTime + '\'' +
+                ", subAmount=" + subAmount +
+                '}';
+    }
+
+    public String getEffectiveTime() {
+        return effectiveTime;
+    }
+
+    public void setEffectiveTime(String effectiveTime) {
+        this.effectiveTime = effectiveTime;
+    }
+
+    public double getSubAmount() {
+        return subAmount;
+    }
+
+    public void setSubAmount(double subAmount) {
+        this.subAmount = subAmount;
+    }
+    
+    public long getBid() {
+        return bid;
+    }
+
+    public void setBid(long bid) {
+        this.bid = bid;
+    }
+
+    public String getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(String totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public String getCnyPrice() {
+        return cnyPrice;
+    }
+
+    public void setCnyPrice(String cnyPrice) {
+        this.cnyPrice = cnyPrice;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getbName() {
+        return bName;
+    }
+
+    public void setbName(String bName) {
+        this.bName = bName;
+    }
+
+    public String getbIamge() {
+        return bIamge;
+    }
+
+    public void setbIamge(String bIamge) {
+        this.bIamge = bIamge;
+    }
+
+    public String getBIamge() {
+        return this.bIamge;
+    }
+
+    public void setBIamge(String bIamge) {
+        this.bIamge = bIamge;
+    }
+
+    public String getBName() {
+        return this.bName;
+    }
+
+    public void setBName(String bName) {
+        this.bName = bName;
+    }
+}

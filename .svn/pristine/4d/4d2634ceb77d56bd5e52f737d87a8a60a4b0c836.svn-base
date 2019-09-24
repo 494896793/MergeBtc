@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/mine_order_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_hasBackBtn="true"
+        app:top_hasExt2Btn="true"
+        app:top_titleText="我的订单"
+        app:top_extButton2Src="@mipmap/ic_chat_shandui"/>
+
+    <RelativeLayout
+        android:layout_width="@dimen/dp_375"
+        android:layout_height="@dimen/dp_44"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/mine_order_list_send_btn"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/dp_72"
+            android:text="我发起的"
+            android:textColor="#fffe695e"
+            android:textSize="@dimen/dp_16" />
+        
+        <TextView
+            android:id="@+id/mine_order_list_exchange_btn"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_72"
+            android:text="我兑换的"
+            android:textColor="#ff4f5a7b"
+            android:textSize="@dimen/dp_16" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_40"
+        android:background="#F2F2F2">
+        <TextView
+            android:visibility="invisible"
+            android:id="@+id/mine_time_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/dp_14"
+            android:textColor="#666666"
+            android:layout_centerVertical="true"
+            android:text="2019/02"
+            android:layout_marginLeft="@dimen/dp_15"
+            />
+        <ImageView
+            android:visibility="invisible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/mine_time_filter"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/dp_5"
+            android:src="@mipmap/ic_arrow_down_gray24"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_filter"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/mine_filter_text"/>
+        <TextView
+            android:id="@+id/mine_filter_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="筛选"
+            android:textColor="#4F5A7B"
+            android:textSize="@dimen/dp_16"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_15"
+            />
+        <RelativeLayout
+            android:id="@+id/mine_filter_btn"
+            android:layout_width="@dimen/dp_50"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_10"
+            android:clickable="true"
+            android:focusable="true">
+        </RelativeLayout>
+    </RelativeLayout>
+    
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ListView
+            android:id="@+id/mine_order_list_send"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+        <ListView
+            android:id="@+id/mine_order_list_exchange"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
+    </RelativeLayout>
+    
+</LinearLayout>

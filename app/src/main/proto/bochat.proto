@@ -1,0 +1,123 @@
+// [START declaration]
+syntax = "proto3";
+package tutorial;
+// [END declaration]
+
+// [START java_declaration]
+option java_package = "com.bochat.app.model.proto";
+option java_outer_classname = "BoChatProto";
+// [END java_declaration]
+
+// [START csharp_declaration]
+option csharp_namespace = "Google.Protobuf.BoChat";
+// [END csharp_declaration]
+
+// [START messages]
+
+message Request {
+    string channel = 1;  
+    string marketId = 2;          
+    string userid = 3;            
+    string type = 4;            
+    string terms = 5;            
+}
+
+message Response {
+    Request request = 1;
+    TransactionList transaction = 2;  
+    EntrustList entrust = 3;  
+    KLine kline = 4;  
+}
+
+// *****************************  市场  ***********************************
+
+message TransactionList {
+    string transactionType = 1;
+    repeated Transaction list = 2;
+}
+
+message Transaction {
+    string sellerId = 1;
+    string buyerId = 2;
+    string sellerName = 3;
+    string buyerName = 4;
+    string totalNum = 5;
+    string currentPrice = 6;
+    string upToLow = 7;
+    string RMB = 8;
+    string marketId = 9;
+}
+
+// ************************************************************************
+
+// *****************************  委托  ***********************************
+
+message EntrustList {
+    string price = 1;
+    string RMB = 2;
+    repeated Entrust sell = 3;
+    repeated Entrust buy = 4;
+}
+
+message Entrust {
+    string id = 1;
+    string price = 2;
+    string num = 3;
+}
+
+// ************************************************************************
+
+// *****************************  K线  ************************************
+
+message KLine {
+    KLineTop top = 1;
+    KLineMid mid = 2;
+    KLineBottom bottom = 3;
+}
+
+message KLineTop {
+	string finalPrice = 1;
+	string finalPrice2RMB = 2;
+	string rangRates = 3;
+	string maxPrice = 4;
+	string minPrice = 5;
+	string volume = 6;
+}
+
+message KLineMid {
+	KLineItem min5 = 1;
+	KLineItem min30 = 2;
+	KLineItem hour = 3;
+	KLineItem day = 4;
+	KLineItem week = 5;
+}
+
+message KLineBottom { 
+    string id = 1;                
+    string marketId = 2;                
+    string buyerId = 3;                
+    string sellerId = 4;                
+    string makePrice = 5;                
+    string makeNum = 6;                
+    string makeMoney = 7;                
+    string buyerRate = 8;                
+    string sellerRate = 9;                
+    string type = 10;                
+    string createTime = 11;                
+    string createTimeStamp = 12;                
+}
+
+message KLineItem{
+    string price = 1;
+    string openPrice = 2;
+    string closePrice = 3;
+    string maxPrice = 4;
+    string minPrice = 5;
+    string type = 6;
+    string createTime = 7;
+    string createTimeStamp = 8;
+}
+
+// ************************************************************************
+
+// [END messages]

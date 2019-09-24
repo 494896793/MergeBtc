@@ -1,0 +1,68 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import org.json.JSONObject;
+
+import java.io.Serializable;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/07/02 18:52
+ * Description :
+ */
+
+public class KLineItemEntity implements Serializable {
+    private long id;
+    private String start;
+    private String end;
+    private String max;
+    private String min;
+    private String num;
+
+    public KLineItemEntity(JSONObject json) {
+        try {
+            id = Long.valueOf(json.getString("id"));
+            start = json.getString("openPrice");
+            end = json.getString("closePrice");
+            max = json.getString("maxPrice");
+            min = json.getString("minPrice");
+            num = json.getString("makeNum");
+        } catch (Exception ignore){
+        }
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getNum() {
+        return num;
+    }
+
+    public String getStart() {
+        return start;
+    }
+
+    public String getEnd() {
+        return end;
+    }
+
+    public String getMax() {
+        return max;
+    }
+
+    public String getMin() {
+        return min;
+    }
+
+    @Override
+    public String toString() {
+        return "KLineItemEntity{" +
+                "id=" + id +
+                ", start='" + start + '\'' +
+                ", end='" + end + '\'' +
+                ", max='" + max + '\'' +
+                ", min='" + min + '\'' +
+                ", num='" + num + '\'' +
+                '}';
+    }
+}

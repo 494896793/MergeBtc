@@ -1,0 +1,40 @@
+package com.bochat.app.app.adapter;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.view.ViewGroup;
+
+/**
+ * 2019/6/12
+ * Author LDL
+ **/
+public class ShakyCenterAdapter extends RecyclerView.Adapter<ShakyCenterAdapter.ShakyCenterViewHolder> {
+
+    private Context mContext;
+
+    @NonNull
+    @Override
+    public ShakyCenterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return null;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ShakyCenterViewHolder holder, int position) {
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return 0;
+    }
+
+    class ShakyCenterViewHolder extends RecyclerView.ViewHolder{
+
+        public ShakyCenterViewHolder(View itemView) {
+            super(itemView);
+        }
+    }
+
+}

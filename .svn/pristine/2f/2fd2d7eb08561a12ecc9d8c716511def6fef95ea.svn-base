@@ -1,0 +1,193 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import android.os.Handler;
+import android.os.HandlerThread;
+
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.model.IMarketCenterModel;
+import com.bochat.app.common.util.ALog;
+import com.bochat.app.common.util.ULog;
+import com.bochat.app.model.bean.UserEntity;
+import com.bochat.app.model.util.QuotationApi;
+import com.bochat.security.Encrypt;
+
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONObject;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 09:27
+ * Description :
+ */
+
+public class MarketCenterModel implements IMarketCenterModel {
+
+    private static MarketCenterModel marketCenterModel = new MarketCenterModel();
+
+    private HandlerThread handlerThread;
+    private Handler handler;
+
+    private HashMap<MarketCenterType, ArrayList<MarketCenterObserver>> listenerMap = new HashMap<>();
+
+    private WebSocketClient client;
+
+    private boolean isConnected;
+
+
+    private MarketCenterModel() {
+        handlerThread = new HandlerThread(MarketCenterModel.class.getSimpleName() + "1288");
+        handlerThread.start();
+        handler = new Handler(handlerThread.getLooper());
+        init();
+    }
+
+    public static MarketCenterModel getInstance() {
+        return marketCenterModel;
+    }
+    
+    @Override
+    public <T extends MarketCenterData> int addObserver(Class<T> tClass, MarketCenterObserver<T> listener) {
+        try {
+            MarketCenterType type = tClass.newInstance().getType();
+            ArrayList<MarketCenterObserver> listenerArray = listenerMap.get(type);
+            if (listenerArray == null) {
+                listenerArray = new ArrayList<>();
+                listenerMap.put(type, listenerArray);
+            }
+            listenerArray.add(listener);
+
+            return listenerArray.size();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public <T extends MarketCenterData> int removeObserver(Class<T> tClass, MarketCenterObserver<T> listener) {
+        try {
+            MarketCenterType type = tClass.newInstance().getType();
+            ArrayList<MarketCenterObserver> listenerArray = listenerMap.get(type);
+            if (listenerArray == null || listenerArray.isEmpty()) {
+                return 0;
+            }
+            listenerArray.remove(listener);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public SendCommandResult sendCommand(MarketCenterCommand command) {
+        try {
+            if (isConnected) {
+                ULog.d("sendCommand:%s", command.convertToJson().toString());
+                client.send(command.convertToJson().toString());
+                return new SendCommandResult(command, true, "成功");
+            }
+        } catch (Exception ignore) {
+        }
+        return new SendCommandResult(command, false, "Socket未连接");
+    }
+
+    @Override
+    public void sendCommand(final MarketCenterCommand command, final SendCommandCallback callback) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                callback.onComplete(sendCommand(command));
+            }
+        });
+    }
+
+    @Override
+    public void destroy() {
+        listenerMap.clear();
+        handlerThread.quitSafely();
+    }
+
+    private void init() {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ALog.d("init websocket");
+                    UserEntity userEntity = CachePool.getInstance().user().getLatest();
+                    String token = userEntity.getToken();
+                    long time = System.currentTimeMillis();
+                    int random = (int) (Math.random() * 1000000);
+
+                    Map<String, String> httpHeaders = new HashMap<>();
+                    httpHeaders.put("Authorization", token);
+                    httpHeaders.put("timestamp", String.valueOf(time));
+                    httpHeaders.put("nonce", String.valueOf(random));
+                    httpHeaders.put("sign", Encrypt.nativeSHA1(String.valueOf(time), String.valueOf(random)));
+
+                    client = new WebSocketClient(new URI(QuotationApi.WS_SERVER_URI), httpHeaders) {
+
+                        @Override
+                        public void onOpen(ServerHandshake handshake) {
+                            ALog.d("onOpen");
+                            isConnected = true;
+                        }
+
+                        @Override
+                        public void onMessage(String message) {
+                            ALog.d("onMessage:" + message);
+                            try {
+                                JSONObject jsonObject = new JSONObject(message);
+                                String channel = jsonObject.getString("channel");
+                                MarketCenterType centerType = MarketCenterType.search(channel);
+                                if (centerType == null) {
+                                    ALog.d("type is null");
+                                    return;
+                                }
+                                ArrayList<MarketCenterObserver> list = listenerMap.get(centerType);
+                                if (list == null || list.isEmpty()) {
+                                    ALog.d("list is empty");
+                                    return;
+                                }
+
+                                MarketCenterData data = centerType.getClazz().newInstance();
+
+                                data.parseFromJson(jsonObject);
+                                for (MarketCenterObserver observer : list) {
+                                    observer.onReceive(data);
+                                }
+                                ALog.d("message deliver complete [" + list.size() + "]");
+                            } catch (Exception e) {
+                                ALog.d(e.getLocalizedMessage());
+                            }
+                        }
+
+                        @Override
+                        public void onClose(int code, String reason, boolean remote) {
+                            ALog.d("onClose " + reason);
+                            isConnected = false;
+                        }
+
+                        @Override
+                        public void onError(Exception ex) {
+                            ALog.d("onError " + ex.getMessage());
+                        }
+                    };
+                    client.connect();
+
+                } catch (Exception ignore) {
+                }
+            }
+        });
+    }
+
+}

@@ -1,0 +1,17 @@
+package com.bochat.app.business.main.dynamic;
+
+import com.bochat.app.common.contract.dynamic.MarketQuotationContract;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+public class MarketQuotationPresenter extends BasePresenter<MarketQuotationContract.View> implements MarketQuotationContract.Presenter {
+
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewAttached(MarketQuotationContract.View view) {
+
+    }
+}

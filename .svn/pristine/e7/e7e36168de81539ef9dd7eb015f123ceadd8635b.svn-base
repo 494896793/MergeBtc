@@ -1,0 +1,16 @@
+package com.bochat.app.common.router;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/19 14:04
+ * Description :
+ */
+
+public class RouterBankCardList extends AbstractRouter {
+    public static final String PATH ="/path/RouterBankCardList";
+    
+    @Override
+    public String getPath() {
+        return PATH;
+    }
+}

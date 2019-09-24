@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/bochatbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_hasBackBtn="true"
+        app:top_titleText="交易详情"
+        app:top_extButton3Text=""/>
+    
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/mine_quick_exchange_detail_icon"
+                android:layout_marginTop="@dimen/dp_29"
+                android:layout_centerHorizontal="true"
+                android:layout_width="@dimen/dp_110"
+                android:layout_height="@dimen/dp_94" />
+
+
+            <TextView
+                android:id="@+id/mine_quick_exchange_detail_status"
+                android:layout_marginTop="@dimen/dp_10"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/mine_quick_exchange_detail_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_25"
+                android:textColor="#ff181818"
+                android:textSize="@dimen/dp_18"
+                />
+
+            <TextView
+                android:id="@+id/mine_quick_exchange_detail_creator"
+                android:layout_marginLeft="@dimen/dp_25"
+                android:layout_marginTop="@dimen/dp_35"
+                android:layout_below="@id/mine_quick_exchange_detail_status"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_22"
+                android:text=""
+                android:textColor="#ff181818"
+                android:textSize="@dimen/dp_16" />
+
+            <TextView
+                android:id="@+id/mine_quick_exchange_detail_create_amount"
+                android:layout_marginTop="@dimen/dp_5"
+                android:layout_below="@id/mine_quick_exchange_detail_creator"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_25"
+                android:text=""
+                android:layout_marginLeft="@dimen/dp_25"
+                android:gravity="center_vertical"
+                android:textColor="#fe695e"
+                android:textSize="@dimen/dp_18" />
+
+            <TextView
+                android:id="@+id/mine_quick_exchange_detail_create_type"
+                android:layout_marginTop="@dimen/dp_5"
+                android:layout_marginLeft="@dimen/dp_10"
+                android:layout_toRightOf="@+id/mine_quick_exchange_detail_create_amount"
+                android:layout_below="@id/mine_quick_exchange_detail_creator"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_25"
+                android:gravity="center_vertical"
+                android:text=""
+                android:textColor="#181818"
+                android:textSize="@dimen/dp_14"
+                />
+
+            <View
+                android:layout_marginRight="@dimen/dp_25"
+                android:layout_marginLeft="@dimen/dp_26"
+                android:layout_marginTop="@dimen/dp_10"
+                android:layout_below="@+id/mine_quick_exchange_detail_create_amount"
+                android:background="#DFDFDF"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_1"
+                />
+
+            <TextView
+                android:id="@+id/convert"
+                android:layout_marginTop="@dimen/dp_31"
+                android:layout_below="@+id/mine_quick_exchange_detail_create_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_22"
+                android:text="兑换"
+                android:layout_marginLeft="@dimen/dp_25"
+                android:textColor="#181818"
+                android:textSize="@dimen/dp_16" />
+
+            <TextView
+                android:id="@+id/mine_quick_exchange_detail_pay_amount"
+                android:layout_below="@+id/convert"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_25"
+                android:layout_marginTop="@dimen/dp_5"
+                android:text=""
+                android:textColor="#181818"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="@dimen/dp_25"
+                android:textSize="@dimen/dp_18" />
+
+            <TextView
+                android:id="@+id/mine_quick_exchange_detail_pay_type"
+                android:layout_marginLeft="@dimen/dp_10"
+                android:layout_toRightOf="@+id/mine_quick_exchange_detail_pay_amount"
+                android:layout_below="@id/convert"
+                android:layout_marginTop="@dimen/dp_5"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_25"
+                android:gravity="center_vertical"
+                android:text=""
+                android:textColor="#181818"
+                android:textSize="@dimen/dp_14" />
+
+
+            <View
+                android:layout_marginRight="@dimen/dp_25"
+                android:layout_marginLeft="@dimen/dp_26"
+                android:layout_marginTop="@dimen/dp_10"
+                android:layout_below="@+id/mine_quick_exchange_detail_pay_amount"
+                android:background="#DFDFDF"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_1"
+                />
+
+            <TextView
+                android:id="@+id/tv_rate"
+                android:layout_marginTop="@dimen/dp_30"
+                android:layout_below="@+id/mine_quick_exchange_detail_pay_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_22"
+                android:text="汇率"
+                android:layout_marginLeft="@dimen/dp_25"
+                android:textColor="#181818"
+                android:textSize="@dimen/dp_16" />
+
+            <TextView
+                android:id="@+id/mine_quick_exchange_detail_rate_top"
+                android:layout_marginLeft="@dimen/dp_25"
+                android:layout_below="@+id/mine_quick_exchange_detail_pay_amount"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="@dimen/dp_57"
+                android:layout_height="@dimen/dp_25"
+                android:text=""
+                android:textColor="#181818"
+                android:textSize="@dimen/dp_18" />
+
+            <TextView
+                android:id="@+id/mine_quick_exchange_detail_rate_top_type"
+                android:layout_marginTop="@dimen/dp_9"
+                android:layout_below="@+id/tv_rate"
+                android:layout_marginLeft="@dimen/dp_10"
+                android:layout_toRightOf="@+id/mine_quick_exchange_detail_rate_top"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_20"
+                android:text="BX"
+                android:visibility="gone"
+                android:textColor="#181818"
+                android:textSize="@dimen/dp_14" />
+
+            <TextView
+                android:id="@+id/mine_quick_exchange_detail_rate_bottom"
+                android:layout_below="@+id/mine_quick_exchange_detail_rate_top"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_20"
+                android:layout_marginLeft="@dimen/dp_25"
+                android:text=""
+                android:textColor="#666666"
+                android:textSize="@dimen/dp_14" />
+
+            <View
+                android:layout_marginRight="@dimen/dp_25"
+                android:layout_marginLeft="@dimen/dp_26"
+                android:layout_marginTop="@dimen/dp_30"
+                android:layout_below="@+id/mine_quick_exchange_detail_rate_top"
+                android:background="#DFDFDF"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp_1" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/mine_quick_exchange_detail_rate_top"
+                android:layout_marginTop="@dimen/dp_76"
+                android:layout_marginBottom="@dimen/dp_20"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+                <Button
+                    android:id="@+id/mine_quick_exchange_detail_enter_btn"
+                    android:layout_width="@dimen/dp_345"
+                    android:layout_height="@dimen/dp_44"
+                    android:background="@drawable/shape_login_btn"
+                    android:text="立即交易"
+                    android:textColor="#FFFFFF"
+                    android:visibility="gone"
+                    android:textSize="@dimen/dp_17" />
+
+                <TextView
+                    android:id="@+id/mine_quick_exchange_detail_tip_1"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/dp_20"
+                    android:layout_marginTop="@dimen/dp_15"
+                    android:text=""
+                    android:textColor="#999999"
+                    android:textSize="@dimen/dp_14"
+                    />
+                <TextView
+                    android:id="@+id/mine_quick_exchange_detail_tip_2"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/dp_20"
+                    android:layout_marginTop="@dimen/dp_5"
+                    android:text=""
+                    android:textColor="#999999"
+                    android:textSize="@dimen/dp_14"
+                    />
+                <TextView
+                    android:id="@+id/mine_quick_exchange_detail_tip_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/dp_20"
+                    android:layout_marginTop="@dimen/dp_5"
+                    android:text=""
+                    android:textColor="#999999"
+                    android:textSize="@dimen/dp_14"/>
+            </LinearLayout>
+
+        </RelativeLayout>
+        
+    </ScrollView>
+</LinearLayout>

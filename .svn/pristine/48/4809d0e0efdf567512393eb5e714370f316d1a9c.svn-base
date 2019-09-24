@@ -1,0 +1,87 @@
+package com.bochat.app.business.login;
+
+import com.bochat.app.business.DaggerBusinessComponent;
+import com.bochat.app.common.contract.SplashScreenContract;
+import com.bochat.app.common.model.IUpgradeModel;
+import com.bochat.app.common.router.Router;
+import com.bochat.app.common.router.RouterLogin;
+import com.bochat.app.model.util.TimeUtils;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
+
+import javax.inject.Inject;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/10 13:42
+ * Description :
+ */
+
+public class SplashScreenPresenter extends BasePresenter<SplashScreenContract.View> implements SplashScreenContract.Presenter {
+
+    @Inject
+    IUpgradeModel upgradeModel;
+    
+    @Override
+    public void onScreenClick() {
+        getView().showTips("恭喜发财，红包拿来！");
+    }
+
+    @Override
+    public void onSkipButtonClick() {
+        Router.navigation(new RouterLogin());
+    }
+
+    @Override
+    public void onViewInactivation() {
+        getView().finish();
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        loadNetTime();
+    }
+
+    @Override
+    public void initInjector() {
+        DaggerBusinessComponent.create().inject(this);
+    }
+
+    private void loadNetTime(){
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                while(true){
+                    try {
+                        long netTime = getNetTime();
+                        long localTime = System.currentTimeMillis();
+                        TimeUtils.setNetworkTimeOffset(localTime - netTime);
+                        return;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }.start();
+    }
+    
+    public static long getNetTime() throws IOException {
+        String webUrl = "http://www.ntsc.ac.cn";//中国科学院国家授时中心
+        URL url = new URL(webUrl);
+        URLConnection uc = url.openConnection();
+        uc.setReadTimeout(5000);
+        uc.setConnectTimeout(5000);
+        uc.connect();
+        return uc.getDate();
+    }
+}

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_hasBackBtn="true"
+        app:top_background="#FFFFFF"
+        app:top_titleText="设置"/>
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/cv_friend_manage_black_list_switch"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_text="加入黑名单"
+        app:item_hasRightBtn="false"
+        app:item_hasSwitchBtn="true"
+        android:visibility="gone"
+        />
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/cv_friend_manage_notification_switch"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_text="消息免打扰"
+        app:item_hasRightBtn="false"
+        app:item_hasSwitchBtn="true"
+        />
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/cv_friend_manage_conversation_top_switch"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_text="聊天置顶"
+        app:item_hasRightBtn="false"
+        app:item_hasSwitchBtn="true"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_10"
+        android:background="#FBFAFA"/>
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/cv_friend_manage_history"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_text="聊天记录"/>
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/cv_friend_manage_history_clear"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:layout_marginTop="@dimen/dp_10"
+        app:item_text="清除聊天记录"/>
+    
+    <Button
+        android:id="@+id/cv_friend_manage_enter_btn"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:layout_marginLeft="@dimen/dp_15"
+        android:layout_marginRight="@dimen/dp_15"
+        android:layout_marginTop="@dimen/dp_50"
+        android:layout_marginBottom="@dimen/dp_47"
+        android:background="@drawable/shape_button_5dp"
+        android:text="删除好友"
+        android:textColor="#FFFFFF"
+        android:textSize="@dimen/dp_17"
+        android:visibility="visible"/>
+</LinearLayout>

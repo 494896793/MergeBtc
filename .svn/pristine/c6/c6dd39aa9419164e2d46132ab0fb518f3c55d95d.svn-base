@@ -1,0 +1,359 @@
+package com.bochat.app.app.activity;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Vibrator;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.view.SurfaceHolder;
+import android.view.SurfaceHolder.Callback;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.common.util.ALog;
+import com.bochat.app.model.constant.Constan;
+import com.bochat.app.model.util.imgutil.ImageUtils;
+import com.bochat.app.model.zxing.CaptureActivityHandler;
+import com.bochat.app.model.zxing.InactivityTimer;
+import com.bochat.app.model.zxing.ViewfinderView;
+import com.bochat.app.model.zxing.camera.CameraManager;
+import com.bochat.app.model.zxing.history.HistoryManager;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.Result;
+import com.jaeger.library.StatusBarUtil;
+
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.Vector;
+
+import crossoverone.statuslib.StatusUtil;
+
+import static com.bochat.app.model.constant.Constan.DEVICE_PHOTO_REQUEST;
+
+@Route(path = RouteTable.SCAN_QR_CODE)
+public class CaptureActivity extends Activity implements Callback, OnClickListener {
+
+
+    private HistoryManager historyManager;
+    private static final int HISTORY_REQUEST_CODE = 0x0000bacc;
+    private CaptureActivityHandler handler;
+    private ViewfinderView viewfinderView;
+    private boolean hasSurface;
+    private Vector<BarcodeFormat> decodeFormats;
+    private String characterSet;
+    private InactivityTimer inactivityTimer;
+    private MediaPlayer mediaPlayer;
+    private boolean playBeep;
+    private static final float BEEP_VOLUME = 0.10f;
+    private boolean vibrate;
+    private TextView my_code_tx;
+    private ImageView imageView_back;
+    private TextView textView_rightFunction;
+    
+    private String returnUrl;
+    
+    /**
+     * Called when the activity is first created.
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setStatusBarColor();
+        setContentView(R.layout.activity_capture);
+        CameraManager.init(getApplication());
+        initView();
+        hasSurface = false;
+        inactivityTimer = new InactivityTimer(this);
+    }
+
+    private void initView() {
+        imageView_back=findViewById(R.id.imageView_back);
+        my_code_tx=findViewById(R.id.my_code_tx);
+        viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
+        textView_rightFunction=findViewById(R.id.textView_rightFunction);
+        viewfinderView.setCameraManager(CameraManager.get());
+
+        textView_rightFunction.setOnClickListener(this);
+        my_code_tx.setOnClickListener(this);
+        imageView_back.setOnClickListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview_view);
+        SurfaceHolder surfaceHolder = surfaceView.getHolder();
+        if (hasSurface) {
+            initCamera(surfaceHolder);
+        } else {
+            surfaceHolder.addCallback(this);
+            surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        }
+        decodeFormats = null;
+        characterSet = null;
+
+        playBeep = true;
+        AudioManager audioService = (AudioManager) getSystemService(AUDIO_SERVICE);
+        if (audioService.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) {
+            playBeep = false;
+        }
+        initBeepSound();
+        vibrate = true;
+
+        returnUrl = null;
+        Intent intent = getIntent();
+        if(intent.hasExtra(RouteExtra.ReturnUrl)){
+            returnUrl = intent.getStringExtra(RouteExtra.ReturnUrl);
+        }
+    }
+
+    protected void setStatusBarColor() {
+        StatusBarUtil.setTranslucent(this);
+        StatusUtil.setSystemStatus(this, false, true);
+        StatusBarUtil.setColorNoTranslucent(this, Color.parseColor("#00000000"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (handler != null) {
+            handler.quitSynchronously();
+            handler = null;
+        }
+        CameraManager.get().closeDriver();
+    }
+
+    @Override
+    protected void onDestroy() {
+        inactivityTimer.shutdown();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+        super.onNewIntent(intent);
+    }
+
+    /**
+     * 扫码后的事件
+     *
+     * @param result
+     * @param barcode
+     */
+    public void handleDecode(Result result, Bitmap barcode) {
+        inactivityTimer.onActivity();
+        playBeepSoundAndVibrate();
+        String resultString = result.getText();
+        ALog.d("scan result " + resultString);
+        if(RouteTable.BOOK_ADDRESS_FRIEND_DETAIL.equals(returnUrl)){
+            try {
+                JSONObject jsonObject = new JSONObject(resultString);
+                String type = jsonObject.getString("type");
+                String id = jsonObject.getString("id");
+                if(type.equals("1")){
+                    ARouter.getInstance().build(returnUrl).withString(RouteExtra.ConversationId_String, id).navigation();
+                } else {
+                    ARouter.getInstance().build(RouteTable.CONVERSATION_GROUP_DETAIL).withString(RouteExtra.ConversationId_String, id).navigation();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (RouteTable.MINE_TOKEN_TRANSFER.equals(returnUrl)){
+            ARouter.getInstance().build(returnUrl)
+                    .withString(RouteExtra.QRCodeResult, resultString)
+                    .navigation();
+        }
+        finish();
+    }
+
+    private void initCamera(SurfaceHolder surfaceHolder) {
+        try {
+            CameraManager.get().openDriver(surfaceHolder);
+        } catch (IOException ioe) {
+            return;
+        } catch (RuntimeException e) {
+//            findViewById(R.id.preview_view).setBackgroundColor(ContextCompat.getColor(this, R.color.text_black));
+//
+            return;
+        }
+        if (handler == null) {
+            handler = new CaptureActivityHandler(this, decodeFormats,
+                    characterSet);
+        }
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width,
+                               int height) {
+
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        if (!hasSurface) {
+            hasSurface = true;
+            initCamera(holder);
+        }
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        hasSurface = false;
+
+    }
+
+    public ViewfinderView getViewfinderView() {
+        return viewfinderView;
+    }
+
+    public Handler getHandler() {
+        return handler;
+    }
+
+    public void drawViewfinder() {
+        viewfinderView.drawViewfinder();
+
+    }
+
+    private void initBeepSound() {
+        if (playBeep && mediaPlayer == null) {
+            // The volume on STREAM_SYSTEM is not adjustable, and users found it
+            // too loud,
+            // so we now play on the music stream.
+            setVolumeControlStream(AudioManager.STREAM_MUSIC);
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mediaPlayer.setOnCompletionListener(beepListener);
+
+            AssetFileDescriptor file = getResources().openRawResourceFd(
+                    R.raw.beep);
+            try {
+                mediaPlayer.setDataSource(file.getFileDescriptor(),
+                        file.getStartOffset(), file.getLength());
+                file.close();
+                mediaPlayer.setVolume(BEEP_VOLUME, BEEP_VOLUME);
+                mediaPlayer.prepare();
+            } catch (IOException e) {
+                mediaPlayer = null;
+            }
+        }
+    }
+
+    private static final long VIBRATE_DURATION = 200L;
+
+    private void playBeepSoundAndVibrate() {
+        if (playBeep && mediaPlayer != null) {
+            mediaPlayer.start();
+        }
+        if (vibrate) {
+            Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            vibrator.vibrate(VIBRATE_DURATION);
+        }
+    }
+
+    /**
+     * When the beep has finished playing, rewind to queue up another one.
+     */
+    private final OnCompletionListener beepListener = new OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mediaPlayer) {
+            mediaPlayer.seekTo(0);
+        }
+    };
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.imageView_back:
+                finish();
+                break;
+            case R.id.textView_rightFunction:
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, DEVICE_PHOTO_REQUEST);
+                break;
+            case R.id.my_code_tx:
+//                MyQrcodeActivity.start(CaptureActivity.this,MyApplication.getInstance().getData());
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        //用户没有进行有效的设置操作，返回
+        if (requestCode == Activity.RESULT_CANCELED ){
+            return;
+        }
+
+//            if(requestCode==DEVICE_PHOTO_REQUEST){
+            try {
+                Result result = null;
+                String[] proj = {MediaStore.Images.Media.DATA};
+                String path="";
+
+                // 获取选中图片的路径
+                //                外界的程序访问ContentProvider所提供数据 可以通过ContentResolver接口
+                Cursor cursor = getContentResolver().query(intent.getData(),
+                        proj, null, null, null);
+
+                if (cursor.moveToFirst()) {
+
+                    int column_index = cursor
+                            .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                    path = cursor.getString(column_index);
+
+
+                }
+
+                cursor.close();
+
+                result = ImageUtils.scanningImage(path);
+
+                if (result == null) {
+                    Log.i(Constan.TAG,"未识别到二维码");
+                } else {
+                    String resultString = result.getText();
+                    if (resultString==null||resultString.equals("")) {
+                        Log.i("====","===");
+                    } else {
+                        String dajianType=resultString.substring(resultString.indexOf(",")+1,resultString.indexOf(",")+2);
+                        if(dajianType.equals("1")){
+                            String uid=resultString.substring(resultString.lastIndexOf(",")+1,resultString.length());
+//                            Intent otherUserCenterIntent=new Intent(CaptureActivity.this,OtherUserCenterActivity.class);
+//                            otherUserCenterIntent.putExtra("otherUid",uid);
+//                            startActivity(otherUserCenterIntent);
+                        }else{
+
+                        }
+                    }
+                    Log.i(Constan.TAG,"识别到的二维码" + result.toString());
+                    finish();
+                }
+
+            } catch (Exception e) {
+                Log.i(Constan.TAG,"报错信息");
+            }
+        }
+//    }
+
+    boolean toggleFlag = false;
+
+}

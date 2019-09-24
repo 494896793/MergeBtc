@@ -1,0 +1,159 @@
+package com.bochat.app.app.activity;
+
+import android.graphics.Color;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.app.view.MessageDialog;
+import com.bochat.app.app.view.SpImageView;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.conversation.FriendDetailContact;
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bumptech.glide.Glide;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+import static com.bochat.app.app.view.SpImageView.TYPE_ROUND;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/19 09:05
+ * Description :
+ */
+
+@Route(path = RouteTable.BOOK_ADDRESS_FRIEND_DETAIL)
+public class FriendDetailActivity extends BaseActivity<FriendDetailContact.Presenter> implements FriendDetailContact.View{
+   
+    @Inject
+    FriendDetailContact.Presenter presenter;
+
+    @BindView(R.id.friend_detail_top_bar) BoChatTopBar topBar;
+    @BindView(R.id.friend_detail_banner) ImageView banner;
+    @BindView(R.id.friend_detail_icon) SpImageView icon;
+    @BindView(R.id.friend_detail_icon_name) TextView iconName;
+    @BindView(R.id.friend_detail_name_text) TextView name;
+    @BindView(R.id.friend_detail_info_text) TextView detail;
+    @BindView(R.id.friend_detail_phone_text) TextView phone;
+    @BindView(R.id.friend_detail_info_signature) TextView signature;
+    @BindView(R.id.friend_detail_enter_btn) Button enterBtn;
+    
+    private boolean isFriend;
+    private boolean isShowDeleteFriend;
+    
+    @Override
+    public void showDeleteFriendBtn(boolean isShow) {
+        isShowDeleteFriend = isShow;
+        if(isShow){
+            topBar.getTextButton().setText("删除");
+            topBar.getTextButton().setTextColor(Color.parseColor("#FE695E"));
+        } else {
+            topBar.getTextButton().setText("");
+        }
+    }
+
+    @Override
+    public void updateFriendDetail(FriendEntity info) {
+        icon.setType(TYPE_ROUND);
+        icon.setRoundRadius(getResources().getDimensionPixelSize(R.dimen.dp_10));
+        Glide.with(this).load(info.getHead_img()).into(icon);
+        Glide.with(this).load(info.getHead_img()).into(banner);
+        iconName.setText(info.getNickname());
+        name.setText(info.getNickname() + "(" + info.getId() + ")");
+        
+        String sex = info.getSex() == 1 ? "男  " : "女  ";
+        String age = info.getAge() == 0 ? ""  : (info.getAge() +  "岁  ");
+        String area = TextUtils.isEmpty(info.getArea()) ? "" : info.getArea();
+        detail.setText(sex + age + area);
+        isFriend = presenter.isFriend();
+        if(!isFriend){
+            topBar.getTextButton().setVisibility(View.INVISIBLE);
+        }
+        signature.setText(TextUtils.isEmpty(info.getSignature()) ? "尚未设置个性签名" : info.getSignature());
+        
+        enterBtn.setText(isFriend ? "发送消息" : "申请好友");
+        
+        enterBtn.setVisibility(info.getId() != CachePool.getInstance().user().getLatest().getId() ? View.VISIBLE : View.INVISIBLE);
+    }
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected FriendDetailContact.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_friend_detail);
+    }
+
+    @Override
+    protected void initWidget() {
+        topBar.setOnClickListener(new BoChatTopBar.OnClickListener() {
+            @Override
+            public void onTextExtButtonClick() {
+                if(isShowDeleteFriend){
+                    MessageDialog messageDialog = new MessageDialog(FriendDetailActivity.this, 
+                            "确定删除好友吗？");
+                    messageDialog.setOnChooseListener(new MessageDialog.OnChooseListener(){
+
+                        @Override
+                        public void onEnter() {
+                            presenter.onManageBtnClick();
+                        }
+
+                        @Override
+                        public void onCancel() {
+
+                        }
+                    });
+                    messageDialog.showPopupWindow();
+                } else {
+                    presenter.onManageBtnClick();
+                }
+            }
+        });
+    }
+
+    @OnClick({R.id.friend_detail_enter_btn, R.id.friend_detail_phone_layout, R.id.friend_detail_qr_layout})
+    @Override
+    protected void onViewClicked(View view) {
+        super.onViewClicked(view);
+        switch (view.getId()) {
+            case R.id.friend_detail_phone_layout:
+                //TODO
+            break;
+            
+            case R.id.friend_detail_qr_layout:
+                presenter.onQRCodeClick();
+            break;
+            
+            case R.id.friend_detail_enter_btn:
+                if(isFriend){
+                    presenter.onStartConversationBtnClick();
+                } else {
+                    presenter.onAddFriendBtnClick();
+                }
+            break;
+        
+            default:
+                break;
+        }
+        
+    }
+}

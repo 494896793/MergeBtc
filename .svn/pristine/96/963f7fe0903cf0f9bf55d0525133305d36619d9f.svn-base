@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_168"
+        android:background="@mipmap/bg_mine_bank_card">
+        <TextView
+            android:id="@+id/item_bank_card_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/dp_16"
+            android:layout_marginLeft="@dimen/dp_29"
+            android:layout_marginTop="@dimen/dp_18"
+            android:text="中国工商银行"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_1"
+            android:layout_marginLeft="@dimen/dp_9"
+            android:layout_marginRight="@dimen/dp_9"
+            android:layout_below="@id/item_bank_card_name"
+            android:background="#DFDFDF"
+            android:layout_marginTop="@dimen/dp_11"
+            />
+
+        <TextView
+            android:id="@+id/item_bank_card_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/dp_20"
+            android:layout_marginLeft="@dimen/dp_35"
+            android:text="6252 **** **** 3761"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/dp_50"
+            />
+        <ImageView
+            android:id="@+id/item_bank_card_delete"
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:src="@mipmap/ic_white_delete"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/dp_50"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/dp_30"
+            />
+    </RelativeLayout>
+</RelativeLayout>

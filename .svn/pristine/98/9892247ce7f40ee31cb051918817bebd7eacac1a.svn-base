@@ -1,0 +1,36 @@
+package com.bochat.app.common.contract.dynamic;
+
+import com.bochat.app.model.bean.MarketCollectionEntity;
+import com.bochat.app.model.bean.ResidueAmountListEntity;
+import com.bochat.app.model.bean.TradingRecordEntity;
+import com.bochat.app.model.bean.TradingRulesEntity;
+import com.bochat.app.model.modelImpl.MarketCenter.EntrustListEntity;
+import com.bochat.app.mvp.presenter.IBasePresenter;
+import com.bochat.app.mvp.view.IBaseView;
+
+public interface MarketQuotationBuyAndSellContract {
+
+    interface View extends IBaseView<Presenter> {
+        void afterResult();
+
+        void getResidueAmount(ResidueAmountListEntity entity);
+
+        void updateEntrustList(EntrustListEntity entity);
+
+        void getTradingRulesEntity(TradingRulesEntity entity);
+
+        void saleSuccess();
+    }
+
+    interface Presenter extends IBasePresenter<View> {
+
+        void queryTradingRules(long marketId);
+
+        void obtainEntrustList(String marketId, String type);
+
+        void listResidueAmount(long userId, String currencyIdL, String currencyIdR);
+
+        void saleBuying(long marketId, String price, int num, int type, long currencyIdL, long currencyIdR);
+
+    }
+}

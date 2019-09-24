@@ -1,0 +1,22 @@
+package com.bochat.app.common.contract.dynamic;
+
+import com.bochat.app.model.bean.DynamicShopGameListEntity;
+import com.bochat.app.model.bean.DynamicShopTypeListEntity;
+import com.bochat.app.mvp.presenter.IBasePresenter;
+import com.bochat.app.mvp.view.IBaseView;
+
+/**
+ * 2019/5/8
+ * Author LDL
+ **/
+public interface ListAppActivityContract {
+
+    interface View extends IBaseView<ListAppActivityContract.Presenter> {
+        void getType(DynamicShopTypeListEntity entity);
+    }
+
+    interface Presenter extends IBasePresenter<ListAppActivityContract.View> {
+        void getAppStoreType();
+    }
+
+}

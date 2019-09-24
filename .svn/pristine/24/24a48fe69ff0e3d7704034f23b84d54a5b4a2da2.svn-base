@@ -1,0 +1,56 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import org.json.JSONObject;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 13:49
+ * Description :
+ */
+
+public class KLineCommand implements MarketCenterCommand {
+
+    private String marketId;
+    private KLineType kLineType;
+
+    public KLineCommand(String marketId, KLineType kLineType) {
+        this.marketId = marketId;
+        this.kLineType = kLineType;
+    }
+
+    @Override
+    public MarketCenterType getType() {
+        return MarketCenterType.KLINE;
+    }
+
+    @Override
+    public JSONObject convertToJson() {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("marketId", marketId);
+            json.put("kLineType", kLineType);
+            return json;
+        } catch (Exception ignore){
+        }
+        return null;
+    }
+
+    public String getMarketId() {
+        return marketId;
+    }
+
+    public KLineType getKLineType() {
+        return kLineType;
+    }
+
+    public enum KLineType{
+        MIN5,
+        MIN30,
+        HOUR,
+        DAY,
+        WEEK,
+        MOUTH
+    }
+
+}
+

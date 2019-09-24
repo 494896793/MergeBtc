@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- TopBar相关 -->
+    <declare-styleable name="BoChatTopBar">
+        <attr name="top_titleText" format="string|reference" />
+        <attr name="top_titleColor" format="string|reference" />
+        <attr name="top_hasBackBtn" format="boolean" />
+        <attr name="top_hasExtBtn" format="boolean" />
+        <attr name="top_hasExt2Btn" format="boolean" />
+        <attr name="top_hasExt3Btn" format="boolean" />
+        <attr name="top_textColor" format="color" />
+        <attr name="top_background" format="color" />
+        <attr name="top_extButtonSrc" format="reference" />
+        <attr name="top_extButton2Src" format="reference" />
+        <attr name="top_extButton3Text" format="string|reference" />
+        <attr name="top_extButton3TextColor" format="color" />
+        <attr name="top_backBtnBackground" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="BoChatItemView">
+        <attr name="item_text" format="string|reference" />
+        <attr name="item_hasRightBtn" format="boolean" />
+        <attr name="item_hasEditText" format="boolean" />
+        <attr name="item_editTextEnable" format="boolean" />
+        <attr name="item_editTextHint" format="string|reference" />
+        <attr name="item_content" format="string|reference" />
+        <attr name="item_content_color" format="string|reference" />
+        <attr name="item_rightIcon" format="reference" />
+        <attr name="item_hasSwitchBtn" format="boolean" />
+        <attr name="item_hasLeftContent" format="boolean" />
+    </declare-styleable>
+
+    <!--通讯录通用的item样式-->
+    <declare-styleable name="AddressBookMainItem">
+        <attr name="title" format="string" />
+        <attr name="left_icon" format="reference" />
+        <attr name="right_icon" format="reference" />
+        <!--<attr name="titlebar_type" format="integer"/>-->
+    </declare-styleable>
+
+    <declare-styleable name="QuickIndexBar">
+        <!--字体的颜色-->
+        <attr name="font_color" format="color|reference" />
+        <!--选中时字体的颜色-->
+        <attr name="selected_font_color" format="color|reference" />
+        <!--字体的大小-->
+        <attr name="font_size" format="dimension|reference" />
+    </declare-styleable>
+
+    <declare-styleable name="SearchEditText">
+        <attr name="clearIcon" format="reference" />
+        <attr name="scaleSize" format="float" />
+        <attr name="drawableWidth" format="dimension" />
+        <attr name="searchHint" format="string|reference" />
+    </declare-styleable>
+    <!--MaterialProgressBar-->
+    <declare-styleable name="MaterialProgressBar">
+        <attr name="progressColour" format="color" />
+        <attr name="secondaryProgressColour" format="color" />
+        <attr name="backgroundColour" format="color" />
+        <attr name="duration" format="integer" />
+    </declare-styleable>
+
+</resources>
+

@@ -1,0 +1,41 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import org.json.JSONObject;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 13:47
+ * Description :
+ */
+
+public class TransactionCommand implements MarketCenterCommand {
+
+    private String userid;
+    private String type;
+    private String terms;
+
+    public TransactionCommand(String userid, String type, String terms) {
+        this.userid = userid;
+        this.type = type;
+        this.terms = terms;
+    }
+
+    @Override
+    public MarketCenterType getType() {
+        return MarketCenterType.TRANSACTION;
+    }
+
+    @Override
+    public JSONObject convertToJson() {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("channel", 1);
+            json.put("userid", userid);
+            json.put("type", type);
+            json.put("terms", terms);
+            return json;
+        } catch (Exception ignore) {
+        }
+        return null;
+    }
+}

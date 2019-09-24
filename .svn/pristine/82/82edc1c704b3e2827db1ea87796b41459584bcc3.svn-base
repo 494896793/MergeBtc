@@ -1,0 +1,361 @@
+package com.bochat.app.business.main.conversation;
+
+import android.content.Intent;
+import android.text.TextUtils;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.bean.SearchedEntity;
+import com.bochat.app.common.contract.conversation.SearchFriendContract;
+import com.bochat.app.common.model.IGroupModule;
+import com.bochat.app.common.model.IUserLocalModel;
+import com.bochat.app.common.model.IUserModel;
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.model.bean.FriendListEntity;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.model.bean.GroupListEntity;
+import com.bochat.app.model.bean.GroupMemberEntity;
+import com.bochat.app.model.greendao.DBManager;
+import com.bochat.app.model.greendao.GroupMemberEntityDao;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/18 11:11
+ * Description :
+ */
+
+public class SearchFriendPresenter extends BasePresenter<SearchFriendContract.View> implements SearchFriendContract.Presenter{
+   
+    @Inject
+    IUserModel userModel;
+
+    @Inject
+    IUserLocalModel userLocalModel;
+    
+    @Inject
+    IGroupModule groupModule;
+    
+    private boolean isSearchLocal;
+    
+    private List<EntitySearcher> searchers;
+    
+    private List<SearchHandler> handlers;
+    
+    private String returnUrl;
+
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+    
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        
+        Intent intent = getView().getViewIntent();
+        isSearchLocal = intent.getBooleanExtra(RouteExtra.IsSearchLocal_Boolean, false);
+        returnUrl = intent.getStringExtra(RouteExtra.ReturnUrl);
+        searchers = new ArrayList<>();
+        handlers = new ArrayList<>();
+        if(intent.getBooleanExtra(RouteExtra.IsSearchFriend_Boolean, false)){
+            searchers.add(isSearchLocal ? new FriendLocalSearcher() : new FriendNetworkSearcher());
+            handlers.add(new SearchFriendHandler());
+            if(isSearchLocal){
+                getView().updateSearchHint("用户ID/昵称");
+            } else {
+                getView().updateSearchHint("用户ID/昵称/手机号");
+            }
+        }
+        if(intent.hasExtra(RouteExtra.IsSearchGroupMember_Boolean)){
+            String id = intent.getStringExtra(RouteExtra.ConversationId_String);
+            searchers.add(new GroupMemberLocalSearcher(Long.valueOf(id)));
+            handlers.add(new GroupMemberHandler());
+            getView().updateSearchHint("用户昵称");
+        }
+        if(intent.getBooleanExtra(RouteExtra.IsSearchGroup_Boolean, false)){
+            searchers.add(isSearchLocal ? new GroupLocalSearcher() : new GroupNetworkSearcher());
+            handlers.add(new SearchGroupHandler());
+            if(isSearchLocal){
+                getView().updateSearchHint("ID/昵称");
+            } else {
+                getView().updateSearchHint("ID");
+            }
+        }
+    }
+
+    @Override
+    public void onSearchTextUpdate(String text) {
+        if(TextUtils.isEmpty(text)){
+            getView().updateSearchList(new ArrayList<SearchedEntity>());
+            return;
+        }
+        if(isSearchLocal){
+            searchAll(text);
+        }
+    }
+
+    @Override
+    public void onSearchTextEnter(final String text) {
+        if(TextUtils.isEmpty(text)){
+            getView().updateSearchList(new ArrayList<SearchedEntity>());
+            return;
+        }
+        searchAll(text);
+    }
+
+    @Override
+    public void onSearchItemClick(SearchedEntity item) {
+        for(SearchHandler searchHandler : handlers){
+            searchHandler.onItemClick(item);
+        }
+        getView().finish();
+    }
+
+    @Override
+    public void onSearchCancel() {
+        getView().finish();
+    }
+    
+    private void searchAll(final String text){
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<List<SearchedEntity>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<SearchedEntity>> emitter) throws Exception {
+                try {
+                    List<SearchedEntity> result = new ArrayList<>();
+                    for(EntitySearcher searcher : searchers){
+                        List<SearchedEntity> search = searcher.search(text);
+                        if(search != null){
+                            result.addAll(search);
+                        }
+                    }
+                    emitter.onNext(result);
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<SearchedEntity>>() {
+            @Override
+            public void accept(List<SearchedEntity> entity) throws Exception {
+                if(isActive()){
+                    if(!isSearchLocal){
+                        getView().hideLoading("");
+                    }
+                    getView().updateSearchList(entity);
+                }
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                if(isActive()){
+                    if(!isSearchLocal){
+                        getView().hideLoading("");
+                    }
+                }
+            }
+        });
+        if(!isSearchLocal){
+            getView().showLoading(subscribe);
+        }
+    }
+    
+    public interface EntitySearcher {
+        List<SearchedEntity> search(String text);
+    }
+    
+    public interface SearchHandler {
+        void onItemClick(SearchedEntity searchedEntity);
+    }
+    
+    private class FriendNetworkSearcher implements EntitySearcher{
+
+        @Override
+        public List<SearchedEntity> search(String text) {
+            //TODO 搜索上限？
+            FriendListEntity friendInfo = userModel.getFriendInfo(text, 1, 100);
+            if(friendInfo != null && friendInfo.getRetcode() == 0 && friendInfo.getItems() != null){
+                List<FriendEntity> items = friendInfo.getItems();
+                ArrayList<SearchedEntity> list = new ArrayList<>();
+                for(FriendEntity friendEntity : items){
+                    list.add(new SearchedEntity(friendEntity));
+                }
+                return list;
+            }
+            return null;
+        }
+    }
+    
+    private class FriendLocalSearcher implements EntitySearcher{
+
+        List<SearchedEntity> list;
+        
+        @Override
+        public List<SearchedEntity> search(String text) {
+            if(list == null){
+                List<FriendEntity> localFriends = CachePool.getInstance().friend().getAll();
+                if(localFriends != null){
+                    list = new ArrayList<>();
+                    for(FriendEntity friendEntity : localFriends){
+                        list.add(new SearchedEntity(friendEntity));
+                    }
+                }
+            }
+            if(list != null){
+                ArrayList<SearchedEntity> result = new ArrayList<>();
+                for(SearchedEntity friend : list) {
+                    FriendEntity friendEntity = (FriendEntity)friend.getObject();
+                    if(String.valueOf(friendEntity.getId()).contains(text) || friendEntity.getNickname().contains(text)){
+                        result.add(friend);
+                    }
+                }
+                return result;
+            }
+            return null;
+        }
+    }
+    
+    private class GroupMemberLocalSearcher implements EntitySearcher{
+
+
+        private long groupId;
+        
+        public GroupMemberLocalSearcher(long groupId) {
+            this.groupId = groupId;
+        }
+
+        @Override
+        public List<SearchedEntity> search(String text) {
+            List<GroupMemberEntity> memberEntities = DBManager.getInstance().getGroupMemberEntityDao().queryBuilder().where(
+                    GroupMemberEntityDao.Properties.Group_id.eq(groupId)
+                    , GroupMemberEntityDao.Properties.Nickname.like(text+"%")
+                    , GroupMemberEntityDao.Properties.Role.notEq(4)
+            ).list();
+            List<GroupMemberEntity> memberLikeId = DBManager.getInstance().getGroupMemberEntityDao().queryBuilder().where(
+                    GroupMemberEntityDao.Properties.Group_id.eq(groupId)
+                    , GroupMemberEntityDao.Properties.Member_id.like(text+"%")
+                    , GroupMemberEntityDao.Properties.Role.notEq(4)
+            ).list();
+            
+            HashMap<Integer, GroupMemberEntity> map = new HashMap<>();
+            for(GroupMemberEntity groupMemberEntity : memberEntities){
+                map.put(groupMemberEntity.getMember_id(), groupMemberEntity);
+            }
+            for(GroupMemberEntity groupMemberEntity : memberLikeId){
+                map.put(groupMemberEntity.getMember_id(), groupMemberEntity);
+            }
+            Collection<GroupMemberEntity> values = map.values();
+            List<SearchedEntity> result = new ArrayList<>();
+            for(GroupMemberEntity entity : values){
+                result.add(new SearchedEntity(entity));
+            }
+            return result;
+        }
+    }
+
+    private class GroupNetworkSearcher implements EntitySearcher{
+
+        @Override
+        public List<SearchedEntity> search(String text) {
+            GroupListEntity codeEntity = groupModule.getGroupInfo(Integer.valueOf(text), "", -1, -1);
+            if (codeEntity != null && codeEntity.getRetcode() == 0) {
+                List<GroupEntity> items = codeEntity.getItems();
+                if(items != null && !items.isEmpty()){
+                    List<SearchedEntity> group = new ArrayList<>();
+                    if(items.get(0).getGroup_id() != 0){
+                        group.add(new SearchedEntity(items.get(0)));
+                    }
+                    return group;
+                }
+            }
+            return null;
+        }
+    }
+
+    private class GroupLocalSearcher implements EntitySearcher{
+
+        List<SearchedEntity> list;
+
+        @Override
+        public List<SearchedEntity> search(String text) {
+            if(list == null){
+                List<GroupEntity> localGroupss = CachePool.getInstance().group().getAll();
+                if(localGroupss != null){
+                    list = new ArrayList<>();
+                    for(GroupEntity groupEntity : localGroupss){
+                        list.add(new SearchedEntity(groupEntity));
+                    }
+                }
+            }
+            if(list != null){
+                ArrayList<SearchedEntity> result = new ArrayList<>();
+                for(SearchedEntity friend : list) {
+                    GroupEntity friendEntity = (GroupEntity)friend.getObject();
+                    if(String.valueOf(friendEntity.getGroup_id()).contains(text) || friendEntity.getGroup_name().contains(text)){
+                        result.add(friend);
+                    }
+                }
+                return result;
+            }
+            return null;
+        }
+    }
+    
+    private class SearchFriendHandler implements SearchHandler {
+
+        @Override
+        public void onItemClick(SearchedEntity searchedEntity) {
+            Object object = searchedEntity.getObject();
+            if(object instanceof FriendEntity){
+                returnUrl = TextUtils.isEmpty(returnUrl) ? RouteTable.BOOK_ADDRESS_FRIEND_DETAIL : returnUrl;
+                ARouter.getInstance().build(returnUrl).withSerializable(RouteExtra.FriendEntity, 
+                        (FriendEntity)object).navigation();
+            }
+        }
+    }
+    
+    private class GroupMemberHandler implements SearchHandler {
+
+        @Override
+        public void onItemClick(SearchedEntity searchedEntity) {
+            Object object = searchedEntity.getObject();
+            if(object instanceof GroupMemberEntity){
+                returnUrl = TextUtils.isEmpty(returnUrl) ? RouteTable.BOOK_ADDRESS_FRIEND_DETAIL : returnUrl;
+                ARouter.getInstance().build(returnUrl).withString(RouteExtra.ConversationId_String, 
+                        String.valueOf(((GroupMemberEntity) object).getMember_id())).navigation();
+            }
+        }
+    }
+    
+    private class SearchGroupHandler implements SearchHandler {
+        
+        @Override
+        public void onItemClick(SearchedEntity searchedEntity) {
+            Object object = searchedEntity.getObject();
+            if(object instanceof GroupEntity){
+                returnUrl = TextUtils.isEmpty(returnUrl) ? RouteTable.CONVERSATION_GROUP_DETAIL : returnUrl;
+                ARouter.getInstance().build(returnUrl).withSerializable(RouteExtra.GroupEntity, 
+                        (GroupEntity)object).navigation();
+            }
+        }
+    }
+}

@@ -1,0 +1,97 @@
+package com.bochat.app.business.main.conversation;
+
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.common.model.IGroupModule;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.GroupForbiddenListEntity;
+import com.bochat.app.model.bean.GroupJionQuestionAnwerEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+import com.bochat.app.common.contract.conversation.GroupQuestionAnswerContract;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+/**
+ * create by guoying ${Date} and ${Month}
+ */
+public class GroupQuestionAnswerPresenter extends BasePresenter<GroupQuestionAnswerContract.View> implements GroupQuestionAnswerContract.Presenter {
+    @Inject
+    IGroupModule groupModule;
+    private int groupId;
+    private String entityAnwser;
+
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        //todo 拿到groupId  和 加群方式 int
+    }
+
+    @Override
+    public void getQuestionAndAnwer() {
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<GroupJionQuestionAnwerEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<GroupJionQuestionAnwerEntity> emitter) throws Exception {
+                try {
+                    //todo
+                    GroupJionQuestionAnwerEntity entity = groupModule.getGroupVerify(String.valueOf(groupId));
+                    if(entity.getRetcode() != 0){
+                        CodeEntity codeEntity = new CodeEntity();
+                        codeEntity.setCode(entity.getCode());
+                        codeEntity.setMsg(entity.getMsg());
+                        codeEntity.setRetcode(entity.getRetcode());
+                        emitter.onError(new RxErrorThrowable(codeEntity));
+                        return;
+                    }
+
+                    emitter.onNext(entity);
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<GroupJionQuestionAnwerEntity>() {
+            @Override
+            public void accept(GroupJionQuestionAnwerEntity entity) throws Exception {
+                getView().hideLoading("");
+                entityAnwser = entity.getAnwser();
+                getView().onUpdateQuestionAndAnwser(entity.getQuestion(),entityAnwser);
+
+
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("");
+
+            }
+        });
+        getView().showLoading(subscribe);
+
+
+    }
+
+    @Override
+    public void sendToApply(String anwser,int type) {
+        if (!anwser.equals(entityAnwser) && type == 4){
+            getView().showTips("问题不正确");
+            return;
+        }
+
+        //todo 去申请同意
+
+    }
+}

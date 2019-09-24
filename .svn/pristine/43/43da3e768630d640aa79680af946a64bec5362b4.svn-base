@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:gravity="center_horizontal"
+                android:background="@mipmap/bg_wallet_gold">
+    
+    <RelativeLayout
+        android:id="@+id/mine_token_transfer_gc_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal">
+
+        <com.bochat.app.app.view.BoChatTopBar
+            android:id="@+id/mine_token_transfer_receive_gc_top_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:top_hasBackBtn="true"
+            android:background="#00FFFFFF"
+            app:top_titleColor="#FFFFFF"
+            app:top_titleText="金币专用码"
+            app:top_backBtnBackground="@mipmap/ic_arrow_left_white"
+            app:top_hasExt2Btn="true"
+            app:top_extButton2Src="@mipmap/wallet_gold_share"/>
+
+        <RelativeLayout
+            android:id="@+id/mine_token_transfer_receive_token_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_42"
+            android:layout_marginRight="@dimen/dp_42"
+            android:layout_below="@id/mine_token_transfer_receive_gc_top_bar"
+            android:layout_marginTop="@dimen/dp_89"
+            android:background="@mipmap/bg_wallet_gold_frame">
+
+            <RelativeLayout
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/dp_58"
+                android:layout_width="@dimen/dp_130"
+                android:layout_height="@dimen/dp_20">
+                <TextView
+                    android:background="#FFBD32"
+                    android:layout_alignParentBottom="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dp_5" />
+                <TextView
+                    android:layout_centerHorizontal="true"
+                    android:id="@+id/mine_token_transfer_receive_gc_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="欢迎使用BoChat!"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="#222222"
+                    android:textSize="@dimen/dp_16" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/mine_token_transfer_receive_token_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_41"
+                android:layout_marginRight="@dimen/dp_41"
+                android:layout_below="@id/mine_token_transfer_receive_gc_name"
+                android:layout_centerHorizontal="true"
+                android:maxLines="2"
+                android:gravity="center"
+                android:text=""
+                android:textColor="#222222"
+                android:textSize="@dimen/dp_11" />
+
+            <ImageView
+                android:id="@+id/mine_token_transfer_receive_gc_code"
+                android:layout_width="@dimen/dp_162"
+                android:layout_height="@dimen/dp_162"
+                android:layout_marginTop="@dimen/dp_117"
+                android:layout_centerHorizontal="true"/>
+
+            <TextView
+                android:id="@+id/mine_token_transfer_receive_gc_tips1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="扫一扫向我划转金币"
+                android:textColor="#222222"
+                android:textSize="@dimen/dp_14"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/mine_token_transfer_receive_gc_code"
+                android:layout_marginTop="@dimen/dp_9"
+                />
+
+            <TextView
+                android:id="@+id/mine_token_transfer_receive_gc_tips2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="  保存二维码"
+                android:textColor="#FE8912"
+                android:textSize="@dimen/dp_14"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/mine_token_transfer_receive_gc_tips1"
+                android:layout_marginTop="@dimen/dp_9"
+                android:layout_marginBottom="@dimen/dp_25"
+                android:drawableLeft="@mipmap/ic_wallet_gold_download"/>
+
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/mine_token_transfer_receive_gc_icon"
+            android:layout_width="@dimen/dp_64"
+            android:layout_height="@dimen/dp_64"
+            android:layout_marginTop="@dimen/dp_55"
+            android:src="@mipmap/ic_wallet_gold_icon"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/mine_token_transfer_receive_gc_top_bar"/>
+    </RelativeLayout>
+</RelativeLayout>

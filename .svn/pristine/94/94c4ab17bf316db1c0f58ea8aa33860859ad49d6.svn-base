@@ -1,0 +1,54 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/07/02 18:25
+ * Description :
+ */
+
+public class KLineListEntity implements Serializable {
+    private List<KLineItemEntity> items = new ArrayList<>();
+    private String startId;
+    private String offset;
+    
+    public KLineListEntity(JSONObject json) {
+        try {
+            startId = json.getString("startId");
+            offset = json.getString("offset");
+            JSONArray kLine = json.getJSONObject("data").getJSONArray("list");
+            for(int i = 0; i < kLine.length(); i++){
+                KLineItemEntity item = new KLineItemEntity(kLine.getJSONObject(i));
+                items.add(item);
+            }
+        } catch (Exception ignore){
+        }
+    }
+
+    public String getStartId() {
+        return startId;
+    }
+
+    public String getOffset() {
+        return offset;
+    }
+
+    public List<KLineItemEntity> getItems() {
+        return items;
+    }
+
+    @Override
+    public String toString() {
+        return "KLineListEntity{" +
+                "items=" + items +
+                ", startId='" + startId + '\'' +
+                ", offset='" + offset + '\'' +
+                '}';
+    }
+}

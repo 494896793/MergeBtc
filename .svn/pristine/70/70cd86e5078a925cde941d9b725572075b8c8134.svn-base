@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#F2F2F2"
+    android:layout_height="match_parent">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_titleText="设置"
+        app:top_background="#FFFFFF"
+        app:top_hasBackBtn="true"/>
+
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/mine_settings_phone_info"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:layout_marginTop="@dimen/dp_10"
+        app:item_hasRightBtn="true"
+        app:item_text="手机号"
+        app:item_content="136******85"
+        app:item_content_color="#000000"/>
+
+</LinearLayout>

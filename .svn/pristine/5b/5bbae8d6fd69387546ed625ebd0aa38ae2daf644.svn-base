@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="@dimen/dp_300"
+        android:layout_height="@dimen/dp_300"
+        android:layout_centerInParent="true"
+        android:background="@mipmap/bg_cv_group_manage_upgrade_pay">
+        <TextView
+            android:id="@+id/cv_group_manage_upgrade_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/default_text"
+            android:text="@string/cv_group_manage_upgrade"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/dp_148"/>
+        <TextView
+            android:id="@+id/cv_group_manage_upgrade_price"
+            android:layout_below="@id/cv_group_manage_upgrade_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="@dimen/dp_22"
+            android:text="5000GC"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/dp_7"/>
+        
+        <Button
+            android:id="@+id/cv_group_manage_upgrade_enter_btn"
+            android:layout_width="@dimen/dp_180"
+            android:layout_height="@dimen/dp_35"
+            android:background="@drawable/shape_login_btn"
+            android:text="确定支付"
+            android:textSize="@dimen/dp_17"
+            android:textColor="#FFFFFF"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/cv_group_manage_upgrade_price"
+            android:layout_marginTop="@dimen/dp_10"
+            />
+        <TextView
+            android:id="@+id/cv_group_manage_upgrade_balance"
+            android:layout_below="@id/cv_group_manage_upgrade_enter_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#181818"
+            android:textSize="@dimen/dp_13"
+            android:text="@string/cv_group_manage_upgrade_balance"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/dp_15"/>
+        
+        <RelativeLayout
+            android:id="@+id/cv_group_manage_upgrade_cancel"
+            android:layout_width="@dimen/dp_44"
+            android:layout_height="@dimen/dp_44"
+            android:layout_alignParentRight="true">
+            <ImageView
+                android:layout_width="@dimen/dp_24"
+                android:layout_height="@dimen/dp_24"
+                android:layout_centerInParent="true"
+                android:src="@mipmap/ic_cv_group_manage_upgrade_cancel_btn"/>
+        </RelativeLayout>
+    </RelativeLayout>
+</RelativeLayout>

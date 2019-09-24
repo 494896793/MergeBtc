@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#8f000000">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp_53"
+        android:layout_marginRight="@dimen/dp_53"
+        android:layout_centerInParent="true"
+        android:background="@drawable/shape_white_4dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+        
+        <ImageView
+            android:layout_width="@dimen/dp_181"
+            android:layout_height="@dimen/dp_133"
+            android:layout_marginTop="@dimen/dp_27"
+            android:src="@mipmap/pop_ausex_logo"/>
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_19"
+            android:text="AUSEX数字资产交易平台"
+            android:textColor="#222222"
+            android:textSize="@dimen/dp_15"
+            android:textStyle="bold"/>
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_15"
+            android:layout_marginLeft="@dimen/dp_21"
+            android:layout_marginRight="@dimen/dp_20"
+            android:text="数字资产交易服务由第三方平台AUSEX提供，交易价格随市场行为波动，请控制好风险"
+            android:textColor="#999999"
+            android:textSize="@dimen/dp_13"/>
+        
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_1"
+            android:layout_marginTop="@dimen/dp_20"
+            android:background="#F7F7F7">
+        </View>
+        
+        <Button
+            android:id="@+id/pop_ausex_btn"
+            android:layout_width="@dimen/dp_135"
+            android:layout_height="@dimen/dp_44"
+            android:background="@null"
+            android:text="我知道了"
+            android:textSize="@dimen/dp_14"/>
+    </LinearLayout>
+    
+</RelativeLayout>

@@ -1,0 +1,117 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import org.json.JSONObject;
+
+import java.io.Serializable;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 13:42
+ * Description :
+ */
+
+public class TransactionEntity implements Serializable {
+
+    private String sellerId;
+    private String buyerId;
+    private String sellerName;
+    private String buyerName;
+    private String totalNum;
+    private String currentPrice;
+    private String upToLow;
+    private String RMB;
+    private String marketId;
+
+    //TODO wangyufei 
+    public TransactionEntity() {
+        sellerName = "";
+        marketId = "37";
+    }
+
+    public TransactionEntity(JSONObject json) {
+        try {
+            sellerId = json.getString("sellerCurrencyId");
+            buyerId = json.getString("buyerCurrencyId");
+            sellerName = json.getString("sellerCurrencyName");
+            buyerName = json.getString("buyerCurrencyName");
+            totalNum = json.getString("num");
+            RMB = json.getString("RMB");
+            currentPrice = json.getString("currentprice");
+            upToLow = json.getString("uptolow");
+            marketId = json.getString("marketId");
+        } catch (Exception ignored) {
+        }
+    }
+
+    public String getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(String sellerId) {
+        this.sellerId = sellerId;
+    }
+
+    public String getBuyerId() {
+        return buyerId;
+    }
+
+    public void setBuyerId(String buyerId) {
+        this.buyerId = buyerId;
+    }
+
+    public String getSellerName() {
+        return sellerName;
+    }
+
+    public void setSellerName(String sellerName) {
+        this.sellerName = sellerName;
+    }
+
+    public String getBuyerName() {
+        return buyerName;
+    }
+
+    public void setBuyerName(String buyerName) {
+        this.buyerName = buyerName;
+    }
+
+    public String getTotalNum() {
+        return totalNum;
+    }
+
+    public void setTotalNum(String totalNum) {
+        this.totalNum = totalNum;
+    }
+
+    public String getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public void setCurrentPrice(String currentPrice) {
+        this.currentPrice = currentPrice;
+    }
+
+    public String getUpToLow() {
+        return upToLow;
+    }
+
+    public void setUpToLow(String upToLow) {
+        this.upToLow = upToLow;
+    }
+
+    public String getRMB() {
+        return RMB;
+    }
+
+    public void setRMB(String RMB) {
+        this.RMB = RMB;
+    }
+
+    public String getMarketId() {
+        return marketId;
+    }
+
+    public void setMarketId(String marketId) {
+        this.marketId = marketId;
+    }
+}

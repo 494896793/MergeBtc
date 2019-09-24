@@ -1,0 +1,23 @@
+package com.bochat.app.common.contract.mine;
+
+import com.bochat.app.model.bean.TradingRecordDataEntity;
+import com.bochat.app.model.bean.UserCurrencyDataEntity;
+import com.bochat.app.mvp.presenter.IBasePresenter;
+import com.bochat.app.mvp.view.IBaseView;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/24 17:21
+ * Description :
+ */
+
+public interface BillContract {
+    interface View extends IBaseView<BillContract.Presenter> {
+        void updateTokenList(UserCurrencyDataEntity list);
+        void updateTradeList(TradingRecordDataEntity list);
+    }
+
+    interface Presenter extends IBasePresenter<BillContract.View> {
+        void getTokenList(String bid, int type);
+    }
+}

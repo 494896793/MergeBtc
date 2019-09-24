@@ -1,0 +1,52 @@
+package com.bochat.app.business.main.dynamic;
+
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.common.contract.dynamic.MarketQuotationOptionalContract;
+import com.bochat.app.common.model.IDynamicModel;
+import com.bochat.app.common.model.IMarketCenterModel;
+import com.bochat.app.common.util.ULog;
+import com.bochat.app.model.bean.MarketInfoListEntity;
+import com.bochat.app.model.constant.Constan;
+import com.bochat.app.model.modelImpl.MarketCenter.KLineEntity;
+import com.bochat.app.model.modelImpl.MarketCenter.MarketCenterObserver;
+import com.bochat.app.model.modelImpl.MarketCenter.TransactionCommand;
+import com.bochat.app.model.modelImpl.MarketCenter.TransactionListEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+public class MarketQuotationOptionalPresenter extends BasePresenter<MarketQuotationOptionalContract.View> implements MarketQuotationOptionalContract.Presenter {
+
+    @Inject
+    IMarketCenterModel marketCenterModel;
+
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void getData() {
+        marketCenterModel.addObserver(TransactionListEntity.class, new MarketCenterObserver<TransactionListEntity>() {
+            @Override
+            public void onReceive(TransactionListEntity entity) {
+                getView().updateTransactionList(entity);
+            }
+        });
+    }
+
+    @Override
+    public void obtainTransactionEntity(String userid, String type, String terms) {
+        marketCenterModel.sendCommand(new TransactionCommand(userid, type, terms));
+    }
+
+}

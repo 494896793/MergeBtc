@@ -1,0 +1,87 @@
+package com.bochat.app.app.adapter;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+
+import java.util.List;
+
+import io.rong.imkit.mention.RongMentionManager;
+import io.rong.imlib.model.UserInfo;
+
+/**
+ * create by guoying ${Date} and ${Month}
+ */
+public class GroupMentioneAdapeter extends RecyclerView.Adapter<GroupMentioneAdapeter.MentioneHolder> {
+    private Context mContext;
+    private List<UserInfo> mData;
+
+    public GroupMentioneAdapeter(Context mContext, List<UserInfo> mData) {
+        this.mContext = mContext;
+        this.mData = mData;
+    }
+
+    @NonNull
+    @Override
+    public MentioneHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(mContext).inflate(R.layout.item_select_mentione,parent,false);
+        MentioneHolder mentioneHolder = new MentioneHolder(view);
+
+        return mentioneHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull MentioneHolder holder, int position) {
+        final UserInfo userInfo = mData.get(position);
+        Glide.with(mContext)
+                .asBitmap()
+                .load(userInfo.getPortraitUri())
+                .transform(new CircleCrop())
+                .error(R.mipmap.default_head).into(holder.userIcon);
+        holder.userName.setText(userInfo.getName());
+        holder.userId.setText(userInfo.getUserId());
+        holder.layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RongMentionManager.getInstance().mentionMember(userInfo);
+            }
+        });
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return mData.size();
+    }
+
+    public void add(List<UserInfo> list){
+        mData.clear();
+        mData.addAll(list);
+        notifyDataSetChanged();
+    }
+
+    class MentioneHolder extends RecyclerView.ViewHolder{
+        ImageView userIcon;
+        TextView userName;
+        TextView userId;
+        RelativeLayout layout;
+
+        public MentioneHolder(View itemView) {
+            super(itemView);
+            userIcon = itemView.findViewById(R.id.select_mentione_icon);
+            userName = itemView.findViewById(R.id.select_mentione_nick_name);
+            userId = itemView.findViewById(R.id.select_mentione_member_id);
+            layout = itemView.findViewById(R.id.select_layout);
+        }
+    }
+}

@@ -1,0 +1,119 @@
+package com.bochat.app.app.activity.dynamic;
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.util.TypedValue;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.MarketQuotationPagerAdapter;
+import com.bochat.app.app.fragment.dynamic.MarketQuotationOptionalFragment;
+import com.bochat.app.app.util.ResourceUtils;
+import com.bochat.app.common.contract.dynamic.MarketQuotationContract;
+import com.bochat.app.common.router.RouterMarketQuotation;
+import com.bochat.app.model.bean.PationInfoEntity;
+import com.bochat.app.model.bean.PationIntoListEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.flyco.tablayout.SlidingTabLayout;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+@Route(path = RouterMarketQuotation.PATH)
+public class MarketQuotationActivity extends BaseActivity<MarketQuotationContract.Presenter> implements MarketQuotationContract.View {
+
+    @Inject
+    MarketQuotationContract.Presenter presenter;
+
+    @BindView(R.id.market_quotation_tab)
+    SlidingTabLayout tabLayout;
+
+    @BindView(R.id.market_quotation_view_pager)
+    ViewPager viewPager;
+
+    private String[] titles = null;
+
+    private MarketQuotationPagerAdapter mPagerAdapter;
+    private List<Fragment> mFragmentList = new ArrayList<>();
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected MarketQuotationContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_market_quotation_layout);
+    }
+
+    @Override
+    public void getPationtation(PationIntoListEntity entity) {
+
+        if (entity != null && entity.getList() != null && entity.getList().size() != 0) {
+
+            List<PationInfoEntity> pationInfoEntities = entity.getList();
+
+            titles = new String[pationInfoEntities.size()];
+
+            for (int i = 0; i < pationInfoEntities.size(); i++) {
+
+                MarketQuotationOptionalFragment fragment = new MarketQuotationOptionalFragment();
+                PationInfoEntity pationInfoEntity = pationInfoEntities.get(i);
+                int type = pationInfoEntity.getId();
+                fragment.setType(String.valueOf(type));
+                mFragmentList.add(fragment);
+
+                titles[i] = pationInfoEntity.getPartition_name();
+
+            }
+
+            if (mPagerAdapter == null) {
+                mPagerAdapter = new MarketQuotationPagerAdapter(getSupportFragmentManager(), mFragmentList, titles);
+                viewPager.setAdapter(mPagerAdapter);
+                tabLayout.setViewPager(viewPager);
+                tabLayout.setCurrentTab(0);
+                tabLayout.getTitleView(0).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_16));
+                viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                    @Override
+                    public void onPageScrolled(int i, float v, int i1) {
+                    }
+
+                    @Override
+                    public void onPageSelected(int i) {
+
+                        for (Fragment f : mFragmentList) {
+                            int pos = mFragmentList.indexOf(f);
+                            if (pos != i) {
+                                tabLayout.getTitleView(pos).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_14));
+                            } else {
+                                tabLayout.getTitleView(i).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_16));
+                                MarketQuotationOptionalFragment fragment = (MarketQuotationOptionalFragment) f;
+                                fragment.sendMessage();
+                            }
+                        }
+
+                    }
+
+                    @Override
+                    public void onPageScrollStateChanged(int i) {
+
+                    }
+                });
+            } else {
+                mPagerAdapter.notifyDataSetChanged();
+            }
+        }
+
+    }
+
+}

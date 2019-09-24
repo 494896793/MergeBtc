@@ -1,0 +1,48 @@
+package com.bochat.app.common.router;
+
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.model.bean.GroupMemberEntity;
+import com.bochat.app.model.bean.GroupMemberListEntity;
+
+import java.util.List;
+
+/**
+ * create by guoying ${Date} and ${Month}
+ */
+public class RouterGroupAddManager extends AbstractRouter {
+    public static final String PATH ="/path/RouterGroupAddManager";
+    private List<GroupMemberEntity> list;
+    private String groupId;
+
+
+
+    public RouterGroupAddManager(List<GroupMemberEntity> list, String groupId) {
+        this.list = list;
+        this.groupId = groupId;
+    }
+/* public RouterGroupAddManager(List<GroupMemberEntity> list,String groupId) {
+        this.list = list;
+    }
+*/
+public String getGroupId() {
+    return groupId;
+}
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public List<GroupMemberEntity> getList() {
+        return list;
+    }
+
+    public void setList(List<GroupMemberEntity> list) {
+        this.list = list;
+    }
+
+
+    @Override
+    public String getPath() {
+        return PATH;
+    }
+}

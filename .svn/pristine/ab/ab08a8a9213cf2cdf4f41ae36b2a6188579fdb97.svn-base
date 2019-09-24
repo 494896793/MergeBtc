@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/dp_165" android:layout_height="@dimen/dp_90">
+
+    <RelativeLayout
+        android:layout_width="@dimen/dp_165"
+        android:layout_height="@dimen/dp_90">
+        <RelativeLayout
+            android:background="@drawable/shape_white_bg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageView
+                android:layout_marginLeft="@dimen/dp_15"
+                android:layout_centerVertical="true"
+                android:id="@+id/icon"
+                android:layout_width="@dimen/dp_48"
+                android:layout_height="@dimen/dp_48" />
+            <TextView
+                android:maxLines="1"
+                android:maxEms="7"
+                android:ellipsize="end"
+                android:id="@+id/label_text"
+                android:layout_alignTop="@id/icon"
+                android:layout_marginLeft="@dimen/dp_10"
+                android:layout_toRightOf="@id/icon"
+                android:textColor="@color/color_181818"
+                android:textSize="@dimen/sp_16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:maxLines="1"
+                android:maxEms="7"
+                android:ellipsize="end"
+                android:id="@+id/declare_text"
+                android:gravity="bottom"
+                android:layout_alignBottom="@id/icon"
+                android:layout_alignLeft="@id/label_text"
+                android:layout_below="@id/label_text"
+                android:textSize="@dimen/sp_12"
+                android:textColor="#666666"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

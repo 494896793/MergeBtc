@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:background="@color/transparent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:background="@color/transparent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:layout_width="@dimen/dp_261"
+        android:layout_height="wrap_content">
+        <RelativeLayout
+            android:background="@mipmap/redpacket_bg"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_375">
+            <RelativeLayout
+                android:id="@+id/title_relative"
+                android:layout_marginTop="@dimen/dp_63"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/head_img"
+                    android:layout_width="@dimen/dp_30"
+                    android:layout_height="@dimen/dp_30" />
+                <TextView
+                    android:id="@+id/name_text"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/dp_9"
+                    android:layout_toRightOf="@id/head_img"
+                    android:text="艾米分享的糖果盒"
+                    android:layout_width="wrap_content"
+                    android:textColor="#FAE7B3"
+                    android:textSize="@dimen/sp_14"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+            <TextView
+                android:id="@+id/title_text"
+                android:layout_marginTop="@dimen/dp_10"
+                android:layout_below="@id/title_relative"
+                android:textColor="#FAE7B3"
+                android:text="送利是，猪佩奇"
+                android:textSize="@dimen/sp_17"
+                android:textStyle="bold"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <ImageView
+                android:id="@+id/open_redpacket_img"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="@dimen/dp_24"
+                android:background="@mipmap/redpacket_bid_icon"
+                android:layout_width="@dimen/dp_110"
+                android:layout_height="@dimen/dp_110" />
+        </RelativeLayout>
+        <ImageView
+            android:id="@+id/close_img"
+            android:layout_marginTop="@dimen/dp_25"
+            android:src="@mipmap/redpacket_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>

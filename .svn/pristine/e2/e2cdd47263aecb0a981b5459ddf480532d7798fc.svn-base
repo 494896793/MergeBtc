@@ -1,0 +1,41 @@
+package com.bochat.app.model.modelImpl;
+
+import com.bochat.app.common.model.IUpgradeModel;
+import com.bochat.app.common.util.ULog;
+import com.bochat.app.model.bean.HttpClientEntity;
+import com.bochat.app.model.bean.UpgradeCompatDataEntity;
+import com.bochat.app.model.bean.UpgradeCompatEntity;
+import com.bochat.app.model.bean.UpgradeEntity;
+import com.bochat.app.model.constant.Constan;
+import com.bochat.app.model.net.HttpClient;
+import com.bochat.app.model.net.RetrofitService;
+import com.bochat.app.model.util.Api;
+
+public class UpgradeModel implements IUpgradeModel {
+
+    @Override
+    public UpgradeEntity upgrade(String version) {
+
+        UpgradeEntity upgradeEntity = null;
+        UpgradeCompatEntity upgradeCompatEntity = null;
+        UpgradeCompatDataEntity upgradeCompatDataEntity = null;
+
+        HttpClientEntity httpClientEntity = (HttpClientEntity) HttpClient.getInstance()
+                .sends(UpgradeCompatEntity.class, HttpClient.getInstance()
+                        .retrofit()
+                        .create(RetrofitService.class)
+                        .getApplicationVersion(Api.getVersion, version));
+        if (httpClientEntity.getCode() == Constan.NET_SUCCESS) {
+            upgradeCompatEntity = httpClientEntity.getObj();
+            upgradeCompatDataEntity = upgradeCompatEntity.getData();
+            upgradeEntity = upgradeCompatDataEntity.getItem();
+            ULog.d("upgradeEntity=%@", upgradeEntity);
+        } else {
+            upgradeEntity = new UpgradeEntity();
+            upgradeEntity.setCode(httpClientEntity.getCode());
+            upgradeEntity.setMsg(httpClientEntity.getMessage());
+            upgradeEntity.setRetcode(httpClientEntity.getCode());
+        }
+        return upgradeEntity;
+    }
+}

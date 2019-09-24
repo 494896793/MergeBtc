@@ -1,0 +1,113 @@
+package com.bochat.app.app.activity.mine;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ListView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.app.view.MessageDialog;
+import com.bochat.app.common.contract.mine.BankCardContract;
+import com.bochat.app.model.bean.BankCard;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bochat.app.mvp.view.ResultTipsType;
+import com.zhy.adapter.abslistview.CommonAdapter;
+import com.zhy.adapter.abslistview.ViewHolder;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/24 17:54
+ * Description :
+ */
+
+@Route(path = RouteTable.MINE_BANK_CARD_LIST)
+public class BankCardActivity extends BaseActivity<BankCardContract.Presenter> implements BankCardContract.View {
+
+    @Inject
+    BankCardContract.Presenter presenter;
+    
+    @BindView(R.id.mine_bank_card_list)
+    ListView listView;
+
+    @BindView(R.id.mine_bank_card_list_top_bar)
+    BoChatTopBar boChatTopBar;
+            
+    List<BankCard> bankCards = new ArrayList<>();
+
+    CommonAdapter<BankCard> adapter;
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected BankCardContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_mine_bank_card_list);
+    }
+    
+    @Override
+    protected void initWidget() {
+
+        boChatTopBar.setOnClickListener(new BoChatTopBar.OnClickListener() {
+            @Override
+            public void onTextExtButtonClick() {
+                super.onTextExtButtonClick();
+                if(bankCards.size() >= 3){
+                    showTips(new ResultTipsType("最多只能绑定三张银行卡", false));
+                    return;
+                }
+                ARouter.getInstance().build(RouteTable.MINE_BANK_CARD_ADD).navigation();
+            }
+        });
+        
+        adapter = new CommonAdapter<BankCard>(this, R.layout.item_mine_bank_card, bankCards) {
+            @Override
+            protected void convert(ViewHolder viewHolder, final BankCard item, int position) {
+                viewHolder.setText(R.id.item_bank_card_name, item.getName());
+                viewHolder.setText(R.id.item_bank_card_id, item.getBankNo());
+                viewHolder.setOnClickListener(R.id.item_bank_card_delete, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        MessageDialog messageDialog = new MessageDialog(BankCardActivity.this, "解除绑定", "是否删除该支付方式？");
+                        messageDialog.setOnChooseListener(new MessageDialog.OnChooseListener() {
+                            @Override
+                            public void onEnter() {
+                                presenter.deleteBankCard(item);
+                            }
+
+                            @Override
+                            public void onCancel() {
+
+                            }
+                        });
+                        messageDialog.showPopupWindow();
+                    }
+                });
+            }
+        };
+        listView.setAdapter(adapter);
+    }
+
+    @Override
+    public void updateBankCardList(List<BankCard> list) {
+        bankCards.clear();
+        bankCards.addAll(list);
+        adapter.notifyDataSetChanged();
+    }
+}

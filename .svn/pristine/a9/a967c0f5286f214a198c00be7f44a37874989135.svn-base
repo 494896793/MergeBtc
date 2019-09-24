@@ -1,0 +1,38 @@
+package com.bochat.app.business.main.conversation;
+
+import android.content.Intent;
+
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.common.contract.conversation.GroupMemberManageContract;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/26 10:52
+ * Description :
+ */
+
+public class GroupMemberManagePresenter extends BasePresenter<GroupMemberManageContract.View> implements GroupMemberManageContract.Presenter{
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        Intent intent = getView().getViewIntent();
+        String stringExtra = intent.getStringExtra(RouteExtra.ConversationId_String);
+        getView().showTips("setting " + stringExtra);
+    }
+
+    @Override
+    public void onForbiddenSwitch(boolean isForbidden) {
+        getView().showTips("setting " + isForbidden);
+    }
+    
+    @Override
+    public void onEnterBtnClick() {
+        getView().showTips("enter ");
+    }
+}

@@ -1,0 +1,125 @@
+package com.bochat.app.app.activity;
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.AddressBookAdapter;
+import com.bochat.app.app.fragment.AddressGroupFragment;
+import com.bochat.app.app.fragment.AddressUserFragment;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.app.view.SideBar;
+import com.bochat.app.common.contract.book.SearchAddressBookContract;
+import com.bochat.app.common.router.RouterSearchAddressBook;
+import com.bochat.app.model.event.PinYinEvent;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.flyco.tablayout.SlidingTabLayout;
+
+import org.greenrobot.eventbus.EventBus;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/05/15 17:21
+ * Description :
+ */
+
+@Route(path = RouterSearchAddressBook.PATH)
+public class SearchAddressBookActivity extends BaseActivity<SearchAddressBookContract.Presenter> implements SearchAddressBookContract.View{
+
+    @BindView(R.id.bochat_search_layout)
+    RelativeLayout bochat_search_layout;
+
+    @BindView(R.id.tableayout)
+    SlidingTabLayout tableayout;
+
+    @BindView(R.id.top_list_linear)
+    LinearLayout top_list_linear;
+
+    @BindView(R.id.bochat_topbar)
+    BoChatTopBar bochat_topbar;
+
+    @BindView(R.id.top_list_linear2)
+    LinearLayout top_list_linear2;
+
+    @BindView(R.id.viewpager)
+    ViewPager viewpager;
+
+    @BindView(R.id.num_notice_tx)
+    TextView num_notice_tx;
+
+    @BindView(R.id.sidebar)
+    SideBar sidebar;
+
+    @Inject
+    SearchAddressBookContract.Presenter presenter;
+
+    private AddressBookAdapter adapter;
+    private List<Fragment> fragmentList;
+    private String[] titles=new String[]{"我的好友","我的群聊"};
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected SearchAddressBookContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.fragment_address_book);
+    }
+    
+    @OnClick({R.id.bochat_search_layout})
+    public void onClick(View view){
+        switch (view.getId()){
+            case R.id.bochat_search_layout:
+                presenter.onSearchBarClick();
+                break;
+        }
+    }
+
+    @Override
+    protected void initWidget() {
+        try{
+            bochat_topbar.setRightButtonInvisble(true);
+            bochat_topbar.setTitleText("BoChat好友/群");
+
+            top_list_linear.setVisibility(View.GONE);
+            top_list_linear2.setVisibility(View.GONE);
+            
+            fragmentList=new ArrayList<>();
+            fragmentList.add(new AddressUserFragment());
+            fragmentList.add(new AddressGroupFragment());
+            adapter=new AddressBookAdapter(getSupportFragmentManager(),fragmentList,titles);
+            viewpager.setAdapter(adapter);
+        
+            tableayout.setViewPager(viewpager);
+            
+            sidebar.setOnTouchingLetterChangedListener(new SideBar.OnTouchingLetterChangedListener() {
+                @Override
+                public void onTouchingLetterChanged(String s) {
+                    EventBus.getDefault().post(new PinYinEvent(s));
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+}

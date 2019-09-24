@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/operation_dialog_shape">
+
+    <TextView
+        android:id="@+id/op_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_222222"
+        android:textSize="@dimen/dp_14"
+        android:layout_marginTop="@dimen/dp_41"
+        android:layout_marginBottom="@dimen/dp_41"
+        android:layout_marginStart="@dimen/dp_52"
+        android:layout_marginEnd="@dimen/dp_52"
+        android:gravity="center"
+        tools:text="@string/operationFormatString_Is_Sure" />
+
+    <LinearLayout
+        android:id="@+id/op_btn_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/upgrade_dialog_corner_bottom"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/op_negative"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dp_44"
+            android:text="@string/operationNegative"
+            android:textColor="@color/color_222222"
+            android:textSize="@dimen/dp_14"
+            android:background="@drawable/upgrade_dialog_left_button_selector"
+            android:visibility="gone"
+            android:layout_weight="1"/>
+        <Button
+            android:id="@+id/op_positive"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dp_44"
+            android:textSize="@dimen/dp_14"
+            android:textColor="@color/color_222222"
+            android:text="@string/operationPositive"
+            android:background="@drawable/upgrade_dialog_right_button_selector"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+</RelativeLayout>

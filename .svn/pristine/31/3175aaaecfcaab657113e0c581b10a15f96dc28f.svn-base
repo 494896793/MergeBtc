@@ -1,0 +1,78 @@
+package com.bochat.app.common.bean;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import io.rong.imlib.model.Conversation;
+import io.rong.imlib.model.Message;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/05/04 16:04
+ * Description :
+ */
+
+public class SearchedMessage implements Parcelable {
+    private Message message;
+    private Conversation conversation;
+
+    public SearchedMessage(Conversation conversation, Message message) {
+        if(message == null){
+            return;
+        }
+        this.message = message;
+        this.conversation = conversation;
+    }
+
+    protected SearchedMessage(Parcel in) {
+        message = in.readParcelable(Message.class.getClassLoader());
+        conversation = in.readParcelable(Conversation.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(message, flags);
+        dest.writeParcelable(conversation, flags);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<SearchedMessage> CREATOR = new Creator<SearchedMessage>() {
+        @Override
+        public SearchedMessage createFromParcel(Parcel in) {
+            return new SearchedMessage(in);
+        }
+
+        @Override
+        public SearchedMessage[] newArray(int size) {
+            return new SearchedMessage[size];
+        }
+    };
+
+    public Message getMessage() {
+        return message;
+    }
+
+    public void setMessage(Message message) {
+        this.message = message;
+    }
+
+    public Conversation getConversation() {
+        return conversation;
+    }
+
+    public void setConversation(Conversation conversation) {
+        this.conversation = conversation;
+    }
+
+    @Override
+    public String toString() {
+        return "SearchedMessage{" +
+                "message=" + message +
+                ", conversation=" + conversation +
+                '}';
+    }
+}

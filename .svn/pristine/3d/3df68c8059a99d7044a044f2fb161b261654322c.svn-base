@@ -1,0 +1,128 @@
+package com.bochat.app.app.activity;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.util.SelectableObject;
+import com.bochat.app.common.contract.conversation.GroupManageJoinFilterContract;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.zhy.adapter.abslistview.CommonAdapter;
+import com.zhy.adapter.abslistview.ViewHolder;
+
+import java.util.ArrayList;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/25 17:44
+ * Description :
+ */
+@Route(path = RouteTable.CONVERSATION_GROUP_MANAGE_JOIN_FILTER)
+public class GroupManageJoinFilterActivity extends BaseActivity<GroupManageJoinFilterContract.Presenter> implements GroupManageJoinFilterContract.View{
+
+    @Inject
+    GroupManageJoinFilterContract.Presenter presenter;
+    
+    @BindView(R.id.cv_group_manage_join_type_list)
+    ListView listView;
+    
+    private CommonAdapter<SelectableObject<String>> adapter;
+    
+    private ArrayList<SelectableObject<String>> list = new ArrayList<>();
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected GroupManageJoinFilterContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_cv_group_manage_join_filter);
+    }
+
+    @Override
+    protected void initWidget() {
+        list.add(new SelectableObject<>("允许任何人加入群聊"));
+        list.add(new SelectableObject<>("需要验证加入群聊"));
+        list.add(new SelectableObject<>("不允许任何人加入群聊"));
+        
+        adapter = new CommonAdapter<SelectableObject<String>>(this, R.layout.item_group_manage_join_type, list) {
+            @Override
+            protected void convert(ViewHolder viewHolder, SelectableObject<String> item, int position) {
+                viewHolder.setText(R.id.group_join_type_title, item.getObject());
+                viewHolder.setVisible(R.id.group_join_type_icon, item.isSelect());
+            }
+        };
+        
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                presenter.setJoinType(convertJoinType(position));
+            }
+        });
+    }
+    
+    private void updateSelect(int select){
+        if(list.size() > 0){
+            for(int i = 0; i < list.size(); i++){
+                list.get(i).setSelect(i == select);
+            }
+        }
+        adapter.notifyDataSetChanged();
+    }
+    
+    private int convertJoinType(int type){
+        switch (type) {
+            case 0:
+                return 1;
+            case 1:
+                return 5;
+            case 2:
+                return 3;
+            default:
+                break;
+        }
+        return 1;
+    }
+    
+    @Override
+    public void updateJoinType(int type) {
+        switch (type) {
+            case 1:
+                updateSelect(0);
+            break;
+            case 2:
+                
+            break;
+            case 3:
+                updateSelect(2);
+            break;
+            case 4:
+            
+            break;
+            case 5:
+                updateSelect(1);
+            break;
+            case 6:
+            
+            break;
+        
+            default:
+                break;
+        }
+    }
+}

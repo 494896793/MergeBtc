@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <!-- Login -->
+    <color name="login_tag_focus">#4591EC</color>
+    <color name="login_tag_un_focus">#000000</color>
+
+    <!-- TopBar -->
+    <color name="top_bar_text">#000000</color>
+    <color name="top_bar_bg">#FFFFFF</color>
+
+    <color name="shadow_bg">#66000000</color>
+    <color name="side_bar_text">#4A4A4A</color>
+    <color name="base_background">#F2F2F2</color>
+    <color name="flash_text">#FF4B3E</color>
+    <color name="base_bottom">#FE695E</color>
+    <color name="letter_text">#666666</color>
+    <color name="color_181818">#181818</color>
+    <color name="color_999999">#999999</color>
+    <color name="color_4591EC">#4591EC</color>
+    <color name="view_line">#DEDEDE</color>
+    <color name="darkBlue">#027BFF</color>
+    <color name="newBlue">#1A88FD</color>
+    <color name="vip_text_choose">#FF8D03</color>
+    <color name="color_0084FF">#0084FF</color>
+    <color name="border_color">#F7F7F7</color>
+    <color name="color_222222">#222222</color>
+    <color name="selected_color">#22222222</color>
+    <color name="golden_yellow">#FEF1C6</color>
+    <color name="kchat_grid_line">#ff232847</color>
+    <color name="kchat_green">#ff04705f</color>
+    <!--zxing-->
+    <color name="contents_text">#ff000000</color>
+    <color name="encode_view">#ffffffff</color>
+    <color name="possible_result_points">#c0ffbd21</color> <!-- Android standard ICS color -->
+    <color name="result_minor_text">#ffc0c0c0</color>
+    <color name="result_points">#c099cc00</color> <!-- Android standard ICS color -->
+    <color name="result_text">#ffffffff</color>
+    <color name="status_text">#ffffffff</color>
+    <color name="viewfinder_laser">#ffcc0000</color> <!-- Android standard ICS color -->
+    <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="lightGray">#ABAEB7</color>
+    <color name="skyblue">#7897FF</color>
+    <color name="black">#000000</color>
+    <color name="viewfinder_mask">#60000000</color>
+    <color name="result_view">#b0000000</color>
+
+    <color name="color_F14348">#F14348</color>
+
+    <color name="sa_accent_transparent">#D8F3D8</color>
+    <color name="sa_accent">#4EE147</color>
+    <color name="quotation_green">#4FCC7A</color>
+    <color name="quotation_red_q">#EE6560</color>
+    <color name="quotation_red_s">#F14348</color>
+    <color name="colorSearchBarForDark">#FBFAFA</color>
+    <color name="colorFontColorForDark">#CCCCCC</color>
+
+    <!--payview-->
+    <color name="grayf9">#f9f9f9</color>
+    <color name="gray_gb">#dddddd</color>
+    <color name="grayc4">#CCCCCC</color>
+    <color name="graye3">#e3e7ee</color>
+    <color name="alipay">#00a5ff</color>
+    <color name="gray_e5">#e5e5e5</color>
+    <!--payview-->
+    <color name="gray_0DCCCCCC">#0DCCCCCC</color>
+    <color name="gray_10CCCCCC">#10CCCCCC</color>
+
+    <!--privilege-->
+    <color name="privilege_used">#FF5051</color>
+    <color name="privilege_expire">#A2A2A2</color>
+    <color name="privilege_renew_used_btn_text_color">#FE3034</color>
+    <color name="privilege_renew_expire_btn_text_color">#999999</color>
+</resources>

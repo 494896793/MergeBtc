@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.bochat.app">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW"/>
+    <!--DownloadManager setNotificationVisibility 权限-->
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
+
+    <application
+        android:name=".MainApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_bochat_launcher_white"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_bochat_launcher_white"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.Design.Light.NoActionBar">
+        <uses-library android:name="org.apache.http.legacy" android:required="false" />
+        <activity android:name=".app.activity.SplashScreenActivity"  android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".app.activity.dynamic.DynamicRecruitActivity" android:screenOrientation="portrait"  android:launchMode="singleTask">
+        </activity>
+
+        <activity android:name=".app.activity.WebActivity">
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN"/>-->
+
+                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
+            <!--</intent-filter>-->
+        </activity>
+        <activity android:name=".app.activity.LoginActivity" android:screenOrientation="portrait"  android:launchMode="singleTask">
+
+        </activity>
+        <activity android:name=".app.activity.RegisterActivity" android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.BoChatActivity" android:screenOrientation="portrait" android:launchMode="singleTask">
+<!--            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>-->
+        </activity>
+        <activity android:name=".app.activity.AddFriendActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.SearchGroupActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.SearchFriendActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.FriendDetailActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.AddFriendEditRequestActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.SelectFriendActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.SearchConversationActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.bochat.app.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/rc_file_path" />
+        </provider>
+
+
+
+        <!--会话界面-->
+        <activity
+            android:name=".app.activity.ConversationDetailActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustResize">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="com.bochat.app"
+                    android:pathPrefix="/conversation/"
+                    android:scheme="rong" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".app.activity.ApplyListActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.DealAddFriendActivity"  android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.AboutUsActivity"  android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.BankCardAddActivity"  android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.BankCardActivity"  android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.BillActivity"  android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.BillDetailActivity"  android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.BlackListActivity"  android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.ChangeNotificationActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.EditPasswordActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.EditUserInfoActivity"  android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.InvitationActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.RealNameAuthActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.RealNameInfoActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.SelectBankActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.SetPasswordActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.SettingsActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+
+        <activity android:name=".app.activity.GroupDetailActivity" android:screenOrientation="portrait"  android:launchMode="singleTask" />
+        <activity android:name=".app.activity.GroupManagerSettingActivity" android:screenOrientation="portrait"  android:launchMode="singleTask" />
+        <activity android:name=".app.activity.GroupAddManagerActivity" android:screenOrientation="portrait"  android:launchMode="singleTask" />
+
+
+        <activity android:name=".app.activity.GroupManageActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.GroupManageEditActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.GroupManageEditNameActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.GroupManageForbiddenActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.GroupManageUpgradeActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.GroupMemberActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.GroupMemberManageActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.GroupMemberManageNoteActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.CaptureActivity" android:screenOrientation="portrait" />
+
+
+        <activity
+            android:name=".model.wxapi.WXPayEntryActivity"
+            android:screenOrientation="portrait"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="wx0389afb0bb6b3ae5"/>
+            </intent-filter>
+
+        </activity>
+
+        <!--聚合会话列表-->
+        <!--<activity-->
+            <!--android:name=".app.activity.SubConversationListActivtiy"-->
+            <!--android:screenOrientation="portrait"-->
+            <!--android:windowSoftInputMode="stateHidden|adjustResize">-->
+
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.VIEW" />-->
+
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+
+                <!--<data-->
+                    <!--android:host="com.bochat.app"-->
+                    <!--android:pathPrefix="/subconversationlist"-->
+                    <!--android:scheme="rong" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+        <activity android:name=".app.activity.FriendManageActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.FriendManageNoteActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.SearchMessageActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.QRCardActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".CrashHandleActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.bill.QuickExchangeHallActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.bill.QuickExchangeActivity" android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.bill.TokenTransferSelectCoinActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.bill.QuickExchangeDetailActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.bill.TokenDetailActivity"  android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.bill.OrderListActivity"  android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.bill.TokenTransferReceiveActivity"  android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.bill.GCSpecialCodeActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.bill.PropertyRechargeActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.bill.PropertyRechargeResultActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.bill.TokenTransferActivity"  android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.bill.WalletActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.bill.WalletActivity_GY" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.bill.PropertyCashOutActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <!--<activity android:name=".app.activity.WebActivity"/>-->
+        <activity android:name=".app.activity.ListAppActivity" android:screenOrientation="portrait"   android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.DynamicNoticeActivity" android:screenOrientation="portrait"   android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.SendRedPacketActivity"  android:screenOrientation="portrait"   android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.SearchAddressBookActivity" android:launchMode="singleTask"  android:screenOrientation="portrait"/>
+        <activity android:name=".app.activity.RedPacketDetailActivity" android:screenOrientation="portrait"   android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.GetVerifyCodeActivity" android:screenOrientation="portrait"   android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.PhoneInfoActivity" android:screenOrientation="portrait"   android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.EditPayPasswordActivity" android:screenOrientation="portrait"   android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.mine.SetPayPasswordActivity" android:screenOrientation="portrait"  android:launchMode="singleTask" />
+        <activity android:name=".app.activity.DynamicNoticeDetailActivity"  android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <service android:name="com.bochat.app.model.util.download.DownloadApkService"/>
+        <activity android:name=".app.activity.dynamic.ViewSpotActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity
+            android:name="com.tencent.tauth.AuthActivity"
+            android:noHistory="true"
+            android:launchMode="singleTask" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="1108740347" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="com.tencent.connect.common.AssistActivity"
+                  android:theme="@android:style/Theme.Translucent.NoTitleBar"
+                  android:configChanges="orientation|keyboardHidden|screenSize"
+            />
+        <activity android:name=".app.activity.GroupManageManagerActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.GroupManageJoinFilterActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+
+        <activity android:name=".app.activity.dynamic.ProjectIdentificatiionActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.dynamic.ProjectIdentificationResultActivity" android:screenOrientation="portrait" android:launchMode="singleInstance"/>
+        <activity android:name=".app.activity.dynamic.ProtocolBookActivity" android:screenOrientation="portrait" android:launchMode="singleInstance" />
+        <activity android:name=".app.activity.dynamic.ViewLookSearchActivity" android:screenOrientation="portrait" android:launchMode="singleInstance" />
+        <activity android:name=".app.activity.dynamic.FastSpeedActivity" android:screenOrientation="portrait" android:launchMode="singleInstance" />
+        <activity android:name=".app.activity.TestIncomeOfTodayActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.bill.TokenSelectActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.dynamic.ShakyCenterActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.HeaderDetailActivity" android:screenOrientation="portrait"  android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.dynamic.DynamicListAppDetailActivity" android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.SearchAppActivity" android:screenOrientation="portrait" android:launchMode="singleTask"/>
+
+        <activity android:name=".app.activity.dynamic.MarketQuotationActivity" android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <activity android:name=".app.activity.dynamic.MarketQuotationDetailActivity" android:screenOrientation="portrait" android:launchMode="singleTask"/>
+        <service android:name=".model.util.download.remote.service.RemoteUpgradeService"/>
+    </application>
+
+</manifest>

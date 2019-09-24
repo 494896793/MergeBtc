@@ -1,0 +1,99 @@
+package com.bochat.app.app.activity.bill;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.util.CodeCreator;
+import com.bochat.app.app.util.ResourceUtils;
+import com.bochat.app.common.contract.bill.TokenTransferReceiveContract;
+import com.bochat.app.common.router.RouterTokenTransferReceive;
+import com.bochat.app.common.util.CopyUtil;
+import com.bochat.app.model.bean.CurrencyDetailEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bochat.app.mvp.view.ResultTipsType;
+import com.bumptech.glide.Glide;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/4/26  17:40
+ * Description : 接收币种
+ */
+@Route(path = RouterTokenTransferReceive.PATH)
+public class TokenTransferReceiveActivity extends BaseActivity<TokenTransferReceiveContract.Presenter> implements TokenTransferReceiveContract.View {
+    @Inject
+    TokenTransferReceiveContract.Presenter presenter;
+
+    @BindView(R.id.mine_token_transfer_receive_token_code)
+    ImageView imageView;
+    @BindView(R.id.mine_token_transfer_receive_token_icon)
+    ImageView icon;
+    @BindView(R.id.mine_token_transfer_receive_token_name)
+    TextView name;
+    @BindView(R.id.mine_token_transfer_receive_token_address)
+    TextView address;
+    @BindView(R.id.mine_token_transfer_type_tips)
+    TextView tips;
+
+    private String addressText = "";
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected TokenTransferReceiveContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_mine_token_transfer_receive);
+    }
+
+    @OnClick({R.id.mine_token_transfer_receive_select_coin, R.id.mine_token_transfer_receive_token_address_copy_btn})
+    @Override
+    protected void onViewClicked(View view) {
+        super.onViewClicked(view);
+        if(view.getId() == R.id.mine_token_transfer_receive_select_coin){
+            presenter.onChooseClick();
+        } else {
+            if(CopyUtil.copy(this, addressText)){
+                showTips("复制成功");
+            } else {
+                showTips(new ResultTipsType("复制失败", false));
+            }
+        }
+    }
+
+    @Override
+    public void updateQRCode(String content) {
+        imageView.setImageBitmap(CodeCreator.createQRCode(content, ResourceUtils.dip2px(this,R.dimen.dp_160),
+                ResourceUtils.dip2px(this, R.dimen.dp_160), null));
+    }
+
+    @Override
+    public void updateTokenInfo(CurrencyDetailEntity info) {
+        Glide.with(this).load(info.getbIamge()).into(icon);
+        name.setText(info.getbName());
+        addressText = info.getAddress();
+        if(addressText.length() > 25){
+            String head = addressText.substring(0, 9);
+            String tail = addressText.substring(addressText.length() - 9);
+            address.setText(head + "....." + tail);
+        } else {
+            address.setText(info.getAddress());
+        }
+        tips.setText(String.format(getResources().getString(R.string.mine_token_transfer_type_tips),
+                info.getbName()));
+    }
+}

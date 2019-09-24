@@ -1,0 +1,23 @@
+package com.bochat.app.common.contract.dynamic;
+
+import com.bochat.app.model.bean.UserCurrencyEntity;
+import com.bochat.app.mvp.presenter.IBasePresenter;
+import com.bochat.app.mvp.view.IBaseView;
+
+import java.util.List;
+
+/**
+ * 2019/6/5
+ * Author LDL
+ **/
+public interface FastSpeedContract {
+
+    interface View extends IBaseView<FastSpeedContract.Presenter>{
+        void updateCoinList(List<UserCurrencyEntity> data);
+    }
+
+    interface Presenter extends IBasePresenter<FastSpeedContract.View>{
+
+    }
+
+}

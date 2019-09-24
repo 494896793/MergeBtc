@@ -1,0 +1,23 @@
+package com.bochat.app.common.contract.mine;
+
+import com.bochat.app.model.bean.CandyDetailDataEntity;
+import com.bochat.app.model.bean.ChangeDetailDataEntity;
+import com.bochat.app.mvp.presenter.IBasePresenter;
+import com.bochat.app.mvp.view.IBaseView;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/24 17:22
+ * Description :
+ */
+
+public interface BillDetailContract {
+    interface View extends IBaseView<BillDetailContract.Presenter> {
+        void updateChange(ChangeDetailDataEntity changeDetailDataEntity, String depictZh, String icon);
+        void updateCandy(CandyDetailDataEntity changeDetailDataEntity, String depictZh, String icon);
+    }   
+
+    interface Presenter extends IBasePresenter<BillDetailContract.View> {
+
+    }
+}

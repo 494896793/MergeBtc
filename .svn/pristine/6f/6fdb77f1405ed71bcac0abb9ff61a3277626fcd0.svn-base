@@ -1,0 +1,20 @@
+package com.bochat.app.common.contract.dynamic;
+
+import com.bochat.app.mvp.presenter.IBasePresenter;
+import com.bochat.app.mvp.view.IBaseView;
+
+/**
+ * 2019/6/19
+ * Author LDL
+ **/
+public interface KChatContract {
+
+    interface View extends IBaseView<KChatContract.Presenter>{
+
+    }
+
+    interface Presenter extends IBasePresenter<KChatContract.View>{
+
+    }
+
+}

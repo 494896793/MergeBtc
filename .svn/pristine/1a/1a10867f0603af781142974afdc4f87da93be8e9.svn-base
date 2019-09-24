@@ -1,0 +1,208 @@
+package com.bochat.app.app.activity;
+
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.ImageView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.BuildConfig;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.util.UriUtil;
+import com.bochat.app.app.view.BoChatItemView;
+import com.bochat.app.app.view.Glide4Engine;
+import com.bochat.app.app.view.NoticeAppDialog;
+import com.bochat.app.common.contract.conversation.GroupManageEditContract;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bochat.app.mvp.view.ResultTipsType;
+import com.bumptech.glide.Glide;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
+
+import java.io.File;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+import fj.edittextcount.lib.FJEditTextCount;
+
+import static com.bochat.app.model.constant.Constan.USE_CAMERA;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/25 17:44
+ * Description :
+ */
+@Route(path = RouteTable.CONVERSATION_GROUP_MANAGE_EDIT)
+public class GroupManageEditActivity extends BaseActivity<GroupManageEditContract.Presenter> implements GroupManageEditContract.View{
+
+    @Inject
+    GroupManageEditContract.Presenter presenter;
+
+    @BindView(R.id.cv_group_manage_edit_name)
+    BoChatItemView name;
+    
+    @BindView(R.id.cv_group_manage_edit_description)
+    FJEditTextCount descriptionInput;
+    
+    @BindView(R.id.cv_group_manage_edit_icon_btn)
+    ImageView iconBtn;
+    @BindView(R.id.cv_group_manage_edit_camera)
+    ImageView iconCameraBtn;
+    
+    private GroupEntity groupEntity;
+    
+    private NoticeAppDialog noticeAppDialog;
+
+    private File file;
+    private boolean isSelectImage;
+    private String headImage;
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected GroupManageEditContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_cv_group_manage_edit);
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+        noticeAppDialog=new NoticeAppDialog(this);
+        noticeAppDialog.show();
+        noticeAppDialog.dismiss();
+        noticeAppDialog.setOnButtonclick(new NoticeAppDialog.OnButtonclick() {
+            @Override
+            public void onFirstButtonClick(View view) {
+                useCamera();
+                noticeAppDialog.dismiss();
+            }
+
+            @Override
+            public void onSecondButtonClick(View view) {
+                Matisse.from(GroupManageEditActivity.this)
+                        .choose(MimeType.ofAll())
+                        .countable(true)
+                        .maxSelectable(9)
+                        .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                        .thumbnailScale(0.85f)
+                        .imageEngine(new Glide4Engine())
+                        .forResult(1);
+                noticeAppDialog.dismiss();
+            }
+
+            @Override
+            public void onCancelButtonClick(View view) {
+                noticeAppDialog.dismiss();
+            }
+        });
+    }
+
+    @Override
+    public void onRefresh(GroupEntity groupEntity) {
+        this.groupEntity = groupEntity;
+        name.getTextView().setText(groupEntity.getGroup_name());
+        descriptionInput.setText(groupEntity.getGroup_introduce());
+        Glide.with(this).load(groupEntity.getGroup_head()).into(iconBtn);
+    }
+
+    @Override
+    public void updateNameText(String text) {
+        name.getTextView().setText(text);
+    }
+
+    @OnClick({R.id.cv_group_manage_edit_name, R.id.cv_group_manage_edit_enter_btn, R.id.cv_group_manage_edit_icon_layout})
+    @Override
+    protected void onViewClicked(View view) {
+        super.onViewClicked(view);
+        switch (view.getId()) {
+            case R.id.cv_group_manage_edit_name:
+                presenter.onEditGroupNameClick();
+            break;
+            case R.id.cv_group_manage_edit_enter_btn:
+                if (!TextUtils.isEmpty(headImage)) {
+                    groupEntity.setGroup_head(headImage);
+                    if(!headImage.toLowerCase().contains("jpg")&&!headImage.toLowerCase().contains("png")){
+                        showTips(new ResultTipsType("只能选择图片哦",false));
+                        return;
+                    }
+                }
+                groupEntity.setGroup_name(name.getTextView().getText().toString());
+                groupEntity.setGroup_introduce(descriptionInput.getText());
+                presenter.onEnterClick(groupEntity);
+            break;
+            case R.id.cv_group_manage_edit_icon_layout:
+                noticeAppDialog.show();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void useCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
+                + "/bochat/images/" + System.currentTimeMillis() + ".jpg");
+        file.getParentFile().mkdirs();
+        Uri tempPhotoUri = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            tempPhotoUri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".FileProvider", file);
+        } else {
+            tempPhotoUri = Uri.fromFile(file);
+        }
+        //添加权限
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, tempPhotoUri);
+        startActivityForResult(intent, USE_CAMERA);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        String targetPath = null;
+        if (requestCode == 1) {
+            isSelectImage = true;
+            if(resultCode == RESULT_OK){
+                final List<Uri> selected = Matisse.obtainResult(data);
+                if(selected != null && !selected.isEmpty()){
+                    try{
+                        targetPath = UriUtil.getFilePathByUri(this, selected.get(0));
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }else if (requestCode == USE_CAMERA && resultCode == RESULT_OK) {
+            targetPath = file.getAbsolutePath();
+        }
+        if(targetPath != null){
+            if(!targetPath.toLowerCase().contains("jpg")&&!targetPath.toLowerCase().contains("png")){
+                showTips(new ResultTipsType("只能选择图片哦",false));
+                return;
+            }
+            headImage = targetPath;
+            iconCameraBtn.setVisibility(View.INVISIBLE);
+            Glide.with(GroupManageEditActivity.this).load(headImage).into(iconBtn);
+        }
+    }
+}

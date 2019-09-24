@@ -1,0 +1,120 @@
+package com.bochat.app.app.fragment.addressbook;
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.AddressBookAdapter;
+import com.bochat.app.app.fragment.AddressGroupFragment;
+import com.bochat.app.app.fragment.AddressUserFragment;
+import com.bochat.app.app.util.ResourceUtils;
+import com.bochat.app.common.contract.book.AddressBookContract;
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.mvp.view.BaseFragment;
+import com.flyco.tablayout.SlidingTabLayout;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/05/23 11:35
+ * Description :
+ */
+
+public class AddressBookDarkFragment extends BaseFragment<AddressBookContract.Presenter> implements AddressBookContract.View {
+
+    @Inject
+    AddressBookContract.Presenter presenter;
+    
+    @BindView(R.id.address_book_dark_tab_layout)
+    SlidingTabLayout tabLayout;
+    
+    @BindView(R.id.address_book_dark_view_pager)
+    ViewPager viewPager;
+    
+    
+    private String[] titles = {"好友", "群聊", "黑名单"};
+    
+    private AddressBookAdapter adapter;
+    private List<Fragment> fragmentList;
+    
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected AddressBookContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_address_book_dark,container,false);
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+        fragmentList=new ArrayList<>();
+        fragmentList.add(new AddressUserFragment());
+        fragmentList.add(new AddressGroupFragment());
+        fragmentList.add(new AddressGroupFragment());
+        adapter = new AddressBookAdapter(getActivity().getSupportFragmentManager(), fragmentList, titles);
+        viewPager.setAdapter(adapter);
+        tabLayout.setViewPager(viewPager);
+        tabLayout.getTitleView(0).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_16));
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                if(i != 0)
+                    tabLayout.getTitleView(0).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_14));
+                if(i != 1) 
+                    tabLayout.getTitleView(1).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_14));
+                if(i != 2)
+                    tabLayout.getTitleView(2).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_14));
+                
+                tabLayout.getTitleView(i).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_16));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+    }
+    
+    @Override
+    public void updateNewRequestCount(String count) {
+        
+    }
+
+    @Override
+    public void updateFriendList(List<FriendEntity> list) {
+
+    }
+
+    @Override
+    public void updateGroupChatList(List<GroupEntity> list) {
+
+    }
+
+
+
+
+}

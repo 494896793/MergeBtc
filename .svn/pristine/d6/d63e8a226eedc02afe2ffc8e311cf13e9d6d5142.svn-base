@@ -1,0 +1,45 @@
+package com.bochat.app.common.router;
+
+import com.bochat.app.model.bean.GroupEntity;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/14 09:31
+ * Description :
+ */
+
+public class RouterGroupManage extends AbstractRouter {
+    public static final String PATH ="/path/RouterGroupManage";
+    
+    private GroupEntity groupEntity;
+    private int groupManager;
+
+    public RouterGroupManage(int groupManager) {
+        this.groupManager = groupManager;
+    }
+
+    public RouterGroupManage(GroupEntity groupEntity) {
+        this.groupEntity = groupEntity;
+    }
+
+    public GroupEntity getGroupEntity() {
+        return groupEntity;
+    }
+
+    public void setGroupEntity(GroupEntity groupEntity) {
+        this.groupEntity = groupEntity;
+    }
+
+    public int getGroupManager() {
+        return groupManager;
+    }
+
+    public void setGroupManager(int groupManager) {
+        this.groupManager = groupManager;
+    }
+
+    @Override
+    public String getPath() {
+        return PATH;
+    }
+}

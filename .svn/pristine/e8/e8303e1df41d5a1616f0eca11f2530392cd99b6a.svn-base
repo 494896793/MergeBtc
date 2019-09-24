@@ -1,0 +1,75 @@
+package com.bochat.app.business.main.conversation;
+
+import android.content.Intent;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.common.contract.conversation.GroupMemberContract;
+import com.bochat.app.model.bean.GroupMemberEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import java.util.ArrayList;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/26 10:52
+ * Description :
+ */
+
+public class GroupMemberPresenter extends BasePresenter<GroupMemberContract.View> implements GroupMemberContract.Presenter{
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        Intent viewIntent = getView().getViewIntent();
+        ArrayList<GroupMemberEntity> memberList = (ArrayList<GroupMemberEntity>)viewIntent.getSerializableExtra(RouteExtra.GroupMemberList);
+        
+        GroupMemberEntity owner = null;
+        ArrayList<GroupMemberEntity> managers = new ArrayList<>();
+        ArrayList<GroupMemberEntity> members = new ArrayList<>();
+        for(GroupMemberEntity member : memberList){
+            if(member.getRole() == 3){
+                owner = member;
+            } else if(member.getRole() == 2){
+                managers.add(member);
+            } else {
+                members.add(member);
+            }
+        }
+        memberList = new ArrayList<>();
+        GroupMemberEntity ownerTitle = new GroupMemberEntity();
+        ownerTitle.setRole(4);
+        ownerTitle.setNickname("群主/管理员("+(1+managers.size())+")");
+        GroupMemberEntity memberTitle = new GroupMemberEntity();
+        memberTitle.setRole(4);
+        memberTitle.setNickname("成员("+(members.size())+")");
+        
+        if(owner != null){
+            memberList.add(ownerTitle);
+            memberList.add(owner);
+            memberList.addAll(managers);
+            memberList.add(memberTitle);
+            memberList.addAll(members);
+        }
+        getView().updateMemberList(memberList);
+    }
+
+    @Override
+    public void onItemClick(GroupMemberEntity entity) {
+        ARouter.getInstance().build(RouteTable.BOOK_ADDRESS_FRIEND_DETAIL)
+                .withString(RouteExtra.ConversationId_String, String.valueOf(entity.getMember_id())).navigation();
+    }
+
+    @Override
+    public void onSearchClick() {
+        ARouter.getInstance().build(RouteTable.CONVERSATION_SEARCH_FRIEND)
+                .withBoolean(RouteExtra.IsSearchFriend_Boolean, true)
+                .withBoolean(RouteExtra.IsSearchLocal_Boolean, true)
+                .withString(RouteExtra.ReturnUrl, RouteTable.BOOK_ADDRESS_FRIEND_DETAIL).navigation();
+    }
+}

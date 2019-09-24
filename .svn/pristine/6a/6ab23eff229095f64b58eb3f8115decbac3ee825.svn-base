@@ -1,0 +1,285 @@
+package com.bochat.app.app.activity;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.common.contract.conversation.GroupManageJoinFilterContract;
+import com.bochat.app.common.router.RouterGroupManageJoinFilter;
+import com.bochat.app.model.util.LogUtil;
+import com.bochat.app.mvp.view.BaseActivity;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/25 17:44
+ * Description :
+ */
+@Route(path = RouterGroupManageJoinFilter.PATH)
+public class GroupManageJoinFilterActivity extends BaseActivity<GroupManageJoinFilterContract.Presenter> implements GroupManageJoinFilterContract.View{
+    private int selectPosition = -1;//用于记录用户选择的变量
+    private String selectBrand;
+    private int[] joinTypeInItem = {R.id.join_type_1,R.id.join_type_2,R.id.join_type_3};
+    private int[] imageResource = {R.mipmap.administrators_choice,R.mipmap.administrators_choice_sel};
+    public static int jionType;
+    public static String questionText1;
+    public static String questionText2;
+    public static String answerText;
+    public static  EditText question1;
+    public static EditText question2 ;
+    public static EditText answer;
+
+    @Inject
+    GroupManageJoinFilterContract.Presenter presenter;
+
+    @BindView(R.id.cv_group_manage_join_type_list)
+    ListView listView;
+    @BindView(R.id.commit_join_type)
+    Button commitType;
+    
+    private GroupManageJoinFilterAdapter adapter;
+    
+    private ArrayList<String> list = new ArrayList<>();
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected GroupManageJoinFilterContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_cv_group_manage_join_filter);
+    }
+
+
+    @Override
+    protected void initWidget() {
+
+        commitType.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                LogUtil.LogDebug("ggyy","finish"+jionType+" "+ questionText1+" "+questionText2+" "+answerText);
+                    questionText1 = question1.getText()+"";
+                    questionText2 = question2.getText()+"";
+                    answerText = answer.getText()+"";
+
+                    if (jionType == 4){
+                        presenter.setJoinType(4,questionText2,answerText);
+                    }else if (jionType == 5) {
+                        presenter.setJoinType(5,"-","-");
+                    } else if (jionType == 6){
+                        presenter.setJoinType(6,questionText1,"-");
+                    }else if (jionType == 0){
+                        presenter.setJoinType(1,"","");
+                    }else {
+                        presenter.setJoinType(jionType,"","");
+                    }
+
+
+
+
+            }
+        });
+
+
+
+        list.add("允许任何人加入群聊");
+        list.add("需要验证加入群聊");
+        list.add("只允许群成员邀请入群");
+        list.add("不允许任何人加入群聊");
+
+        adapter = new GroupManageJoinFilterAdapter(list,this);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                adapter.setIsCheckMap(position);
+                RelativeLayout relativeLayout0 = (RelativeLayout)view.findViewById(joinTypeInItem[0]);
+                RelativeLayout relativeLayout1 = (RelativeLayout)view.findViewById(joinTypeInItem[1]);
+                RelativeLayout relativeLayout2 = (RelativeLayout)view.findViewById(joinTypeInItem[2]);
+
+                final ImageView check0 = (ImageView)view.findViewById(R.id.check_1);
+                final ImageView check1 = (ImageView)view.findViewById(R.id.check_2);
+                final ImageView check2 = (ImageView)view.findViewById(R.id.check_3);
+
+                question1 = (EditText)view.findViewById(R.id.edit_question_1);
+                question2 = (EditText)view.findViewById(R.id.edit_question_2);
+                answer = (EditText)view.findViewById(R.id.answer_edit);
+
+
+
+                selectPosition = position;
+                adapter.notifyDataSetChanged();
+                selectBrand = list.get(position);
+                LinearLayout itemLayout =(LinearLayout) view.findViewById(R.id.layout_item_join);
+                if (position == 1){
+                    itemLayout.setVisibility(View.VISIBLE);
+                    check0.setImageResource(imageResource[1]);
+                    check1.setImageResource(imageResource[0]);
+                    check2.setImageResource(imageResource[0]);
+                }else {
+                    itemLayout.setVisibility(View.GONE);
+                    //todo 设置进群方式
+                   jionType = position;
+
+                }
+
+
+
+                relativeLayout0.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        jionType = 5;
+                        check0.setImageResource(imageResource[1]);
+                        check1.setImageResource(imageResource[0]);
+                        check2.setImageResource(imageResource[0]);
+
+
+
+                    }
+                });
+                relativeLayout1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //回答问题
+                        jionType =6;
+                        check1.setImageResource(imageResource[1]);
+                        check0.setImageResource(imageResource[0]);
+                        check2.setImageResource(imageResource[0]);
+
+                    }
+                });
+                relativeLayout2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //回答问题并校认
+                        jionType = 4;
+                        check2.setImageResource(imageResource[1]);
+                        check0.setImageResource(imageResource[0]);
+                        check1.setImageResource(imageResource[0]);
+
+                    }
+                });
+
+
+
+            }
+        });
+    }
+
+    @Override
+    public void updateJoinType(int type) {
+
+    }
+
+
+    class GroupManageJoinFilterAdapter extends BaseAdapter {
+        List<String> mDate;
+        Context mContext;
+        private Map<Integer,Boolean> isCheckMap = new HashMap<>();
+        private ImageView isCheckImage;
+
+        LayoutInflater mInflater;
+
+        public GroupManageJoinFilterAdapter(List<String> mDate, Context mContext) {
+            this.mDate = mDate;
+            this.mContext = mContext;
+            for (int i = 0;i<mDate.size();i++){
+                isCheckMap.put(i,false);
+            }
+            mInflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        }
+
+
+        @Override
+        public int getCount() {
+            return mDate.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mDate.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            ViewHolder viewHolder = null;
+            if(convertView == null){
+                convertView = mInflater.inflate(R.layout.item_group_manage_join_type,parent,false);
+                viewHolder = new ViewHolder();
+                viewHolder.strType = (TextView)convertView.findViewById(R.id.group_join_type_title);
+                viewHolder.checkImag = (ImageView)convertView.findViewById(R.id.group_join_type_icon);
+                viewHolder.itemLinearLayout = (LinearLayout)convertView.findViewById(R.id.layout_item_join);
+                convertView.setTag(viewHolder);
+            }else{
+                viewHolder = (ViewHolder)convertView.getTag();
+            }
+            viewHolder.strType.setText(mDate.get(position));
+            if(selectPosition == position){
+//            viewHolder.checkImag.setChecked(true);
+                viewHolder.checkImag.setVisibility(View.VISIBLE);
+
+            }
+            else{
+                viewHolder.checkImag.setVisibility(View.GONE);
+                viewHolder.itemLinearLayout.setVisibility(View.GONE);
+            }
+            return convertView;
+        }
+
+        public void setIsCheckMap(int positon){
+            isCheckImage.setVisibility(View.VISIBLE);
+            isCheckMap.put(positon,true);
+            notifyDataSetChanged();
+
+        }
+
+
+        /*public void add(List<String> )*/
+
+        public class ViewHolder{
+            TextView strType;
+            ImageView checkImag;
+            LinearLayout itemLinearLayout;
+        }
+
+    }
+}

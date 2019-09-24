@@ -1,0 +1,99 @@
+package com.bochat.app.app;
+
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/19 15:19
+ * Description :
+ */
+
+public class RouteExtra {
+
+    public static final String UserEntiry = "UserEntiry";
+
+    public static final String FriendEntity = "friendDetail";
+    
+    public static final String GroupEntity = "GroupEntity";
+    public static final String GroupName_String = "GroupName_String";
+    public static final String IsNeedUpdate = "IsNeedUpdate";
+    
+    public static final String ConversationId_String = "conversationId";
+    public static final String FriendId_String = "friendId";
+    public static final String GroupId_String = "groupId";
+    public static final String GroupRole_Int = "GroupRole_Int";
+    public static final String FriendGroupRole_Int = "FriendGroupRole_Int";
+    public static final String SearchedConversation = "searchedConversation";
+    
+    public static final String IsSearchLocal_Boolean = "IsSearchLocal_Boolean";
+    public static final String IsSearchFriend_Boolean = "IsSearchFriend";
+    public static final String IsSearchGroup_Boolean = "IsSearchGroup";
+    public static final String IsSearchGroupMember_Boolean = "IsSearchGroupMember_Boolean";
+    
+    public static final String ReturnUrl = "ReturnUrl";
+    
+    public static final String VerifyCode = "VerifyCode";
+    public static final String PhoneNum = "PhoneNum";
+    
+    public static final String ChangeTab_Int = "ChangeTab_Int";
+    public static final String mineExtra = "mineExtra";
+
+    public static final String WEB_LINK="link";
+    public static final String TARGET_ID="targetId";
+    public static final String WEB_TITLE="title";
+    public static final String ISGROUP="isgroup";
+    public static final String QRCodeResult = "QRCodeResult";
+    public static final String BName = "BName";
+    
+    public static final String BankCard = "BankCard";
+
+    public static final String ConversationDtail="ConversationDtailActivity";
+
+    public static final String ConversationIsGroup="ConversationIsGroup";
+    public static final String ConversationReceiveId="ConversationReceiveId";
+    public static final String SpeedConverOrRepacket="SpeedConverOrRepacket";
+    public static final String FROM_PAGE="from_page";
+    public static final String BIT_ID="bitId";
+    public static final String BIT_NAME="bitName";
+    public static final String ORDERID="orderId";
+    public static final String RED_TITLE_TEXT="redPacketTitle";
+    public static final String REDPACKET_TYPE="redPacketType";
+    public static final String REDPACKET_MONEY="redPacketMoney";
+
+    public static final String RedPacketPeopleEntity="RedPacketPeopleEntity";
+    public static final String DYNAMIC_NOTICE_ENTITY="dynamicNoticeEntity";
+    public static final String DYNAMIC_NOTICE_CONTENT="dynamicNoticeDetailContent";
+    public static final String REDPACKET_STATU_ENTITY="RedPacketStatuEntity";
+    public static final String REDPACKET_MESSAGE="RedPacketMessage";
+    public static final String UserEntity="UserEntity";
+    public static final String UserCurrencyDataEntity = "UserCurrencyDataEntity";
+    public static final String UserCurrencyEntity = "UserCurrencyEntity";
+    public static final String SpeedConverTradingEntity="SpeedConverTradingEntity";
+    public static final String SendSpeedEntity="SendSpeedEntity";
+    public static final String SpeedConverListItemEntity = "SpeedConverListItemEntity";
+    public static final String SpeedConverOrderItem = "SpeedConverOrderItem";
+    public static final String OrderType = "OrderType";
+    public static final String GET_REDPACKET="get_redpacket";
+    
+    public static final String TradingRecordItemEntity = "TradingRecordItemEntity";
+    public static final String AmountEntity = "AmountEntity";
+
+    public static final String ProjectIdentificationEntity="ProjectIdentificationEntity";
+    public static final String SpeedConverMessage="SpeedConverMessage";
+    public static final String ProtocolBookEntity="ProtocolBookEntity";
+
+    public static final String IsShareUrl="IsShareUrl";
+
+    public static final String Logo_path="logoPath";
+    public static final String Lisence_path="lisencePath";
+    public static final String RedPacketRecordListEntity="RedPacketRecordListEntity";
+    
+    public static final String TokenEntityList = "TokenEntityList";
+    public static final String TokenEntity = "TokenEntity";
+    public static final String IsStartTokenEntity = "IsStartTokenEntity";
+    public static final String IsContainsBXTokenEntity = "IsContainsBXTokenEntity";
+
+    public static final String InstallRongRefresh="installRongRefresh";
+    
+    public static final String BillDefaultBName = "BillDefaultBName";
+    
+}

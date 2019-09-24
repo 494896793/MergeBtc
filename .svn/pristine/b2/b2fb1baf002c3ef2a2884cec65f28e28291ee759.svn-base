@@ -1,0 +1,14 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 13:45
+ * Description :
+ */
+
+public class EntrustBuyListEntity extends EntrustSellListEntity {
+    @Override
+    public MarketCenterType getType() {
+        return MarketCenterType.ENTRUST_BUY;
+    }
+}

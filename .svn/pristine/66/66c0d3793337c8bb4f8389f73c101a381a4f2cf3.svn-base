@@ -1,0 +1,84 @@
+package com.bochat.app.app.adapter;
+
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+import com.bochat.app.model.modelImpl.MarketCenter.EntrustEntity;
+import com.bochat.app.model.modelImpl.MarketCenter.EntrustListEntity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MarketQuotationBSAdapter extends RecyclerView.Adapter<MarketQuotationBSAdapter.MarketQuotationBSViewHolder> {
+
+    private Context mContext;
+    private boolean isSell;
+    private List<EntrustEntity> mData = new ArrayList<>();
+
+    public MarketQuotationBSAdapter(Context context, boolean sell) {
+        mContext = context;
+        isSell = sell;
+    }
+
+    @NonNull
+    @Override
+    public MarketQuotationBSViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(mContext).inflate(R.layout.fragment_bs_socket_push_entrust_item, parent, false);
+        return new MarketQuotationBSViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull MarketQuotationBSViewHolder holder, int position) {
+
+        Resources res = mContext.getResources();
+        EntrustEntity entrustEntity = mData.get(position);
+        holder.mSortId.setText(String.valueOf(position + 1));
+        holder.mPrice.setTextColor(isSell ? res.getColor(R.color.quotation_green) : res.getColor(R.color.quotation_red_s));
+
+        if (entrustEntity != null) {
+            holder.mPrice.setText(String.format("", entrustEntity.getPrice()));
+            holder.mCount.setText(String.format("", entrustEntity.getNum()));
+        }
+    }
+
+    public void isSell(boolean sell) {
+        isSell = sell;
+    }
+
+    public void notifyData(List<EntrustEntity> data) {
+        mData.clear();
+        mData.addAll(data);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemCount() {
+        return mData != null ? mData.size() : 0;
+    }
+
+    class MarketQuotationBSViewHolder extends RecyclerView.ViewHolder {
+
+        TextView mSortId;
+
+        TextView mPrice;
+
+        TextView mCount;
+
+        public MarketQuotationBSViewHolder(View itemView) {
+            super(itemView);
+
+            mSortId = itemView.findViewById(R.id.sort_id);
+            mPrice = itemView.findViewById(R.id.price);
+            mCount = itemView.findViewById(R.id.count);
+        }
+    }
+
+}

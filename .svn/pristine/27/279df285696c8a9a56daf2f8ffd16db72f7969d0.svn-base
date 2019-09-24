@@ -1,0 +1,22 @@
+package com.bochat.app.common.contract;
+
+import com.bochat.app.mvp.presenter.IBasePresenter;
+import com.bochat.app.mvp.presenter.IUpgradePresenter;
+import com.bochat.app.mvp.view.IBaseView;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/10 11:42
+ * Description :
+ */
+
+public interface SplashScreenContract {
+    interface View extends IBaseView<Presenter> {
+    }
+
+    interface Presenter extends IBasePresenter<View> {
+        public void onScreenClick();
+
+        public void onSkipButtonClick();
+    }
+}

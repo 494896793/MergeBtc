@@ -1,0 +1,113 @@
+package com.bochat.app.model.bean;
+
+import com.alibaba.fastjson.annotation.JSONField;
+
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Id;
+
+import java.io.Serializable;
+import org.greenrobot.greendao.annotation.Generated;
+
+/**
+ * create by guoying ${Date} and ${Month}
+ */
+@Entity(
+        nameInDb = "table_teams"
+)
+public class TeamEntity extends CodeEntity implements Serializable {
+    @Id
+    @JSONField(name = "id")
+    private long id;
+
+    private String account;
+
+    private String nickname;
+    private int isInit;
+    private String head_img;
+    private String signature;
+    private int sex;
+    private int age;
+
+
+
+    @Generated(hash = 946305641)
+    public TeamEntity(long id, String account, String nickname, int isInit,
+            String head_img, String signature, int sex, int age) {
+        this.id = id;
+        this.account = account;
+        this.nickname = nickname;
+        this.isInit = isInit;
+        this.head_img = head_img;
+        this.signature = signature;
+        this.sex = sex;
+        this.age = age;
+    }
+
+    @Generated(hash = 513320542)
+    public TeamEntity() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public int getIsInit() {
+        return isInit;
+    }
+
+    public void setIsInit(int isInit) {
+        this.isInit = isInit;
+    }
+
+    public String getHead_img() {
+        return head_img;
+    }
+
+    public void setHead_img(String head_img) {
+        this.head_img = head_img;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    public int getSex() {
+        return sex;
+    }
+
+    public void setSex(int sex) {
+        this.sex = sex;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}

@@ -1,0 +1,56 @@
+package com.bochat.app.app.activity;
+
+import android.os.Bundle;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.common.contract.conversation.GroupManageForbiddenContract;
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/25 17:44
+ * Description :
+ */
+@Route(path = RouteTable.CONVERSATION_GROUP_MANAGE_FORBIDDEN)
+public class GroupManageForbiddenActivity extends BaseActivity<GroupManageForbiddenContract.Presenter> implements GroupManageForbiddenContract.View{
+
+    @Inject
+    GroupManageForbiddenContract.Presenter presenter;
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected GroupManageForbiddenContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_cv_group_manage_forbidden);
+    }
+
+    @Override
+    protected void initWidget() {
+
+    }
+
+    @Override
+    public void changeGlobalForbidden(boolean isGlobalForbidden) {
+        
+    }
+
+    @Override
+    public void onUpdateList(List<FriendEntity> forbiddenList) {
+        
+    }
+}

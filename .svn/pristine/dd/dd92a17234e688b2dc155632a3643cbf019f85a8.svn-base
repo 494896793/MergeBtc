@@ -1,0 +1,84 @@
+package com.bochat.app.business.main.dynamic;
+
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.common.contract.dynamic.MarketQuotationOptionalContract;
+import com.bochat.app.common.model.IDynamicModel;
+import com.bochat.app.model.bean.MarketInfoListEntity;
+import com.bochat.app.model.constant.Constan;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+public class MarketQuotationOptionalPresenter extends BasePresenter<MarketQuotationOptionalContract.View> implements MarketQuotationOptionalContract.Presenter {
+
+    @Inject
+    IDynamicModel model;
+
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void getMarketInfo(final String type, final String terms) {
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<MarketInfoListEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<MarketInfoListEntity> emitter) throws Exception {
+                try {
+
+                    MarketInfoListEntity entity = model.getMarketInfo(type, terms);
+                    if (entity != null && entity.getCode() == Constan.NET_SUCCESS) {
+
+                        emitter.onNext(entity);
+
+                    } else {
+
+                        emitter.onError(new RxErrorThrowable(entity));
+
+                    }
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<MarketInfoListEntity>() {
+            @Override
+            public void accept(MarketInfoListEntity entity) throws Exception {
+                if (isActive()) {
+                    getView().obtainMarketInfo(entity);
+                    getView().hideLoading("");
+
+                }
+            }
+        }, new RxErrorConsumer<Throwable>(this) {
+
+            @Override
+            public void acceptError(Throwable throwable) {
+
+                if (isActive()) {
+                    getView().hideLoading("");
+                    getView().showTips(throwable.getMessage());
+                }
+
+            }
+
+            @Override
+            public String getDefaultErrorTips() {
+                return "";
+            }
+        });
+
+        getView().showLoading(subscribe);
+    }
+
+}

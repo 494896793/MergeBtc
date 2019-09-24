@@ -1,0 +1,221 @@
+package com.bochat.app.app.fragment.dynamic;
+
+import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.DynamicAdapter;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.dynamic.DynamicContract;
+import com.bochat.app.common.router.Router;
+import com.bochat.app.common.router.RouterDynamicNoticeFlash;
+import com.bochat.app.common.router.RouterDynamicProjectIdentification;
+import com.bochat.app.common.router.RouterDynamicProjectIdentificationResult;
+import com.bochat.app.common.router.RouterDynamicShakyCenter;
+import com.bochat.app.common.router.RouterDynamicViewSpot;
+import com.bochat.app.common.router.RouterDynamicWebView;
+import com.bochat.app.common.router.RouterDynamitAppList;
+import com.bochat.app.common.router.RouterFastSpeed;
+import com.bochat.app.common.router.RouterMarketQuotation;
+import com.bochat.app.common.router.RouterQuickExchangeHall;
+import com.bochat.app.common.router.RouterRedHall;
+import com.bochat.app.model.bean.BitMallEntity;
+import com.bochat.app.model.bean.DynamicAdapterEntity;
+import com.bochat.app.model.bean.DynamicBannerEntity;
+import com.bochat.app.model.bean.DynamicTopShopEntity;
+import com.bochat.app.model.bean.GameGoEntity;
+import com.bochat.app.model.bean.ProjectIdentificationEntity;
+import com.bochat.app.model.bean.UserEntity;
+import com.bochat.app.model.bean.ViewPagerItemJumpEntity;
+import com.bochat.app.mvp.view.BaseFragment;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+/**
+ * 2019/5/7
+ * Author LDL
+ **/
+public class DynamicFragment extends BaseFragment<DynamicContract.Presenter> implements DynamicContract.View , DynamicAdapter.OnViewpagerItemClick, DynamicAdapter.OnGridViewItemClick
+        , DynamicAdapter.OnAppTitleClickListenner, DynamicAdapter.OnNoticeClick,DynamicAdapter.OnRedHallItemClick {
+
+    boolean isOpen = true;
+    @Inject
+    DynamicContract.Presenter presenter;
+
+    @BindView(R.id.bochat_topbar)
+    BoChatTopBar bochat_topbar;
+
+    @BindView(R.id.recyclerview)
+    RecyclerView recyclerview;
+
+    DynamicAdapter adapter;
+
+    ProjectIdentificationEntity projectIdentificationEntity;
+
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected DynamicContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    private GameGoEntity gameGoEntity;
+
+    private BitMallEntity bitMallEntity;
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view=inflater.inflate(R.layout.fragment_dynamic,null);
+        return view;
+    }
+
+    @Override
+    protected void initWidget() {
+        bochat_topbar.setTitleText("动态");
+        bochat_topbar.setRightButtonInvisble(true);
+
+        adapter=new DynamicAdapter(new ArrayList<DynamicAdapterEntity>(),getActivity());
+        adapter.setOnGridViewItemClick(this);
+        adapter.setOnViewpagerItemClick(this);
+        adapter.setOnNoticeClick(this);
+        adapter.setOnRedHallItemClick(this);
+        adapter.setOnAppTitleClickListenner(this);
+        recyclerview.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false));
+        recyclerview.setAdapter(adapter);
+    }
+
+    @Override
+    public void refreshData(List<DynamicAdapterEntity> entity) {
+        if(entity!=null){
+            adapter.refreshData(entity);
+        }
+    }
+
+    @Override
+    public void getProjectStatuSuccess(ProjectIdentificationEntity entity) {
+        projectIdentificationEntity=entity;
+        presenter.loadData();
+    }
+
+    @Override
+    public void gameGoLogin(GameGoEntity entity) {
+        gameGoEntity = entity;
+    }
+
+    @Override
+    public void bitMallLogin(BitMallEntity entity) {
+        bitMallEntity = entity;
+    }
+
+    @Override
+    public void onItemClick(int position, DynamicBannerEntity entity, ViewPagerItemJumpEntity jumpEntity) {
+        if(jumpEntity.linkJump){
+            UserEntity latest = CachePool.getInstance().loginUser().getLatest();
+            Map<String,Object> share=null;
+            String shareUrl=null;
+            if(entity.getIsShare().equals("1")){
+                share=new HashMap<>();
+//                share.put("code",latest.getInviteCode());
+//                share.put("token",latest.getToken().substring(7));
+//                share.put("type",2);
+                shareUrl=entity.getLink();
+            }
+            Map<String,Object> splicing=new HashMap<>();
+            splicing.put("code",latest.getInviteCode());
+            splicing.put("token",latest.getToken().substring(7));
+            splicing.put("type",1);
+            if(!TextUtils.isEmpty(entity.getLink())){
+                Router.navigation(new RouterDynamicWebView(entity.getLink(), shareUrl,  entity.getTitle(),splicing,share));
+            }
+        }else{
+            if(jumpEntity.isJump){
+                Router.navigation(new RouterQuickExchangeHall());
+            }else{
+                Toast.makeText(getActivity(),"暂未开通",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    public void onItemClick(int position, DynamicTopShopEntity entity) {
+        if(entity.getName().equals(getString(R.string.exchange))){
+            Router.navigation(new RouterQuickExchangeHall());
+        }else if(entity.getName().equals(getString(R.string.view_look))){
+            Router.navigation(new RouterDynamicViewSpot());
+        }else if(entity.getName().equals(getString(R.string.fast_exchange))){
+            Router.navigation(new RouterFastSpeed());
+        }else if(entity.getName().equals(getString(R.string.app_store))){
+            Router.navigation(new RouterDynamitAppList());
+        }else if(entity.getName().equals(getString(R.string.project_apply))){
+            if(projectIdentificationEntity!=null&&projectIdentificationEntity.getCompanyName()!=null){
+                Router.navigation(new RouterDynamicProjectIdentificationResult(projectIdentificationEntity));
+            }else{
+                Router.navigation(new RouterDynamicProjectIdentification());
+            }
+        }else if(entity.getName().equals(getString(R.string.game_hall))){
+            if(gameGoEntity!=null){
+                Router.navigation(new RouterDynamicWebView(gameGoEntity.getGameUrl(), entity.getName(),null,null));
+            }
+        }else if(entity.getName().equals(getString(R.string.otc_transcation))) {
+            if(bitMallEntity != null){
+                UserEntity latest = CachePool.getInstance().loginUser().getLatest();
+                String token = latest.getToken();
+                token = token.substring(7);
+
+                String bitmall = bitMallEntity.getBitmallUrl();
+//                String bitmall = "http://47.244.178.71/bitmall/index.html";
+
+                Router.navigation(new RouterDynamicWebView(bitmall
+                        + "?token=" + token, entity.getName()));
+            }
+        }else if(entity.getName().equals(getString(R.string.dynamic_quotation))){
+            if (isOpen && entity.getName().equals(getString(R.string.dynamic_quotation)))
+//                Router.navigation(new RouterPrivilege());
+                Router.navigation(new RouterMarketQuotation());
+        }else if(entity.getName().equals(getString(R.string.dynamic_activity))){
+            Router.navigation(new RouterDynamicShakyCenter());
+        }else if(entity.getName().equals(getString(R.string.icon_zilong))){
+            Router.navigation(new RouterDynamicWebView(entity.getLink(),  entity.getName()));
+        }else if(entity.getName().equals(getString(R.string.real_register))){
+            Router.navigation(new RouterDynamicWebView(entity.getLink(),  entity.getName()));
+        }
+    }
+
+    @Override
+    public void onTitleClick() {
+        Router.navigation(new RouterDynamitAppList());
+    }
+
+    @Override
+    public void onNoticeClick() {
+        Router.navigation(new RouterDynamicNoticeFlash(1));
+    }
+
+    @Override
+    public void onNewFlashClick() {
+        Router.navigation(new RouterDynamicNoticeFlash(0));
+    }
+
+    @Override
+    public void onItemClick() {
+        Router.navigation(new RouterRedHall());
+    }
+}
+

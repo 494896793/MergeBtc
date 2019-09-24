@@ -1,0 +1,17 @@
+package com.bochat.app.common.router;
+
+/**
+ * create by guoying ${Date} and ${Month}
+ */
+public class RouterDynamicNoticeFlash extends AbstractRouter {
+    public static final String PATH ="/path/RouterDynamicNoticeFlash";
+
+    public RouterDynamicNoticeFlash() {
+
+    }
+
+    @Override
+    public String getPath() {
+        return PATH;
+    }
+}

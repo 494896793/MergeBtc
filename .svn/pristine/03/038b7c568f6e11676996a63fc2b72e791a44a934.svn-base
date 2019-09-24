@@ -1,0 +1,44 @@
+package com.bochat.app.model.bean;
+
+import java.io.Serializable;
+
+/**
+ * 2019/7/18
+ * Author LDL
+ **/
+public class RechargeTypeEntity extends CodeEntity implements Serializable {
+
+    private String expire_date;
+    private String price;
+    private int id;
+
+    public RechargeTypeEntity(String expire_date,String price,int id){
+        this.id=id;
+        this.price=price;
+        this.expire_date=expire_date;
+    }
+
+    public String getExpire_date() {
+        return expire_date;
+    }
+
+    public void setExpire_date(String expire_date) {
+        this.expire_date = expire_date;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+}

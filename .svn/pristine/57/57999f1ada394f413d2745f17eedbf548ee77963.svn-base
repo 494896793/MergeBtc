@@ -1,0 +1,152 @@
+package com.bochat.app.app.activity.mine;
+
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.common.contract.mine.BillDetailContract;
+import com.bochat.app.model.bean.CandyDetailDataEntity;
+import com.bochat.app.model.bean.CandyDetailEntity;
+import com.bochat.app.model.bean.ChangeDetailDataEntity;
+import com.bochat.app.model.bean.ChangeDetailEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.zhy.adapter.abslistview.CommonAdapter;
+import com.zhy.adapter.abslistview.ViewHolder;
+
+import java.util.ArrayList;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/24 17:24
+ * Description :
+ */
+
+@Route(path = RouteTable.MINE_BILL_DETAIL)
+public class BillDetailActivity extends BaseActivity<BillDetailContract.Presenter> implements BillDetailContract.View{
+
+    @Inject
+    BillDetailContract.Presenter presenter;
+    
+    @BindView(R.id.mine_bill_detail_type)
+    TextView type;
+    @BindView(R.id.mine_bill_detail_count)
+    TextView count; //要有 + - 号
+    @BindView(R.id.mine_bill_detail_list)
+    ListView listView;
+    
+    private ArrayList<BillPair> list = new ArrayList<>();
+
+
+    private static final String[] TOKEN_TYPE = {
+            "",             //0
+            "接收",         //1
+            "转出",         //2
+            "发红包",      //3
+            "抢红包",      //4
+            "闪兑兑换",      //5
+            "闪兑发送",      //6
+            "红包退还",             //7
+            "划转转出",             //8
+            "划转接收",      //9
+            "注册赠送",      //10
+            "邀请好友赠送",   //11
+            "推荐人闪兑收益", //12
+            "升级群",        //13
+            "游戏充值"       //14 
+    };
+    
+    private static final String[] CHANGE_TYPE = {
+            "",             //0
+            "充值",         //1
+            "提现",         //2
+            "购买商品",      //3
+            "抢红包",      //4
+            "红包退还",      //5
+            "发红包",      //6
+    };
+    
+    private static final String[] STATUS = {
+            "",             //0
+            "未完成",         //1
+            "已完成",         //2
+            "已撤销",      //3
+    };
+
+    CommonAdapter<BillPair> adapter;
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected BillDetailContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_mine_bill_detail);
+    }
+
+    @Override
+    protected void initWidget() {
+        adapter = new CommonAdapter<BillPair>(this, R.layout.item_bill_detail, list) {
+            @Override
+            protected void convert(ViewHolder viewHolder, BillPair item, int position) {
+                viewHolder.setText(R.id.mine_bill_detail_title, item.type);
+                viewHolder.setText(R.id.mine_bill_detail_content, item.content);
+            }
+        };
+        listView.setAdapter(adapter);
+    }
+    
+    @Override
+    public void updateChange(ChangeDetailDataEntity changeDetailDataEntity) {
+        list.clear();
+        ChangeDetailEntity data = changeDetailDataEntity.getData();
+
+        
+        count.setText((data.getOrder_type() == 1 ? "+" : "-") + String.format("%.2f", data.getOrder_money()));
+        list.add(new BillPair("类型", CHANGE_TYPE[data.getType_depict()]));
+        list.add(new BillPair("状态", STATUS[data.getTrade_status()]));
+        list.add(new BillPair("时间", data.getTime()));
+        list.add(new BillPair("手续费", String.format("%.2f", data.getCost())));
+        list.add(new BillPair("交易单号", data.getId()));
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void updateCandy(CandyDetailDataEntity candyDetailDataEntity) {
+        list.clear();
+        CandyDetailEntity data = candyDetailDataEntity.getData();
+        count.setText((data.getOrder_type() == 1 ? "+" : "-") + String.format("%.6f", data.getOrder_money()) + " " + data.getbName());
+        list.add(new BillPair("类型", TOKEN_TYPE[data.getType_depict()]));
+        list.add(new BillPair("状态", STATUS[data.getTrade_status()]));
+        list.add(new BillPair("时间", data.getTime()));
+        list.add(new BillPair("交易单号", data.getId()));
+        list.add(new BillPair("服务费", String.format("%.6f", data.getCost()) + " " + data.getbName()));
+        if(!TextUtils.isEmpty(data.getTrade_address())){
+            list.add(new BillPair("钱包地址", data.getTrade_address()));
+        }
+        adapter.notifyDataSetChanged();
+    }
+    
+    private class BillPair{
+        String type;
+        String content;
+
+        public BillPair(String type, String content) {
+            this.type = type;
+            this.content = content;
+        }
+    }
+}

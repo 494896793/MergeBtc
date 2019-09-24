@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@id/rc_layout"
+    android:layout_width="@dimen/dp_210"
+    android:layout_height="@dimen/dp_88"
+    android:layout_centerHorizontal="true"
+    android:layout_centerInParent="true"
+    android:layout_gravity="center"
+    android:layout_marginBottom="5dp"
+    android:gravity="center_horizontal" >
+
+    <RelativeLayout
+        android:id="@id/rc_img"
+        android:layout_width="@dimen/dp_210"
+        android:layout_height="@dimen/dp_88"
+        android:background="#fa9d3b"
+        android:scaleType="fitXY" >
+
+        <RelativeLayout
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_above="@id/rc_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true" >
+            <ImageView
+                android:src="@mipmap/communicate_redpacket_icon"
+                android:id="@+id/speed_conver_icon"
+                android:layout_marginLeft="@dimen/dp_10"
+                android:layout_marginTop="@dimen/dp_10"
+                android:layout_width="@dimen/dp_37"
+                android:layout_height="@dimen/dp_45" />
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="@dimen/dp_120"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_55"
+                android:text="送利是，猪佩奇"
+                android:layout_marginTop="@dimen/dp_20"
+                android:maxEms="10"
+                android:lines="1"
+                android:ellipsize="end"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@id/rc_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:background="#FFFFFF"
+            android:gravity="left|center"
+            android:paddingBottom="5dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="5dp"
+            android:text="个人糖果"
+            android:textColor="#999999"
+            android:textSize="11sp" />
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:layout_height="match_parent">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/mine_settings_two_line_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_titleText="登录密码"
+        app:top_background="#FFFFFF"
+        app:top_hasBackBtn="true"/>
+
+    <EditText
+        android:id="@+id/mine_settings_two_line_input_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:singleLine="true"
+        android:textColor="#BABABA"
+        android:inputType="numberPassword"
+        android:hint="请输入登录密码"
+        android:maxLength="6"
+        android:textSize="@dimen/dp_14"
+        android:layout_marginLeft="@dimen/dp_30"
+        android:layout_marginTop="@dimen/dp_43"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1"
+        android:background="#F7F7F7"
+        android:layout_marginLeft="@dimen/dp_30"
+        android:layout_marginRight="@dimen/dp_30"
+        android:layout_marginTop="@dimen/dp_11"
+        />
+
+    <EditText
+        android:id="@+id/mine_settings_two_line_input_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:singleLine="true"
+        android:textColor="#BABABA"
+        android:inputType="numberPassword"
+        android:hint="请确认登录密码"
+        android:maxLength="6"
+        android:textSize="@dimen/dp_14"
+        android:layout_marginLeft="@dimen/dp_30"
+        android:layout_marginTop="@dimen/dp_43"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1"
+        android:background="#F7F7F7"
+        android:layout_marginLeft="@dimen/dp_30"
+        android:layout_marginRight="@dimen/dp_30"
+        android:layout_marginTop="@dimen/dp_11"
+        />
+    <Button
+        android:id="@+id/mine_settings_two_line_enter_btn"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:background="@drawable/shape_button_5dp"
+        android:layout_gravity="center_horizontal"
+        android:textSize="@dimen/dp_16"
+        android:layout_marginTop="@dimen/dp_75"
+        android:layout_marginLeft="@dimen/dp_30"
+        android:layout_marginRight="@dimen/dp_30"
+        android:text="保存"
+        android:textColor="#FFFFFF"/>
+
+</LinearLayout>

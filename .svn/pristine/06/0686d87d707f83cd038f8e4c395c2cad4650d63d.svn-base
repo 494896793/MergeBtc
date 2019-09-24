@@ -1,0 +1,24 @@
+package com.bochat.app.model.util;
+
+/**
+ * Created by cookie on 2017/5/22 15:13.
+ *
+ * @author LDL
+ */
+//All request API
+public class QuotationApi {
+    
+    public static final String BASE_URL = "http://47.244.177.24:8787/";//开发
+
+//    public static final String WS_SERVER_URI = "ws://192.168.0.29:8787/websocket";
+    public static final String WS_SERVER_URI = "ws://47.244.177.24:8787/websocket";
+
+    /*获取交易区块*/
+    public static final String getPationInfo="app/marketInfo/getPationInfo";
+    /*委托查询*/
+    public static final String queryApplyList = "app/entrust/queryApplyList";
+    /*获取币种交易队信息*/
+    public static final String getMarketInfo = "/app/marketInfo/getMarketInfo";
+    /*获取问题和答案*/
+    public static final String  queryKLineRecord="/app/marketInfo/queryKLineRecord";
+}

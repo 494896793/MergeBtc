@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        app:top_backBtnBackground="@mipmap/ic_top_bar_back"
+        app:top_hasBackBtn="true"
+        android:id="@+id/bochat_topbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_titleText="红包大厅VIP"
+        app:top_titleColor="@color/color_222222"
+        app:top_hasExtBtn="false"
+        app:top_hasExt2Btn="false"
+        app:top_background="@color/transparent"
+        />
+
+    <ImageView
+        android:src="@mipmap/vip_success"
+        android:layout_marginTop="@dimen/dp_50"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="@dimen/dp_158"
+        android:layout_height="@dimen/dp_133" />
+    <TextView
+        android:layout_marginTop="@dimen/dp_14"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/color_222222"
+        android:text="红包VIP开通成功"
+        android:textSize="@dimen/dp_14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/pay_bt"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/dp_60"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/origin_bt"
+        android:elevation="@dimen/dp_2"
+        android:text="去抢红包"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dp_18"
+        android:layout_width="@dimen/dp_264"
+        android:layout_height="@dimen/dp_44" />
+
+    <TextView
+        android:id="@+id/time_text"
+        android:layout_marginTop="@dimen/dp_13"
+        android:layout_gravity="center_horizontal"
+        android:textColor="#FF8D03"
+        android:text="有效期：2019/7/12-2019/7/19"
+        android:textSize="@dimen/dp_14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFFFF">
+
+    <ImageView
+        android:id="@+id/top_image"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_140"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:src="@mipmap/news_banner" />
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/dynamic_flash_bochat_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_textColor="#FBFAFA"
+        app:top_titleText=""
+        app:top_hasExt2Btn="true"
+        app:top_extButton2Src="@mipmap/wallet_gold_share"
+        app:top_hasBackBtn="true"
+        app:top_backBtnBackground="@mipmap/ic_arrow_left_white">
+
+    </com.bochat.app.app.view.BoChatTopBar>
+
+    <LinearLayout
+        android:id="@+id/text_layout"
+        android:layout_below="@id/top_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/dp_20"
+        android:layout_marginRight="@dimen/dp_28"
+        android:orientation="vertical">
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_48"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="@dimen/dp_16"
+                android:layout_height="@dimen/dp_16"
+                android:src="@mipmap/favorable_icon_sel"/>
+
+            <TextView
+                android:id="@+id/detail_rise"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FF666666"
+                android:textSize="@dimen/dp_11"
+                android:text="利好 1000"
+                android:layout_marginLeft="@dimen/dp_6"/>
+
+            <ImageView
+                android:layout_marginLeft="@dimen/dp_165"
+                android:layout_width="@dimen/dp_16"
+                android:layout_height="@dimen/dp_16"
+                android:src="@mipmap/empty_icon_sel"/>
+
+            <TextView
+                android:id="@+id/detail_decline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FF666666"
+                android:textSize="@dimen/dp_11"
+                android:text="利空 100"
+                android:layout_marginLeft="@dimen/dp_6" />
+
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_1"
+            android:background="#FFEEEEEE"/>
+        <TextView
+            android:id="@+id/flash_detail_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textColor="#FF333333"
+            android:textSize="@dimen/dp_18"
+            android:text=" 明星项目ALGO正式上线大交易所！币 圈排位又要大变？ "
+            android:layout_marginTop="@dimen/dp_20"
+            />
+
+        <TextView
+            android:id="@+id/flash_detail_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:maxLines="10"
+            android:textSize="@dimen/dp_13"
+
+            android:textColor="#FF666666"
+            android:text="的"/>
+        <RelativeLayout
+            android:layout_marginTop="@dimen/dp_41"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FF333333"
+                android:text="官网：www.bochat.net"
+                android:textSize="@dimen/dp_11"
+
+                />
+            <TextView
+                android:id="@+id/flash_date"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/dp_11"
+                android:textColor="#FF666666"
+                android:text="06月26日 14:47"/>
+
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_1"
+            android:background="#FF0084FF"
+            android:layout_marginTop="@dimen/dp_20"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_25"
+            >
+            <TextView
+                android:id="@+id/text_load"
+                android:layout_width="@dimen/dp_101"
+                android:layout_height="wrap_content"
+                android:textColor="#FF666666"
+                android:textSize="@dimen/dp_11"
+                android:text="长按图片识别二维码下载APP"
+                android:maxLines="2"
+                />
+            <TextView
+                android:layout_marginTop="@dimen/dp_28"
+                android:layout_below="@id/text_load"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FF666666"
+                android:textSize="@dimen/dp_11"
+                android:text="世界因链而改变，社交又链才信任"
+                />
+
+            <ImageView
+                android:layout_width="@dimen/dp_70"
+                android:layout_height="@dimen/dp_70"
+                android:layout_alignParentRight="true"
+                android:src="@mipmap/qr_code"/>
+
+
+
+        </RelativeLayout>
+
+
+
+
+
+    </LinearLayout>
+
+
+
+
+</RelativeLayout>

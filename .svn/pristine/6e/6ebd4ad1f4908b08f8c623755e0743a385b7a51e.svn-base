@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#FFFFFF">
+
+    <ImageView
+        android:id="@+id/ic_bill_type_icon"
+        android:layout_width="@dimen/dp_30"
+        android:layout_height="@dimen/dp_30"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/dp_15"
+        android:layout_marginTop="@dimen/dp_17"
+        android:layout_marginBottom="@dimen/dp_17"
+        android:scaleType="fitXY"/>
+
+    <TextView
+        android:id="@+id/ic_bill_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp_20"
+        android:layout_marginTop="@dimen/dp_16"
+        android:layout_toRightOf="@id/ic_bill_type_icon"
+        android:includeFontPadding="false"
+        android:text="提现"
+        android:textColor="#222222"
+        android:textSize="@dimen/dp_14"
+        />
+
+    <TextView
+        android:id="@+id/bill_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ic_bill_type"
+        android:layout_marginLeft="@dimen/dp_20"
+        android:layout_marginTop="@dimen/dp_6"
+        android:layout_toRightOf="@id/ic_bill_type_icon"
+        android:includeFontPadding="false"
+        android:text="05/30 14:22:00"
+        android:textColor="#999999"
+        android:textSize="@dimen/dp_12"
+
+        />
+
+    <TextView
+        android:id="@+id/bill_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_marginRight="@dimen/dp_15"
+        android:fontFamily="serif"
+        android:text="-200.00"
+        android:textColor="#222222"
+        android:textSize="@dimen/dp_14"
+        android:textStyle="bold"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_1"
+        android:layout_below="@id/bill_date"
+        android:layout_marginLeft="@dimen/dp_64"
+        android:layout_marginTop="@dimen/dp_16"
+        android:background="#F7F7F7"
+        />
+
+</RelativeLayout>

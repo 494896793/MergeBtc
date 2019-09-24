@@ -1,0 +1,96 @@
+package com.bochat.app.business.main.mine;
+
+import android.text.TextUtils;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.common.contract.mine.EditPasswordContract;
+import com.bochat.app.common.model.ISettingModule;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+import com.bochat.app.mvp.view.ResultTipsType;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/05/16 07:03
+ * Description :
+ */
+
+public class EditPasswordPresenter extends BasePresenter<EditPasswordContract.View> implements EditPasswordContract.Presenter {
+
+    @Inject
+    ISettingModule settingModule;
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void enter(final String oldPwd, final String newPwd, String pwdConfirm) {
+        if(TextUtils.isEmpty(oldPwd) || TextUtils.isEmpty(newPwd) || TextUtils.isEmpty(pwdConfirm)){
+            getView().showTips(new ResultTipsType("密码不能为空", false));
+            return;
+        }
+        if(oldPwd.length() < 6 || newPwd.length() < 6 || pwdConfirm.length() < 6){
+            getView().showTips(new ResultTipsType("密码长度不能少于6位", false));
+            return;
+        }
+        if(oldPwd.equals(newPwd)){
+            getView().showTips(new ResultTipsType("新旧密码不能相同", false));
+            return;
+        }
+        if(!newPwd.equals(pwdConfirm)){
+            getView().showTips(new ResultTipsType("两次输入的密码不一致", false));
+            return;
+        }
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<CodeEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<CodeEntity> emitter) throws Exception {
+                try {
+                    CodeEntity entity = settingModule.updateLogin(oldPwd, newPwd);
+                    if(entity.getRetcode() != 0){
+                        emitter.onError(new RxErrorThrowable(entity));
+                    } else {
+                        emitter.onNext(entity);
+                    }
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<CodeEntity>() {
+            @Override
+            public void accept(CodeEntity entity) throws Exception {
+                getView().hideLoading("修改成功");
+                ARouter.getInstance().build(RouteTable.MINE_SETTINGS).navigation();
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("");
+            }
+        });
+        getView().showLoading(subscribe);
+    }
+
+    @Override
+    public void forgetPassword() {
+        ARouter.getInstance().build(RouteTable.MINE_SETTINGS_GET_CODE)
+                .withString(RouteExtra.ReturnUrl, RouteTable.MINE_SETTINGS_EDIT_PASSWORD).navigation();
+    }
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/conversation_long_click_list"
+    android:background="@drawable/card_view_shape"
+    android:layout_width="@dimen/dp_132"
+    android:layout_height="wrap_content"/>

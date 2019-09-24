@@ -1,0 +1,114 @@
+package com.bochat.app.common.provider;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+public abstract class BaseEntityProvider<R extends IEntityRequest, E> {
+
+    private LinkedList<IEntityFetcher<R, E>> entityHandlers = new LinkedList<>();
+
+    /**
+     * Author      : FJ
+     * CreateDate  : 2019/7/19 0019 下午 5:54
+     * Description : 推荐开发时继承这个默认数据获取器，可省去写isForceTrigger()等实现和泛型<R,E>的代码      
+     */
+    public class DefaultFetcher implements IEntityFetcher<R, E> {
+        
+        private boolean isForceTrigger;
+        
+        @Override
+        public boolean isForceTrigger() {
+            return isForceTrigger;
+        }
+
+        @Override
+        public void setForceTrigger(boolean isForceTrigger) {
+            this.isForceTrigger = isForceTrigger;
+        }
+
+        @Override
+        public List<E> getEntity(R request) {
+            return null;
+        }
+
+        @Override
+        public void setEntity(R request, List<E> entity) {
+        }
+    }
+
+    /**
+     * Author      : FJ
+     * CreateDate  : 2019/7/19 0019 下午 5:57
+     * Description : 设置支持的数据获取器，可设置多个，参数顺序即为调用顺序   
+     */
+    public void setEntityFetcher(IEntityFetcher<R, E>...entityHandler) {
+        entityHandlers.clear();
+        if(entityHandler != null && entityHandler.length > 0){
+            Collections.addAll(entityHandlers, entityHandler);
+        }
+    }
+    
+    /**
+     * Author      : FJ
+     * CreateDate  : 2019/7/19 0019 下午 5:52
+     * Description : 依次调用支持的数据获取器，   
+     */
+    public Disposable getEntity(final R request, final IEntityResponse<R, E> response){
+
+        return Observable.create(new ObservableOnSubscribe<List<E>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<E>> emitter) throws Exception {
+                if(entityHandlers == null || entityHandlers.isEmpty()) {
+                    emitter.onError(new BaseEntityThrowable( "EntityHandler not found"));
+                    return;
+                }
+                int index = 0;
+                int handleIndex = 0;
+                List<E> entity = null;
+                for(; index < entityHandlers.size(); index++){
+                    IEntityFetcher<R, E> handler = entityHandlers.get(index);
+                    if(entity != null && !handler.isForceTrigger()){
+                        continue;
+                    }
+                    entity = handler.getEntity(request);
+                    if(entity != null){
+                        handleIndex = index;
+                        emitter.onNext(entity);
+                    }
+                }
+                if (entity == null) {
+                    emitter.onError(new BaseEntityThrowable( "Entity is null"));
+                    return;
+                }
+                if(handleIndex-- > 0){
+                    for(int i = handleIndex; i >= 0; i--){
+                        entityHandlers.get(i).setEntity(request, entity);
+                    }
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<E>>() {
+            @Override
+            public void accept(List<E> entity) throws Exception {
+                response.onNext(entity, request);
+            }
+        }, new Consumer<Throwable>()  {
+            @Override
+            public void accept(Throwable throwable) throws Exception {
+                if(throwable instanceof BaseEntityThrowable){
+                    response.onError((BaseEntityThrowable)throwable);
+                } else {
+                    response.onError(new BaseEntityThrowable(throwable.getMessage()));
+                }
+            }
+        });
+    }
+}

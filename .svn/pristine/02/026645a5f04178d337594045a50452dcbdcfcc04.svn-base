@@ -1,0 +1,226 @@
+package com.bochat.app.app.fragment.addressbook;
+
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.AddressUserAdapter;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.book.AddressUserContract;
+import com.bochat.app.model.bean.FriendApplyEntity;
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.model.bean.UserEntity;
+import com.bochat.app.model.event.FriendApplyEvent;
+import com.bochat.app.model.event.PinYinEvent;
+import com.bochat.app.model.util.PinYinUtil;
+import com.bochat.app.mvp.view.BaseFragment;
+import com.liaoinstan.springview.container.DefaultFooter;
+import com.liaoinstan.springview.container.DefaultHeader;
+import com.liaoinstan.springview.widget.SpringView;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+/**
+ * 2019/4/19
+ * Author LDL
+ **/
+
+public class AddressUserDarkFragment extends BaseFragment<AddressUserContract.Presenter> implements AddressUserContract.View, SpringView.OnFreshListener {
+
+    @Inject
+    AddressUserContract.Presenter presenter;
+
+    @BindView(R.id.recycler)
+    RecyclerView recycler;
+
+    @BindView(R.id.springView)
+    SpringView springView;
+    
+    private AddressUserAdapter adapter;
+    Handler handler=new Handler();
+    private List<FriendEntity> list;
+    private String[] letter={"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+    private UserEntity user;
+    
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected AddressUserContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+        user = CachePool.getInstance().user().getLatest();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void onEventMainThread(PinYinEvent pinYinEvent){
+        if(list!=null&&list.size()>0){
+            for(int i=0;i<list.size();i++){
+                if(list.get(i).getFirstPinYin().substring(0,1).toUpperCase().equals(pinYinEvent.firstPinYin)){
+                    LinearLayoutManager llm = (LinearLayoutManager) recycler.getLayoutManager();
+                    llm.scrollToPositionWithOffset(i, 0);
+                    llm.setStackFromEnd(false);
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view=inflater.inflate(R.layout.fragment_address_user,container,false);
+        return view;
+    }
+
+    @Override
+    protected void initWidget() {
+        initSpringView();
+        initRecyclerView();
+        onRefresh();
+    }
+
+    private void initRecyclerView(){
+        adapter=new AddressUserAdapter(getActivity(),new ArrayList<FriendEntity>());
+        adapter.setOnItemClickListenner(new AddressUserAdapter.OnItemClickListenner() {
+            @Override
+            public void onItemClick(int position, FriendEntity friendEntity) {
+                presenter.onFriendItemClick(friendEntity);
+            }
+        });
+        recycler.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false));
+        recycler.setAdapter(adapter);
+    }
+    
+    private void initSpringView(){
+        springView.setListener(this);
+        springView.setHeader(new DefaultHeader(getContext()));
+        springView.setFooter(new DefaultFooter(getContext()));
+    }
+    
+    @Override
+    public void onViewRefresh(final List<FriendEntity> friendList) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                springView.onFinishFreshAndLoad();
+                List<FriendApplyEntity> list= CachePool.getInstance().friendApply().getAll();
+                if(friendList != null){
+                    if(list!=null){
+                        for(int i=0;i<list.size();i++){
+                            for(int j=0;j<friendList.size();j++){
+                                if(list.get(i).getProposer_id().equals(friendList.get(j).getId()+"")) {
+                                    list.get(i).setApply_state("2");
+                                    list.get(i).setIsRead("0");
+                                }
+                            }
+                        }
+                        for(int i = 0;i<list.size();i++){
+                            if(list.get(i).getProposer_id().equals(user.getId()+"")){
+                                list.remove(i);
+                            }
+                        }
+//                        DBManager.getInstance().saveOrUpdateFriendApplyList(list);
+                        CachePool.getInstance().friendApply().put(list);
+                        EventBus.getDefault().post(new FriendApplyEvent());
+                    }
+                    List<FriendEntity> friendEntities=formatFriendList(friendList);
+                    adapter.refreshData(friendEntities);
+                }
+            }
+        });
+    }
+    
+    private List<FriendEntity> formatFriendList(List<FriendEntity> list){
+        List<FriendEntity> temperaList = new ArrayList<>();
+        if(list!=null){
+            for(int i=0;i<list.size();i++){
+                if(list.get(i).getNickname()!=null){
+                    list.get(i).setFirstPinYin(PinYinUtil.getFirstSpell(list.get(i).getNickname()));
+                }
+            }
+            for(int i = 0; i < letter.length; i++){
+                boolean hasLetterDiv=false;
+                for(int j = 0; j < list.size(); j++){
+                    if(!TextUtils.isEmpty(list.get(j).getFirstPinYin())){
+                        if(list.get(j).getFirstPinYin().substring(0,1).toUpperCase().equals(letter[i])){
+                            if(!hasLetterDiv){
+                                FriendEntity friendEntity=new FriendEntity();
+                                friendEntity.setFirstPinYin(letter[i]);
+                                friendEntity.setType(0);
+                                temperaList.add(friendEntity);
+                                hasLetterDiv=true;
+                            }
+                            list.get(j).setType(1);
+                            temperaList.add(list.get(j));
+                        }
+                    }
+                }
+            }
+            FriendEntity friendEntity = new FriendEntity();
+            friendEntity.setFirstPinYin("#");
+            friendEntity.setType(0);
+            temperaList.add(friendEntity);
+
+            List<FriendEntity> otherList = new ArrayList<>();
+            for(FriendEntity entity : list){
+                if(!temperaList.contains(entity)){
+                    entity.setType(1);
+                    otherList.add(entity);
+                }
+            }
+            Collections.sort(otherList, new Comparator<Object>() {
+                @Override
+                public int compare(Object o1, Object o2) {
+                    String nick1 = ((FriendEntity)o1).getNickname();
+                    String nick2 = ((FriendEntity)o2).getNickname();
+                    int f1 = TextUtils.isEmpty(nick1) ? 0 : nick1.charAt(0);
+                    int f2 = TextUtils.isEmpty(nick2) ? 0 : nick2.charAt(0);
+                    return f1 == f2 ? 0 : f1 < f2 ? 1 : -1;
+                }
+            });
+            temperaList.addAll(otherList);
+        }
+        this.list = temperaList;
+        return this.list;
+    }
+    
+    @Override
+    public void onRefresh() {
+        presenter.requestFriendList();
+    }
+
+    @Override
+    public void onLoadmore() {
+        presenter.requestFriendList();
+    }
+}

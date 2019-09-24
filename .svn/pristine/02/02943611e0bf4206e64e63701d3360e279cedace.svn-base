@@ -1,0 +1,121 @@
+package com.bochat.app.business.main.dynamic;
+
+import com.bochat.app.R;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.common.contract.dynamic.DynamicContract;
+import com.bochat.app.common.model.IDynamicModel;
+import com.bochat.app.model.bean.DynamicAdapterBannerEntity;
+import com.bochat.app.model.bean.DynamicAdapterEntity;
+import com.bochat.app.model.bean.DynamicBannerListEntity;
+import com.bochat.app.model.bean.DynamicNoticeListEntity;
+import com.bochat.app.model.bean.DynamicTopShopListEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+
+/**
+ * 2019/5/7
+ * Author LDL
+ **/
+public class DynamicPresenter extends BasePresenter<DynamicContract.View> implements DynamicContract.Presenter {
+
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Inject
+    IDynamicModel model;
+
+    @Override
+    public void loadData(int type){
+        Observable.create(new ObservableOnSubscribe<List<DynamicAdapterEntity>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<DynamicAdapterEntity>> emitter) throws Exception {
+                try{
+                    DynamicBannerListEntity dynamicBannerListEntit=model.listBanner(4);
+                    DynamicTopShopListEntity dynamicTopShopListEntity=model.listApplicationHome("");
+                    DynamicNoticeListEntity dynamicNoticeListEntity=model.listAnnouncement(1,10,1);
+
+                    DynamicAdapterEntity entity=new DynamicAdapterEntity();
+                    DynamicAdapterEntity entity2=new DynamicAdapterEntity();
+                    DynamicAdapterEntity entity3=new DynamicAdapterEntity();
+                    DynamicAdapterEntity entity4=new DynamicAdapterEntity();
+
+                    entity.setDynamicBannerListEntity(dynamicBannerListEntit);
+                    entity.setDynamicNoticeListEntity(dynamicNoticeListEntity);
+                    entity.setType(0);
+
+                    List<DynamicAdapterBannerEntity> bannerEntityList=new ArrayList<>();
+                    DynamicAdapterBannerEntity bannerEntity=new DynamicAdapterBannerEntity();
+                    bannerEntity.setSourceId(R.mipmap.token_banner);
+                    bannerEntityList.add(bannerEntity);
+                    bannerEntity.setTitle("闪兑大厅");
+                    entity2.setTitle("闪兑大厅");
+                    entity2.setType(1);
+                    entity2.setBannerEntityList(bannerEntityList);
+
+                    entity3.setDynamicTopShopListEntity(dynamicTopShopListEntity);
+                    entity3.setType(2);
+                    entity3.setTitle("精选app");
+
+                    List<DynamicAdapterBannerEntity> moreBannerEntityList=new ArrayList<>();
+                    DynamicAdapterBannerEntity moreEntity=new DynamicAdapterBannerEntity();
+                    moreEntity.setSourceId(R.mipmap.more_banner);
+                    moreBannerEntityList.add(moreEntity);
+                    moreEntity.setTitle("更多精彩");
+                    entity4.setTitle("更多精彩");
+                    entity4.setType(1);
+                    entity4.setBannerEntityList(moreBannerEntityList);
+
+                    List<DynamicAdapterEntity> list=new ArrayList<>();
+                    list.add(entity);
+                    list.add(entity2);
+                    list.add(entity3);
+                    list.add(entity4);
+
+                    if(dynamicBannerListEntit==null){
+                        emitter.onError(new Throwable("获取Banner失败"));
+                        return;
+                    }
+                    if(dynamicTopShopListEntity==null){
+                        emitter.onError(new Throwable("获取应用商店失败"));
+                        return;
+                    }
+                    if(dynamicNoticeListEntity==null){
+                        emitter.onError(new Throwable("获取公告失败"));
+                        return;
+                    }
+                    emitter.onNext(list);
+                }catch (Exception e){
+                    emitter.onError(new Throwable("请求失败"));
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<DynamicAdapterEntity>>() {
+            @Override
+            public void accept(List<DynamicAdapterEntity> dynamicAdapterEntity) throws Exception {
+                if(isActive()){
+                    getView().refreshData(dynamicAdapterEntity);
+                }
+            }
+        }, new RxErrorConsumer<Throwable>(this) {
+            @Override
+            public void acceptError(Throwable throwable) {
+                getView().showTips(throwable.getMessage());
+            }
+        });
+    }
+
+}

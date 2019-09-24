@@ -1,0 +1,112 @@
+package com.bochat.app.app.activity;
+
+import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.AddressBookAdapter;
+import com.bochat.app.app.fragment.ListAppFragment;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.common.contract.dynamic.ListAppActivityContract;
+import com.bochat.app.model.bean.DynamicShopTypeListEntity;
+import com.bochat.app.model.util.TablayoutUtil;
+import com.bochat.app.mvp.view.BaseActivity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+import static com.bochat.app.app.RouteTable.DYNAMIC_LIST_APP;
+
+/**
+ * 2019/5/8
+ * Author LDL
+ **/
+@Route(path =DYNAMIC_LIST_APP)
+public class ListAppActivity extends BaseActivity<ListAppActivityContract.Presenter> implements ListAppActivityContract.View {
+
+    @Inject
+    ListAppActivityContract.Presenter presenter;
+
+    @BindView(R.id.list_app_topbar)
+    BoChatTopBar list_app_topbar;
+
+    @BindView(R.id.tableayout)
+    TabLayout tableayout;
+
+    @BindView(R.id.viewpager)
+    ViewPager viewpager;
+
+    private AddressBookAdapter adapter;
+    private String[] titles;
+    private List<Fragment> fragmentList=new ArrayList<>();
+    private int[] icons={R.mipmap.icon_game,R.mipmap.icon_news,R.mipmap.icon_market,R.mipmap.icon_money_packet};
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected ListAppActivityContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_listapp);
+    }
+
+    @Override
+    protected void initWidget() {
+        list_app_topbar.setTitleText("精选APP");
+        list_app_topbar.setReturnBtVisible(true);
+        list_app_topbar.setRightButtonInvisble(true);
+        presenter.getAppStoreType();
+    }
+
+    @Override
+    public void getType(DynamicShopTypeListEntity entity) {
+        titles=new String[entity.getData().size()];
+        for(int i=0;i<entity.getData().size();i++){
+            titles[i]=entity.getData().get(i).getDictLabel();
+            ListAppFragment fragment=new ListAppFragment();
+            Bundle bundle=new Bundle();
+            bundle.putSerializable("type",entity.getData().get(i));
+            fragment.setArguments(bundle);
+            fragmentList.add(fragment);
+        }
+        adapter=new AddressBookAdapter(getSupportFragmentManager(),fragmentList,titles);
+        viewpager.setAdapter(adapter);
+        tableayout.setupWithViewPager(viewpager,true);
+        tableayout.setTabsFromPagerAdapter(adapter);
+        tableayout.setTabTextColors(ContextCompat.getColor(this,R.color.color_181818), ContextCompat.getColor(this, R.color.base_bottom));
+        tableayout.setSelectedTabIndicatorColor(ContextCompat.getColor(this, R.color.base_bottom));
+        tableayout.post(new Runnable() {
+            @Override
+            public void run() {
+                TablayoutUtil.setIndicator(tableayout,10,10,0);
+            }
+        });
+
+        for(int i=0;i<tableayout.getTabCount();i++){
+            View view= LayoutInflater.from(this).inflate(R.layout.tablayout_tab_view,null);
+            TextView title_text=view.findViewById(R.id.title_text);
+            ImageView icon_img=view.findViewById(R.id.icon_img);
+            icon_img.setImageResource(icons[i]);
+            title_text.setText(titles[i]);
+            tableayout.getTabAt(i).setCustomView(view);
+        }
+    }
+}

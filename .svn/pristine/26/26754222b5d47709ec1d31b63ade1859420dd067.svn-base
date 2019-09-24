@@ -1,0 +1,70 @@
+package com.bochat.app.business.main.conversation;
+
+import android.net.Uri;
+
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.common.contract.conversation.GroupMentionedSeleteContract;
+import com.bochat.app.common.router.RouterGroupMentionedSelete;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.GroupForbiddenListEntity;
+import com.bochat.app.model.bean.GroupMemberEntity;
+import com.bochat.app.model.greendao.DBManager;
+import com.bochat.app.model.util.LogUtil;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import io.rong.imlib.model.UserInfo;
+
+/**
+ * create by guoying ${Date} and ${Month}
+ */
+public class GroupMentionedSeletePresenter extends BasePresenter<GroupMentionedSeleteContract.View> implements GroupMentionedSeleteContract.Presenter {
+    private List<UserInfo> userInfoList;
+    private String mGroupId;
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        RouterGroupMentionedSelete extra = getExtra(RouterGroupMentionedSelete.class);
+        if (extra != null) {
+            if (userInfoList != null){
+//                userInfoList.clear();
+            }
+
+            mGroupId = extra.getGroupId();
+            userInfoList = initGroupMember(mGroupId);
+            getView().onUpdateMentioneList(userInfoList,mGroupId);
+        }
+
+
+    }
+
+    private List<UserInfo> initGroupMember(String groupId){
+        List<UserInfo> userInfos=new ArrayList<>();
+        List<GroupMemberEntity> list=DBManager.getInstance().findGroupMembersByGroupId(Long.valueOf(groupId));
+        for(int i=0;i<list.size();i++){
+            if (list.get(i).getMember_id() != 0){
+                userInfos.add(new UserInfo(list.get(i).getMember_id()+"",list.get(i).getNickname(),Uri.parse(list.get(i).getHead_img())));
+            }
+        }
+        return userInfos;
+    }
+
+
+
+
+}

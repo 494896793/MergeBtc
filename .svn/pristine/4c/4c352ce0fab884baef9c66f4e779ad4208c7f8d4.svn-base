@@ -1,0 +1,113 @@
+package com.bochat.app.model.bean;
+
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Id;
+
+import java.io.Serializable;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/03 22:32
+ * Description :
+ */
+
+@Entity(
+        nameInDb = "table_group_server_apply"
+)
+public class GroupApplyServerEntity  extends CodeEntity implements Serializable {
+    
+    @Id
+    private long id;
+    private int applyFroUser;
+    private int groupId;
+    private String applyTime;
+    private String applyText;
+    private String refuseText;
+    private int applyState;
+
+    @Generated(hash = 1850846557)
+    public GroupApplyServerEntity(long id, int applyFroUser, int groupId,
+            String applyTime, String applyText, String refuseText, int applyState) {
+        this.id = id;
+        this.applyFroUser = applyFroUser;
+        this.groupId = groupId;
+        this.applyTime = applyTime;
+        this.applyText = applyText;
+        this.refuseText = refuseText;
+        this.applyState = applyState;
+    }
+
+    @Generated(hash = 218873944)
+    public GroupApplyServerEntity() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public int getApplyFroUser() {
+        return applyFroUser;
+    }
+
+    public void setApplyFroUser(int applyFroUser) {
+        this.applyFroUser = applyFroUser;
+    }
+
+    public int getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
+    }
+
+    public String getApplyTime() {
+        return applyTime;
+    }
+
+    public void setApplyTime(String applyTime) {
+        this.applyTime = applyTime;
+    }
+
+    public String getApplyText() {
+        return applyText;
+    }
+
+    public void setApplyText(String applyText) {
+        this.applyText = applyText;
+    }
+
+    public String getRefuseText() {
+        return refuseText;
+    }
+
+    public void setRefuseText(String refuseText) {
+        this.refuseText = refuseText;
+    }
+
+    public int getApplyState() {
+        return applyState;
+    }
+
+    public void setApplyState(int applyState) {
+        this.applyState = applyState;
+    }
+
+    @Override
+    public String toString() {
+        return "GroupApplyServerEntity{" +
+                "id=" + id +
+                ", applyFroUser=" + applyFroUser +
+                ", groupId=" + groupId +
+                ", applyTime='" + applyTime + '\'' +
+                ", applyText='" + applyText + '\'' +
+                ", refuseText='" + refuseText + '\'' +
+                ", applyState=" + applyState +
+                '}';
+    }
+}

@@ -1,0 +1,16 @@
+package com.bochat.app.model.event;
+
+import com.bochat.app.model.modelImpl.MarketCenter.TransactionEntity;
+
+public class MarketQuotationEvent {
+
+    TransactionEntity entity;
+
+    public TransactionEntity getEntity() {
+        return entity;
+    }
+
+    public void setEntity(TransactionEntity entity) {
+        this.entity = entity;
+    }
+}

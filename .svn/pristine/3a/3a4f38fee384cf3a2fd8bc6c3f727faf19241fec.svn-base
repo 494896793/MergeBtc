@@ -1,0 +1,176 @@
+package com.bochat.app.business.main.dynamic;
+
+import android.provider.ContactsContract;
+
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.dynamic.DynamicFlashContract;
+import com.bochat.app.common.model.IDynamicModel;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.DynamicFlashEntity;
+import com.bochat.app.model.bean.DynamicFlashListEntity;
+import com.bochat.app.model.bean.DynamicNoticeListEntity;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.model.constant.Constan;
+import com.bochat.app.model.util.LogUtil;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.logging.SimpleFormatter;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+/**
+ * create by guoying ${Date} and ${Month}
+ */
+public class DynamicFlashPresenter extends BasePresenter<DynamicFlashContract.View> implements DynamicFlashContract.Presenter {
+    @Inject
+    IDynamicModel dynamicModel;
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        loadeFlashList(1);
+    }
+
+    @Override
+    public void loadeFlashList(final int page) {
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<DynamicFlashListEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<DynamicFlashListEntity> emitter) throws Exception {
+                try {
+                    DynamicFlashListEntity entity = dynamicModel.messageLists(String.valueOf(page), "1");
+                    if(entity.getRetcode() != 0){
+                        CodeEntity codeEntity = new CodeEntity();
+                        codeEntity.setCode(entity.getCode());
+                        codeEntity.setMsg(entity.getMsg());
+                        codeEntity.setRetcode(entity.getRetcode());
+                        emitter.onError(new RxErrorThrowable(codeEntity));
+                        return;
+                    }
+
+
+                    emitter.onNext(entity);
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<DynamicFlashListEntity>() {
+            @Override
+            public void accept(DynamicFlashListEntity entity) throws Exception {
+                getView().hideLoading("");
+//                LogUtil.LogDebug("ggyy","memem=="+getTime( ));
+                List<DynamicFlashEntity> dynamic = entity.getItems();
+                for (int i =0;i<dynamic.size();i++){
+                    dynamic.get(i).getCreateTime();
+                }
+                getView().onUpdateList(entity.getItems());
+
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("");
+
+            }
+        });
+        getView().showLoading(subscribe);
+
+
+    }
+
+    public String getTime(int timestamp) {
+//        SimpleFormatter sdf = new SimpleFormatter()
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                 String time = null;
+                try {
+                         java.util.Date currentdate = new java.util.Date();// 当前时间
+
+                        long i = (currentdate.getTime() / 1000 - timestamp) / (60);
+                        Timestamp now = new Timestamp(System.currentTimeMillis());// 获取系统当前时间
+                         String str = sdf.format(new Timestamp(IntToLong(timestamp)));
+                        time = str.substring(11, 16);
+                        String year = str.substring(0, 4);
+                        String month = str.substring(5, 7);
+                         String day = str.substring(8, 10);
+                         System.out.println(str);
+                         System.out.println(time);
+//                        System.out.println(getDate(year, month, day));
+//                         time = getDate(year, month, day) + time;
+                     } catch (Exception e) {
+                        e.printStackTrace();
+                     }
+                return time;
+
+    }
+    public  long IntToLong(int i) {
+                long result = (long) i;
+                result *= 1000;
+               return result;
+           }
+
+
+
+
+    //点赞
+    @Override
+    public void sendLiked(final String flashId, final String option) {
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<CodeEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<CodeEntity> emitter) throws Exception {
+                try {
+                    CodeEntity entity = dynamicModel.like(flashId,option);
+                    if(entity.getRetcode() != 0){
+                        CodeEntity codeEntity = new CodeEntity();
+                        codeEntity.setCode(entity.getCode());
+                        codeEntity.setMsg(entity.getMsg());
+                        codeEntity.setRetcode(entity.getRetcode());
+                        emitter.onError(new RxErrorThrowable(codeEntity));
+                        return;
+                    }
+
+
+                    emitter.onNext(entity);
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<CodeEntity>() {
+            @Override
+            public void accept(CodeEntity entity) throws Exception {
+
+//                getView().onUpdateList(entity.getItems());
+
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+
+
+            }
+        });
+
+
+
+    }
+}

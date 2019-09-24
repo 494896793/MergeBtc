@@ -1,0 +1,67 @@
+package com.bochat.app.app.activity;
+
+import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.GroupMentioneAdapeter;
+import com.bochat.app.common.contract.conversation.GroupMentionedSeleteContract;
+import com.bochat.app.common.router.RouterGroupMentionedSelete;
+import com.bochat.app.model.bean.GroupMemberEntity;
+import com.bochat.app.model.util.LogUtil;
+import com.bochat.app.mvp.view.BaseActivity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import io.rong.imlib.model.UserInfo;
+
+/**
+ * create by guoying ${Date} and ${Month}
+ */
+@Route(path = RouterGroupMentionedSelete.PATH)
+public class GroupMentionedSeleteActivity extends BaseActivity<GroupMentionedSeleteContract.Presenter> implements GroupMentionedSeleteContract.View {
+    @Inject
+    GroupMentionedSeleteContract.Presenter presenter;
+    @BindView(R.id.select_mentione_recycler)
+    RecyclerView recyclerView;
+    private List<UserInfo> userInfoList;
+    private GroupMentioneAdapeter adapeter;
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected GroupMentionedSeleteContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_select_mentione);
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+        userInfoList = new ArrayList<>();
+
+        adapeter = new GroupMentioneAdapeter(this,userInfoList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
+
+
+    }
+
+    @Override
+    public void onUpdateMentioneList(List<UserInfo> userInfoList) {
+        LogUtil.LogDebug("ggyy","userInfoList");
+        adapeter.add(userInfoList);
+    }
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.bochat.app.app.view.SearchEditText
+        android:id="@+id/search_friend_input"
+        android:layout_marginTop="@dimen/dp_34"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"/>
+
+    <ListView
+        android:id="@+id/search_friend_list"
+        android:divider="@null"
+        android:layout_below="@id/search_friend_input"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</RelativeLayout>

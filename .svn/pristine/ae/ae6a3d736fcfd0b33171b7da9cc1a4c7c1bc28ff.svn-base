@@ -1,0 +1,61 @@
+package com.bochat.app.business.main.mine;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.view.MessageDialog;
+import com.bochat.app.common.contract.mine.AboutUsContract;
+import com.bochat.app.common.model.IUpgradeModel;
+import com.bochat.app.model.bean.UpgradeEntity;
+import com.bochat.app.model.modelImpl.UpgradeModel;
+import com.bochat.app.model.util.APKUtils;
+import com.bochat.app.mvp.presenter.BasePresenter;
+import com.bochat.app.mvp.view.BaseActivity;
+
+import javax.inject.Inject;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/05/12 10:46
+ * Description :
+ */
+
+public class AboutUsPresenter extends BasePresenter<AboutUsContract.View> implements AboutUsContract.Presenter{
+
+    @Inject
+    IUpgradeModel upgradeModel;
+
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void upgradeApplication() {
+        if(!BaseActivity.isChecked && !BaseActivity.isUpdated) {
+            getView().showLoading(null);
+            APKUtils.checkUpdate(getView().getViewContext(), new UpgradeModel(), new APKUtils.OnCheckUpdateListener() {
+                @Override
+                public void onUpdate(final UpgradeEntity entity) {
+                    getView().hideLoading(null);
+                    MessageDialog dialog = new MessageDialog(getView().getViewContext(), "检测到新版本");
+                    dialog.setOnChooseListener(new MessageDialog.OnChooseListener() {
+                        @Override
+                        public void onEnter() {
+                            ARouter.getInstance().build(RouteTable.DYNAMIC_MAIN).withBoolean(RouteExtra.IsShareUrl, false).withString(RouteExtra.WEB_LINK, entity.getAddress()).navigation();
+                            BaseActivity.isChecked = false;
+                        }
+
+                        @Override
+                        public void onCancel() {
+                            BaseActivity.isChecked = false;
+                        }
+                    });
+                    dialog.showPopupWindow();
+                }
+            });
+        } else {
+            getView().showTips("当前已是最新版本");
+        }
+    }
+}

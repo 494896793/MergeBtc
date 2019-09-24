@@ -1,0 +1,228 @@
+package com.bochat.app.app.fragment;
+
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.adapter.AddressBookAdapter;
+import com.bochat.app.app.fragment.addressbook.AddressBlackListFragment;
+import com.bochat.app.app.util.ResourceUtils;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.book.AddressBookContract;
+import com.bochat.app.model.bean.FriendApplyEntity;
+import com.bochat.app.model.bean.FriendEntity;
+import com.bochat.app.model.bean.GroupApplyEntity;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.model.event.FriendApplyEvent;
+import com.bochat.app.model.event.GroupApplyEvent;
+import com.bochat.app.mvp.view.BaseFragment;
+import com.flyco.tablayout.SlidingTabLayout;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+import static com.bochat.app.app.RouteTable.BOOK_ADDRESS;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/17 16:41
+ * Description :
+ */
+@Route(path = BOOK_ADDRESS)
+public class AddressBookFragment extends BaseFragment<AddressBookContract.Presenter> implements AddressBookContract.View{
+    @Inject
+    AddressBookContract.Presenter presenter;
+
+    @BindView(R.id.address_book_dark_tab_layout)
+    SlidingTabLayout tabLayout;
+
+    @BindView(R.id.address_book_dark_view_pager)
+    ViewPager viewPager;
+
+    private String[] titles = {"好友", "群聊", "黑名单"};
+
+    private AddressBookAdapter adapter;
+    private List<Fragment> fragmentList;
+
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected AddressBookContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_address_book_dark,container,false);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+        fragmentList=new ArrayList<>();
+
+        fragmentList.add(new AddressUserFragment());
+        fragmentList.add(new AddressGroupFragment());
+        fragmentList.add(new AddressBlackListFragment());
+
+        adapter = new AddressBookAdapter(getActivity().getSupportFragmentManager(), fragmentList, titles);
+        viewPager.setAdapter(adapter);
+        tabLayout.setViewPager(viewPager);
+        tabLayout.getTitleView(0).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_16));
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                if(i != 0)
+                    tabLayout.getTitleView(0).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_14));
+                if(i != 1)
+                    tabLayout.getTitleView(1).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_14));
+                if(i != 2)
+                    tabLayout.getTitleView(2).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_14));
+
+                tabLayout.getTitleView(i).setTextSize(TypedValue.COMPLEX_UNIT_PX, ResourceUtils.dip2px(getViewContext(), R.dimen.dp_16));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+    }
+
+    @Subscribe
+    public void onEventMainThread(final FriendApplyEvent event){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(!event.isClearAll()){
+                    List<FriendApplyEntity> list = new ArrayList<>();
+                    List<FriendApplyEntity> all = CachePool.getInstance().friendApply().getAll();
+                    for(FriendApplyEntity entity : all){
+                        if("1".equals(entity.getApply_state())&&entity.getIsRead().equals("1")){
+                            list.add(entity);
+                        }
+                    }
+                    for(Fragment fragment : fragmentList){
+                        if(fragment instanceof AddressBookFragment.NotificationShower){
+                            ((AddressBookFragment.NotificationShower) fragment).setNotificationCount(list.size());
+                        }
+                    }
+                } else {
+                    List<FriendApplyEntity> all = CachePool.getInstance().friendApply().getAll();
+                    if(all != null && !all.isEmpty()) {
+                        for(FriendApplyEntity entity : all){
+                            entity.setIsRead("0");
+                        }
+                    }
+                    CachePool.getInstance().friendApply().put(all);
+                    for(Fragment fragment : fragmentList){
+                        if(fragment instanceof AddressBookFragment.NotificationShower){
+                            ((AddressBookFragment.NotificationShower) fragment).setNotificationCount(0);
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    @Subscribe
+    public void onEventMainGroupThread(final GroupApplyEvent event){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(!event.isClearAll()){
+                    List<GroupApplyEntity> list = new ArrayList<>();
+                    List<GroupApplyEntity> all = CachePool.getInstance().groupApply().getAll();
+                    for(GroupApplyEntity entity : all){
+                        if("1".equals(entity.getApply_state())&&entity.getIsRead().equals("1")){
+                            list.add(entity);
+                        }
+                    }
+                    for(Fragment fragment : fragmentList){
+                        if(fragment instanceof AddressBookFragment.NotificationShower){
+                            ((AddressBookFragment.NotificationShower) fragment).setNotificationCount(list.size());
+                        }
+                    }
+                } else {
+                    List<GroupApplyEntity> all = CachePool.getInstance().groupApply().getAll();
+                    if(all != null && !all.isEmpty()) {
+                        for(GroupApplyEntity entity : all){
+                            entity.setIsRead("0");
+                        }
+                    }
+                    for(Fragment fragment : fragmentList){
+                        if(fragment instanceof AddressBookFragment.NotificationShower){
+                            ((AddressBookFragment.NotificationShower) fragment).setNotificationCount(0);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    @OnClick(R.id.bochat_search_layout)
+    @Override
+    protected void onViewClicked(View view) {
+        super.onViewClicked(view);
+        ARouter.getInstance().build(RouteTable.CONVERSATION_SEARCH_FRIEND)
+                .withBoolean(RouteExtra.IsSearchLocal_Boolean,true)
+                .withBoolean(RouteExtra.IsSearchFriend_Boolean, true)
+                .withBoolean(RouteExtra.IsSearchGroup_Boolean, true).navigation();
+    }
+
+    @Override
+    public void updateNewRequestCount(String count) {
+
+    }
+
+    @Override
+    public void updateFriendList(List<FriendEntity> list) {
+
+    }
+
+    @Override
+    public void updateGroupChatList(List<GroupEntity> list) {
+
+    }
+
+    public interface NotificationShower{
+        void setNotificationCount(int num);
+    }
+}

@@ -1,0 +1,18 @@
+package com.bochat.app.business.main.conversation;
+
+import com.bochat.app.common.contract.conversation.GroupManageJoinFilterContract;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/05/30 16:24
+ * Description :
+ */
+
+public class GroupManageJoinFilterPresenter extends BasePresenter<GroupManageJoinFilterContract.View> implements GroupManageJoinFilterContract.Presenter{
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+}

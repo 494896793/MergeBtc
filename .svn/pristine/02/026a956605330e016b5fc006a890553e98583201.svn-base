@@ -1,0 +1,17 @@
+package com.bochat.app.business.main.mine;
+
+import com.bochat.app.common.contract.mine.SettingsContract;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/05/16 07:03
+ * Description :
+ */
+
+public class SettingsPresenter extends BasePresenter<SettingsContract.View> implements SettingsContract.Presenter {
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+}

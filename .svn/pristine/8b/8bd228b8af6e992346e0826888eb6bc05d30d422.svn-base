@@ -1,0 +1,16 @@
+package com.bochat.app.common.router;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/14 09:36
+ * Description :
+ */
+
+public class RouterGroupMemberManage extends AbstractRouter {
+    public static final String PATH ="/path/RouterGroupMemberManage";
+    
+    @Override
+    public String getPath() {
+        return PATH;
+    }
+}

@@ -1,0 +1,280 @@
+package com.bochat.app.app.fragment.dynamic;
+
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.KChatHistoryAdapter;
+import com.bochat.app.app.adapter.KChatTitleAdapter;
+import com.bochat.app.app.view.kline.KData;
+import com.bochat.app.app.view.kline.KLineView;
+import com.bochat.app.common.contract.dynamic.KChatContract;
+import com.bochat.app.model.modelImpl.MarketCenter.KLineEntity;
+import com.bochat.app.mvp.view.BaseFragment;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+/**
+ * 2019/6/19
+ * Author LDL
+ **/
+public class KChatFragment extends BaseFragment<KChatContract.Presenter> implements KChatContract.View {
+
+    @Inject
+    KChatContract.Presenter presenter;
+
+    @BindView(R.id.recycler)
+    RecyclerView recycler;
+
+    @BindView(R.id.mKLineView)
+    KLineView mKLineView;
+
+    @BindView(R.id.history_recycler)
+    RecyclerView history_recycler;
+
+    @BindView(R.id.have_data_relative)
+    RelativeLayout have_data_relative;
+
+    @BindView(R.id.no_data_relative)
+    RelativeLayout no_data_relative;
+
+    @BindView(R.id.price_max)
+    TextView price_max;
+
+    private KChatHistoryAdapter historyAdapter;
+    private KChatTitleAdapter adapter;
+    private Handler mHandler;
+    private Runnable dataListAddRunnable;
+    private List<String> titles = new ArrayList<>();
+    private KChatTitleAdapter.KChatTitleViewHolder lastHolder;
+
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected KChatContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_kchat, null);
+        return view;
+    }
+
+    int position=10;
+    List<KData> list=new ArrayList<>();
+    List<KData> list2=new ArrayList<>();
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+        initRecyclerView();
+        list=getKDataList(10).subList(0,120);
+        list2=getKDataList(10);
+        //初始化控件加载数据
+        mKLineView.initKDataList(list);
+        //设置十字线移动模式，默认为0：固定指向收盘价
+        mKLineView.setCrossHairMoveMode(KLineView.CROSS_HAIR_MOVE_OPEN);
+
+        mHandler = new Handler();
+
+        price_max.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                mKLineView.addSingleData(list2.get(position));
+               try{
+//                   mKLineView.addPreDataList();
+                   List<KData> aaa=new ArrayList<>();
+//                   aaa.addAll(list);
+                   aaa.addAll(list2.subList(position,position+1));
+                   aaa.addAll(mKLineView.getData());
+//                   List<KData> bb=new ArrayList<>();
+//                   bb.addAll(list2.subList(position,position+1));
+//                   mKLineView.initKDataList(aaa);
+                mKLineView.resetDataList(aaa,true);
+//                mKLineView.addPreDataList(list2.subList(position,position+1),false);
+                   position++;
+               }catch (Exception e){
+                   e.printStackTrace();
+               }
+            }
+        });
+        dataListAddRunnable = new Runnable() {
+            @Override
+            public void run() {
+                Log.i("==========","====================分页加载时添加多条数据");
+                //分页加载时添加多条数据
+//                mKLineView.addPreDataList(new ArrayList<KData>(), false);
+            }
+        };
+
+        /**
+         * 当控件显示数据属于总数据量的前三分之一时，会自动调用该接口，用于预加载数据，保证控件操作过程中的流畅性，
+         * 虽然做了预加载，当总数据量较小时，也会出现用户滑到左边界了，但数据还未获取到，依然会有停顿。
+         * 所以数据量越大，越不会出现停顿，也就越流畅
+         */
+        mKLineView.setOnRequestDataListListener(new KLineView.OnRequestDataListListener() {
+            @Override
+            public void requestData() {
+                Log.i("==========","====================requestData");
+                //延时3秒执行，模拟网络请求耗时
+//                mHandler.postDelayed(dataListAddRunnable, 500);
+            }
+        });
+    }
+
+    private void initRecyclerView() {
+        titles.add("5分钟");
+        titles.add("30分钟");
+        titles.add("1小时");
+        titles.add("1天");
+        titles.add("1周");
+        recycler.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+        adapter = new KChatTitleAdapter(getActivity(), titles);
+        adapter.setOnItemClickListener(new KChatTitleAdapter.OnItemClickListener() {
+            @Override
+            public void OnItemClick(final int position, String title) {
+                if(position==recycler.getChildCount()-1){
+                    no_data_relative.setVisibility(View.VISIBLE);
+                    have_data_relative.setVisibility(View.GONE);
+                }else{
+                    no_data_relative.setVisibility(View.GONE);
+                    have_data_relative.setVisibility(View.VISIBLE);
+                }
+                View view = recycler.getChildAt(position);
+                KChatTitleAdapter.KChatTitleViewHolder holder = (KChatTitleAdapter.KChatTitleViewHolder) recycler.getChildViewHolder(view);
+                holder.title_text.setTextColor(getResources().getColor(R.color.color_0084FF));
+                if (lastHolder != null) {
+                    lastHolder.title_text.setTextColor(getResources().getColor(R.color.color_999999));
+                }
+                mKLineView.initKDataList(getKDataList(10));
+                lastHolder = holder;
+            }
+        });
+
+
+        recycler.setAdapter(adapter);
+
+        historyAdapter = new KChatHistoryAdapter(getActivity(),new ArrayList<KLineEntity.TradeItemEntity>());
+        history_recycler.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        history_recycler.setAdapter(historyAdapter);
+    }
+
+    /*模拟K线数据*/
+    private List<KData> getKDataList(double num) {
+        long start = System.currentTimeMillis();
+
+        Random random = new Random();
+        List<KData> dataList = new ArrayList<>();
+        double openPrice = 100;
+        double closePrice;
+        double maxPrice;
+        double minPrice;
+        double volume;
+
+        for (int x = 0; x < num * 10; x++) {
+            for (int i = 0; i < 12; i++) {
+                start += 60 * 1000 * 5;
+                closePrice = openPrice + getAddRandomDouble();
+                maxPrice = closePrice + getAddRandomDouble();
+                minPrice = openPrice - getSubRandomDouble();
+                volume = random.nextInt(100) * 1000 + random.nextInt(10) * 10 + random.nextInt(10) + random.nextDouble();
+                dataList.add(new KData(start, openPrice, closePrice, maxPrice, minPrice, volume));
+                openPrice = closePrice;
+            }
+
+            for (int i = 0; i < 8; i++) {
+                start += 60 * 1000 * 5;
+                closePrice = openPrice - getSubRandomDouble();
+                maxPrice = openPrice + getAddRandomDouble();
+                minPrice = closePrice - getSubRandomDouble();
+                volume = random.nextInt(100) * 1000 + random.nextInt(10) * 10 + random.nextInt(10) + random.nextDouble();
+                dataList.add(new KData(start, openPrice, closePrice, maxPrice, minPrice, volume));
+                openPrice = closePrice;
+            }
+        }
+        long end = System.currentTimeMillis();
+        return dataList;
+    }
+
+    private double getAddRandomDouble() {
+        Random random = new Random();
+        return random.nextInt(5) * 5 + random.nextDouble();
+    }
+
+    private double getSubRandomDouble() {
+        Random random = new Random();
+        return random.nextInt(5) * 5 - random.nextDouble();
+    }
+
+    private int dp2px(float dpValue) {
+        final float scale = getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //退出页面时停止子线程并置空，便于回收，避免内存泄露
+        mKLineView.cancelQuotaThread();
+    }
+
+    @Override
+    public void getData(KLineEntity kLineEntity) {
+        if(kLineEntity.getKLineItems()!=null&&kLineEntity.getKLineItems().size()!=0){
+            int startNum=mKLineView.getStartDataNum();
+            int total=mKLineView.getTotleSize();
+            List<KData> kDataList=new ArrayList<>();
+            for(int i=0;i<kLineEntity.getKLineItems().size();i++){
+                KData kData=new KData();
+                kData.setOpenPrice(Double.valueOf(kLineEntity.getKLineItems().get(i).getStart()));
+                kData.setClosePrice(Double.valueOf(kLineEntity.getKLineItems().get(i).getEnd()));
+                kData.setMaxPrice(Double.valueOf(kLineEntity.getKLineItems().get(i).getMax()));
+                kData.setMinPrice(Double.valueOf(kLineEntity.getKLineItems().get(i).getMin()));
+                kData.setVolume(Double.valueOf(kLineEntity.getKLineItems().get(i).getMax())-Double.valueOf(kLineEntity.getKLineItems().get(i).getMin()));
+            }
+            if(total==0){
+                mKLineView.initKDataList(kDataList);
+            }else {
+                if(kDataList.size()!=0){
+                    if ((total - startNum) >=33) {      //刷新数据
+                        mKLineView.initKDataList(kDataList);
+                    }else{
+                        List<KData> kDataList2=new ArrayList<>();
+                        kDataList2.addAll(mKLineView.getData());
+                        kDataList2.addAll(kDataList);
+                        mKLineView.resetDataList(kDataList2,true);
+                    }
+                }
+            }
+        }
+
+        if(kLineEntity.getTradeItems()!=null&&kLineEntity.getTradeItems().size()!=0){
+            no_data_relative.setVisibility(View.GONE);
+            have_data_relative.setVisibility(View.VISIBLE);
+            historyAdapter.refreshData(kLineEntity.getTradeItems());
+        }else{
+            if(historyAdapter.getData()==null||historyAdapter.getData().size()==0){
+                no_data_relative.setVisibility(View.VISIBLE);
+                have_data_relative.setVisibility(View.GONE);
+            }
+        }
+    }
+}

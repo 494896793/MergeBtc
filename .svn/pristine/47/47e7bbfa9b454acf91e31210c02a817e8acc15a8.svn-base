@@ -1,0 +1,63 @@
+package com.bochat.app.app.fragment.dynamic;
+
+import android.graphics.Color;
+import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+
+import com.bochat.app.R;
+import com.bochat.app.common.contract.dynamic.MarketQuotationBuyAndSellContract;
+import com.bochat.app.mvp.view.BaseFragment;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+public class MarketQuotationBuyAndSellFragment extends BaseFragment<MarketQuotationBuyAndSellContract.Presenter> implements MarketQuotationBuyAndSellContract.View {
+
+    public static final String IS_SELL = "isSell";
+    private boolean isSell = false;
+
+    @Inject
+    MarketQuotationBuyAndSellContract.Presenter presenter;
+
+    @BindView(R.id.dynamic_right_sell_list)
+    RecyclerView mDynamicSellRecyclerView;
+
+    @BindView(R.id.dynamic_buy_or_sell_btn)
+    Button mDynamicSellButton;
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+
+        isSell = getArguments().getBoolean(IS_SELL);
+        if (isSell) {
+            mDynamicSellButton.setText("卖出");
+            mDynamicSellButton.setBackgroundColor(Color.parseColor("#4FCC7A"));
+        }
+        mDynamicSellRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mDynamicSellRecyclerView.setLayoutManager(new LinearLayoutManager(getViewContext()));
+
+    }
+
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected MarketQuotationBuyAndSellContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_market_quotation_buy_and_sell_layout, container, false);
+    }
+}

@@ -1,0 +1,135 @@
+package com.bochat.app.business.main.bill;
+
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.common.contract.bill.TokenPropertyContract;
+import com.bochat.app.common.model.ITokenAssetModel;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.TotalCurrencyEntity;
+import com.bochat.app.model.bean.UserCurrencyDataEntity;
+import com.bochat.app.model.bean.UserCurrencyEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+import com.bochat.app.mvp.view.ResultTipsType;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+/**
+ *
+ */
+public class TokenPropertyPresenter extends BasePresenter<TokenPropertyContract.View> implements TokenPropertyContract.Presenter {
+
+    @Inject
+    ITokenAssetModel tokenAssetModel;
+    
+    private UserCurrencyDataEntity userCurrencyDataEntity;
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+    
+    
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<CodeEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<CodeEntity> emitter) throws Exception {
+                try {
+                    TotalCurrencyEntity entity = tokenAssetModel.getUserCurrencyCny();
+                    if(entity.getRetcode() != 0){
+                        emitter.onError(new RxErrorThrowable(entity));
+                        return;
+                    }
+                    emitter.onNext(entity);
+                    userCurrencyDataEntity = tokenAssetModel.listUserCurrency();
+                    if(userCurrencyDataEntity.getRetcode() != 0){
+                        emitter.onError(new RxErrorThrowable(userCurrencyDataEntity));
+                        return;
+                    }
+                    emitter.onNext(userCurrencyDataEntity);
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<CodeEntity>() {
+            @Override
+            public void accept(CodeEntity entity) throws Exception {
+                if(isActive()){
+                    if(entity instanceof TotalCurrencyEntity){
+                        getView().updateTotalMoney(String.valueOf(((TotalCurrencyEntity) entity).getCnyPrice()));
+                    } else if(entity instanceof UserCurrencyDataEntity){
+                        getView().updateTokenList((UserCurrencyDataEntity)entity);
+                    }
+                }
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+            }
+
+            @Override
+            public String getDefaultErrorTips() {
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public void onGCSpecialCodeClick() {
+        ARouter.getInstance().build(RouteTable.MINE_GC_SPECIAL_CODE).navigation();
+    }
+
+    @Override
+    public void onTokenReceiveClick() {
+        if(userCurrencyDataEntity != null && !userCurrencyDataEntity.isEmpty()){
+            ARouter.getInstance().build(RouteTable.MINE_TOKEN_TRANSFER_RECEIVE)
+                    .withSerializable(RouteExtra.UserCurrencyDataEntity, userCurrencyDataEntity).navigation();
+        } else {
+            showWarning();
+        }
+    }
+
+    private void showWarning(){
+        getView().showTips(new ResultTipsType("网络繁忙", false));
+    }
+    
+    @Override
+    public void onTokenTransferClick() {
+        if(userCurrencyDataEntity != null && !userCurrencyDataEntity.isEmpty()){
+            ARouter.getInstance().build(RouteTable.MINE_TOKEN_TRANSFER)
+                    .withSerializable(RouteExtra.UserCurrencyDataEntity, userCurrencyDataEntity).navigation();
+        } else {
+            showWarning();
+        }
+    }
+
+    @Override
+    public void onQuickExchangeClick() {
+        if(userCurrencyDataEntity != null && !userCurrencyDataEntity.isEmpty()){
+            ARouter.getInstance().build(RouteTable.MINE_QUICK_EXCHANGE_HALL)
+                    .withSerializable(RouteExtra.UserCurrencyDataEntity, userCurrencyDataEntity).navigation();
+        } else {
+            showWarning();
+        }
+    }
+
+    @Override
+    public void onTokenItemClick(UserCurrencyEntity item) {
+        ARouter.getInstance().build(RouteTable.MINE_TOKEN_DETAIL).withSerializable(RouteExtra.UserCurrencyEntity, item).navigation();
+    }
+}

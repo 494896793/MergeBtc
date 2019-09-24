@@ -1,0 +1,71 @@
+package com.bochat.app.model.bean;
+
+public class TradingRulesEntity extends CodeEntity {
+
+    private String buyingMinNum;
+    private String sellingMaxNum;
+    private int decimalNum;
+    private String sellingMinNum;
+    private String buyingMaxNum;
+    private int currencyDecimalNum;
+
+    public String getBuyingMinNum() {
+        return buyingMinNum;
+    }
+
+    public void setBuyingMinNum(String buyingMinNum) {
+        this.buyingMinNum = buyingMinNum;
+    }
+
+    public String getSellingMaxNum() {
+        return sellingMaxNum;
+    }
+
+    public void setSellingMaxNum(String sellingMaxNum) {
+        this.sellingMaxNum = sellingMaxNum;
+    }
+
+    public int getDecimalNum() {
+        return decimalNum;
+    }
+
+    public void setDecimalNum(int decimalNum) {
+        this.decimalNum = decimalNum;
+    }
+
+    public String getSellingMinNum() {
+        return sellingMinNum;
+    }
+
+    public void setSellingMinNum(String sellingMinNum) {
+        this.sellingMinNum = sellingMinNum;
+    }
+
+    public String getBuyingMaxNum() {
+        return buyingMaxNum;
+    }
+
+    public void setBuyingMaxNum(String buyingMaxNum) {
+        this.buyingMaxNum = buyingMaxNum;
+    }
+
+    public int getCurrencyDecimalNum() {
+        return currencyDecimalNum;
+    }
+
+    public void setCurrencyDecimalNum(int currencyDecimalNum) {
+        this.currencyDecimalNum = currencyDecimalNum;
+    }
+
+    @Override
+    public String toString() {
+        return "TradingRulesEntity{" +
+                "buyingMinNum='" + buyingMinNum + '\'' +
+                ", sellingMaxNum='" + sellingMaxNum + '\'' +
+                ", decimalNum=" + decimalNum +
+                ", sellingMinNum='" + sellingMinNum + '\'' +
+                ", buyingMaxNum='" + buyingMaxNum + '\'' +
+                ", currencyDecimalNum=" + currencyDecimalNum +
+                '}';
+    }
+}

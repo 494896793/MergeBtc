@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_hasBackBtn="true"
+        app:top_background="#FFFFFF"
+        app:top_titleText="群管理"/>
+
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/cv_group_manage_edit"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:layout_marginTop="@dimen/dp_10"
+        app:item_text="编辑群资料"/>
+    
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/cv_group_manage_upgrade"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_text="升级群聊"
+        app:item_content="200人"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_10"
+        android:background="#FBFAFA"/>
+    
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/cv_group_manage_manager"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:visibility="visible"
+        app:item_text="管理员设置"/>
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/cv_group_manage_forbidden"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:visibility="visible"
+        app:item_text="禁言管理"/>
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/cv_group_manage_join_filter"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:visibility="visible"
+        app:item_text="加群方式"/>
+</LinearLayout>

@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/dynamic_left_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dp_14"
+            android:layout_marginTop="@dimen/dp_16"
+            android:layout_marginEnd="@dimen/dp_14"
+            android:layout_marginBottom="@dimen/dp_16">
+
+            <RelativeLayout
+                android:id="@+id/dynamic_buy_price_edit_container"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="@dimen/dp_40"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="@dimen/dp_16"
+                android:background="@drawable/market_quotation_edit_shape"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/dynamic_buy_price_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/dynamic_buy_price_edit_target"
+                    android:background="@null"
+                    android:hint="买入单价"
+                    android:inputType="numberDecimal"
+                    android:padding="@dimen/dp_8"
+                    android:textSize="@dimen/dp_14" />
+
+                <TextView
+                    android:id="@+id/dynamic_buy_price_edit_target"
+                    android:layout_width="@dimen/dp_50"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:gravity="center"
+                    android:text="ETH" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/dynamic_buy_count_edit_container"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="@dimen/dp_40"
+                android:layout_marginBottom="@dimen/dp_10"
+                android:layout_below="@id/dynamic_buy_price_edit_container"
+                android:background="@drawable/market_quotation_edit_shape">
+
+                <EditText
+                    android:id="@+id/dynamic_buy_count_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:hint="买入数量"
+                    android:inputType="numberDecimal"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@id/dynamic_buy_count_edit_target"
+                    android:padding="@dimen/dp_8"
+                    android:textSize="@dimen/dp_14" />
+
+                <TextView
+                    android:id="@+id/dynamic_buy_count_edit_target"
+                    android:layout_width="@dimen/dp_50"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:gravity="center"
+                    android:text="BX" />
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/dynamic_buy_text"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/dynamic_buy_count_edit_container"
+                android:layout_marginBottom="@dimen/dp_18"
+                android:gravity="end"
+                android:text="可买BX 100,000.0022"
+                android:textColor="@color/color_999999" />
+
+            <RadioGroup
+                android:id="@+id/dynamic_buy_radio_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/dynamic_buy_text"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="@dimen/dp_13"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    style="@style/MarketQuotationRadioButton.CustomStyle"
+                    android:text="25%" />
+
+                <RadioButton
+                    style="@style/MarketQuotationRadioButton.CustomStyle"
+                    android:text="50%" />
+
+                <RadioButton
+                    style="@style/MarketQuotationRadioButton.CustomStyle"
+                    android:text="75%" />
+
+                <RadioButton
+                    style="@style/MarketQuotationRadioButton.CustomStyle"
+                    android:layout_marginEnd="0dp"
+                    android:text="100%" />
+            </RadioGroup>
+
+            <RelativeLayout
+                android:id="@+id/dynamic_expected_turnover"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/dynamic_buy_radio_group"
+                android:layout_centerHorizontal="true">
+
+                <TextView
+                    android:id="@+id/dynamic_expected_turnover_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:text="预计交易额"
+                    android:textColor="@color/color_222222"
+                    android:textSize="@dimen/dp_11" />
+
+                <TextView
+                    android:id="@+id/dynamic_expected_turnover_result"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="0.000000ETH"
+                    android:textColor="@color/color_222222"
+                    android:textSize="@dimen/dp_11" />
+
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/dynamic_buy_or_sell_btn"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="@dimen/dp_40"
+                android:layout_below="@id/dynamic_expected_turnover"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/dp_22"
+                android:background="#F14348"
+                android:text="买入"
+                android:textColor="@color/white"
+                android:textSize="@dimen/dp_14" />
+
+            <View
+                android:id="@+id/dynamic_divider"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="1dp"
+                android:layout_below="@id/dynamic_buy_or_sell_btn"
+                android:layout_marginTop="@dimen/dp_48"
+                android:layout_marginBottom="@dimen/dp_36"
+                android:background="@drawable/market_quotation_divider_shape" />
+
+            <RelativeLayout
+                android:id="@+id/dynamic_balance_x"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="@dimen/dp_40"
+                android:layout_below="@id/dynamic_divider"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="@dimen/dp_20"
+                android:background="@drawable/market_quotation_balance_shape"
+                android:gravity="center"
+                android:padding="@dimen/dp_8">
+
+                <TextView
+                    android:id="@+id/dynamic_balance_x_01"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:text="可用XX"
+                    android:textColor="@color/color_999999"
+                    android:textSize="@dimen/dp_14" />
+
+                <TextView
+                    android:id="@+id/dynamic_balance_x_02"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="100,000.0022"
+                    android:textColor="#000022"
+                    android:textSize="@dimen/dp_14" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/dynamic_balance_bx"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="@dimen/dp_40"
+                android:layout_below="@id/dynamic_balance_x"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/market_quotation_balance_shape"
+                android:gravity="center"
+                android:padding="@dimen/dp_8">
+
+                <TextView
+                    android:id="@+id/dynamic_balance_bx_left_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:text="可用BX"
+                    android:textColor="@color/color_999999"
+                    android:textSize="@dimen/dp_14" />
+
+                <TextView
+                    android:id="@+id/dynamic_balance_bx_right_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="100,000.0022"
+                    android:textColor="#000022"
+                    android:textSize="@dimen/dp_14" />
+
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/dynamic_recharge_btn"
+                android:layout_width="@dimen/dp_180"
+                android:layout_height="@dimen/dp_40"
+                android:layout_below="@id/dynamic_balance_bx"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/dp_37"
+                android:layout_marginBottom="@dimen/dp_35"
+                android:background="#0084FF"
+                android:text="充值"
+                android:textColor="@color/white"
+                android:textSize="@dimen/dp_14" />
+        </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/dynamic_right_sell_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/dp_16"
+            android:layout_marginEnd="@dimen/dp_14"
+            android:layout_toEndOf="@id/dynamic_left_container" />
+
+        <!--<LinearLayout-->
+        <!--android:id="@+id/dynamic_right_new_price"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:gravity="end"-->
+        <!--android:orientation="vertical">-->
+
+        <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="end"-->
+        <!--android:textColor="#4FCC7A"-->
+        <!--android:textSize="@dimen/dp_14"-->
+        <!--tools:text="0.00016668 ETH" />-->
+
+        <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textColor="@color/color_999999"-->
+        <!--android:textSize="@dimen/dp_11"-->
+        <!--tools:text="≈ ￥0.24" />-->
+        <!--</LinearLayout>-->
+    </RelativeLayout>
+</ScrollView>

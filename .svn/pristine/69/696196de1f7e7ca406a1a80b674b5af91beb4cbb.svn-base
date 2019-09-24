@@ -1,0 +1,11 @@
+package com.bochat.app.common.router;
+
+public class RouterSearchApp extends AbstractRouter {
+
+    public static final String PATH = "/path/RouterSearchApp";
+
+    @Override
+    public String getPath() {
+        return PATH;
+    }
+}

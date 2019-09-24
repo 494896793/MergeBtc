@@ -1,0 +1,129 @@
+package com.bochat.app.business.main.book;
+
+import android.app.Activity;
+import android.content.Intent;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.book.AddressGroupContract;
+import com.bochat.app.common.model.IGroupModule;
+import com.bochat.app.common.model.IUserLocalModel;
+import com.bochat.app.common.util.ALog;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.model.bean.GroupListEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import io.rong.imkit.RongIM;
+
+/**
+ * 2019/4/19
+ * Author LDL
+ **/
+public class AddressGroupPresenter extends BasePresenter<AddressGroupContract.View> implements AddressGroupContract.Presenter {
+
+    @Inject
+    IGroupModule groupModule;
+    
+    @Inject
+    IUserLocalModel userLocalModel;
+    
+    private boolean isCreate;
+    
+    private String returnUrl;
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        returnUrl = null;
+        if(!isCreate){
+            isCreate = true;
+        } else {
+            queryMyGroupList();
+        }
+        Intent intent = getView().getViewIntent();
+        if(intent.hasExtra(RouteExtra.ReturnUrl)){
+            returnUrl = intent.getStringExtra(RouteExtra.ReturnUrl);
+        }
+    }
+
+    @Override
+    public void queryMyGroupList() {
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<List<GroupEntity>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<GroupEntity>> emitter) throws Exception {
+                try {
+                    List<GroupEntity> groupList = CachePool.getInstance().group().getAll();
+                    if(groupList != null && !groupList.isEmpty()){
+                        emitter.onNext(groupList);
+                    }
+                    String userId = String.valueOf(userLocalModel.getLocalUserInfo().getId());
+                    GroupListEntity groupListEntity = groupModule.queryMyGroupList(userId, 0, 0);
+                    if(groupListEntity.getRetcode() != 0){
+                        emitter.onError(new RxErrorThrowable(groupListEntity));
+                    } else {
+                        List<GroupEntity> networkList = groupListEntity.getItems();
+                        if(networkList == null){
+                            networkList = new ArrayList<>();
+                        }
+                        CachePool.getInstance().group().clear();
+                        CachePool.getInstance().group().put(networkList);
+                        emitter.onNext(networkList);
+                    }
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<List<GroupEntity>>() {
+            @Override
+            public void accept(List<GroupEntity> list) throws Exception {
+                if(isActive()){
+                    getView().onViewRefresh(list);
+                }
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                if(isActive()){
+                    ALog.e("获取群聊列表失败 " + object.getMessage());
+                }
+            }
+
+            @Override
+            public String getDefaultErrorTips() {
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public void onItemClick(GroupEntity groupEntity) {
+        if (returnUrl != null) {
+            ARouter.getInstance().build(returnUrl).withSerializable(RouteExtra.GroupEntity, groupEntity).navigation();
+        } else {
+            RongIM.getInstance().startGroupChat((Activity)getView().getViewContext(),
+                    groupEntity.getGroup_id()+"", groupEntity.getGroup_name());
+        }
+    }
+}

@@ -1,0 +1,76 @@
+package com.bochat.app.app.activity;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.common.contract.conversation.AddFriendContract;
+import com.bochat.app.mvp.view.BaseActivity;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/18 10:58
+ * Description :
+ */
+
+@Route(path = RouteTable.CONVERSATION_ADD_FRIEND)
+public class AddFriendActivity extends BaseActivity<AddFriendContract.Presenter> implements AddFriendContract.View{
+
+    @Inject
+    AddFriendContract.Presenter presenter;
+    
+    @BindView(R.id.add_friend_id)
+    TextView textView;
+    
+    @Override
+    public void updateIdText(String id) {
+        textView.setText("我的ID: " + id);
+    }
+
+    @OnClick({R.id.add_friend_search_layout, R.id.add_friend_scan_layout, R.id.add_friend_qr_card})
+    @Override
+    protected void onViewClicked(View view) {
+        
+        switch (view.getId()) {
+            case R.id.add_friend_search_layout:
+                presenter.onSearchClick();
+            break;
+            case R.id.add_friend_scan_layout:
+                presenter.onQRScanClick();
+            break;
+            case R.id.add_friend_qr_card:
+                presenter.onQRCardClick();
+            break;
+        
+            default:
+                break;
+        }
+    }
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected AddFriendContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_add_friend);
+    }
+
+    @Override
+    protected void initWidget() {
+    }
+}

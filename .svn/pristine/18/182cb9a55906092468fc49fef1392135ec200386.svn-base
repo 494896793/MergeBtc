@@ -1,0 +1,61 @@
+package com.bochat.app.app.activity;
+
+import android.os.Bundle;
+import android.view.View;
+
+import com.bochat.app.R;
+import com.bochat.app.common.contract.TestContract;
+import com.bochat.app.mvp.view.BaseActivity;
+
+import javax.inject.Inject;
+
+import butterknife.OnClick;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/03 16:25
+ * Description :
+ */
+
+public class TestActivity extends BaseActivity<TestContract.Presenter> implements TestContract.View {
+    
+    @Inject
+    TestContract.Presenter presenter;
+    
+    
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected TestContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_login);
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+        
+    }
+
+    @OnClick({R.id.login_enter_btn})
+    @Override
+    protected void onViewClicked(View view) {
+        super.onViewClicked(view);
+        switch (view.getId()) {
+
+            default:
+                break;
+        }
+    }
+    
+    
+    
+}

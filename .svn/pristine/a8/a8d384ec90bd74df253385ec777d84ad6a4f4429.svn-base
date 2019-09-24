@@ -1,0 +1,130 @@
+package com.bochat.app.app.activity.mine;
+
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.common.contract.mine.BillDetailContract;
+import com.bochat.app.common.router.RouterBillDetail;
+import com.bochat.app.model.bean.CandyDetailEntity;
+import com.bochat.app.model.bean.ChangeDetailEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.bumptech.glide.Glide;
+import com.zhy.adapter.abslistview.CommonAdapter;
+import com.zhy.adapter.abslistview.ViewHolder;
+
+import java.util.ArrayList;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/24 17:24
+ * Description :
+ */
+
+@Route(path = RouterBillDetail.PATH)
+public class BillDetailActivity extends BaseActivity<BillDetailContract.Presenter> implements BillDetailContract.View{
+
+    @Inject
+    BillDetailContract.Presenter presenter;
+    
+    @BindView(R.id.mine_bill_detail_icon)
+    ImageView iconView;
+    @BindView(R.id.mine_bill_detail_count)
+    TextView count; 
+    @BindView(R.id.mine_bill_detail_list)
+    ListView listView;
+    
+    private ArrayList<BillPair> list = new ArrayList<>();
+    
+    private static final String[] STATUS = {
+            "",               //0
+            "未完成",         //1
+            "已完成",         //2
+            "已撤销",         //3
+    };
+
+    private CommonAdapter<BillPair> adapter;
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected BillDetailContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_mine_bill_detail);
+    }
+
+    @Override
+    protected void initWidget() {
+        adapter = new CommonAdapter<BillPair>(this, R.layout.item_bill_detail, list) {
+            @Override
+            protected void convert(ViewHolder viewHolder, BillPair item, int position) {
+                viewHolder.setText(R.id.mine_bill_detail_title, item.type);
+                viewHolder.setText(R.id.mine_bill_detail_content, item.content);
+            }
+        };
+        listView.setAdapter(adapter);
+    }
+    
+    @Override
+    public void updateChange(ChangeDetailEntity data, String depictZh) {
+        if(data == null){
+            return;
+        }
+        Glide.with(this).load(data.getIcon()).into(iconView);
+        list.clear();
+        count.setText((data.getOrder_type() == 1 ? "+" : "-") + String.format("%.2f", data.getOrder_money()));
+        list.add(new BillPair("类型", depictZh));
+        String status = data.getTrade_status() < STATUS.length ? STATUS[data.getTrade_status()] : "";
+        list.add(new BillPair("时间", data.getTime()));
+        list.add(new BillPair("状态", status));
+        list.add(new BillPair("流水号", data.getId()));
+        list.add(new BillPair("手续费", String.format("%.2f", data.getCost())));
+//        list.add(new BillPair("备注", "-"));
+        adapter.notifyDataSetChanged();
+    }
+    
+    @Override
+    public void updateCandy(CandyDetailEntity data, String depictZh) {
+        if(data == null){
+            return;
+        }
+        Glide.with(this).load(data.getIcon()).into(iconView);
+        list.clear();
+        count.setText((data.getOrder_type() == 1 ? "+" : "-") + String.format("%.6f", data.getOrder_money()) + " " + data.getbName());
+        list.add(new BillPair("类型", depictZh));
+        list.add(new BillPair("时间", data.getTime()));
+        list.add(new BillPair("状态", STATUS[data.getTrade_status()]));
+        list.add(new BillPair("流水号", data.getId()));
+        list.add(new BillPair("手续费", String.format("%.6f", data.getCost()) + " " + data.getbName()));
+        if(!TextUtils.isEmpty(data.getTrade_address())){
+            list.add(new BillPair("接收地址", data.getTrade_address()));
+        }
+//        list.add(new BillPair("备注", "-"));
+        adapter.notifyDataSetChanged();
+    }
+    
+    private class BillPair{
+        String type;
+        String content;
+
+        public BillPair(String type, String content) {
+            this.type = type;
+            this.content = content;
+        }
+    }
+}

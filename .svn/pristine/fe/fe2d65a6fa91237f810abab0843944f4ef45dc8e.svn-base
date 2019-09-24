@@ -1,0 +1,144 @@
+package com.bochat.app.app.activity.dynamic;
+
+import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.RelativeLayout;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.ViewSpotAdapter;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.common.contract.dynamic.ViewSpotContract;
+import com.bochat.app.model.bean.ViewSpotEntity;
+import com.bochat.app.model.bean.ViewSpotItemEntity;
+import com.bochat.app.mvp.view.BaseActivity;
+import com.liaoinstan.springview.container.DefaultFooter;
+import com.liaoinstan.springview.container.DefaultHeader;
+import com.liaoinstan.springview.widget.SpringView;
+
+import java.util.LinkedList;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+import static com.bochat.app.app.RouteExtra.WEB_LINK;
+import static com.bochat.app.app.RouteExtra.WEB_TITLE;
+import static com.bochat.app.app.RouteTable.DYNAMIC_MAIN;
+import static com.bochat.app.app.RouteTable.DYNAMIC_MAIN_VIEW_SPOT;
+import static com.bochat.app.app.RouteTable.DYNAMIC_MAIN_VIEW_SPOT_SEARCH;
+
+/**
+ * 2019/5/23
+ * Author LDL
+ **/
+@Route(path = DYNAMIC_MAIN_VIEW_SPOT)
+public class ViewSpotActivity extends BaseActivity<ViewSpotContract.Presenter> implements SpringView.OnFreshListener, ViewSpotContract.View , ViewSpotAdapter.OnItemClickListenner {
+
+    @Inject
+    ViewSpotContract.Presenter presenter;
+
+    @BindView(R.id.recycler)
+    RecyclerView recycler;
+
+    @BindView(R.id.springView)
+    SpringView springView;
+
+    @BindView(R.id.bochat_topbar)
+    BoChatTopBar bochat_topbar;
+
+    @BindView(R.id.bochat_search_layout)
+    RelativeLayout bochat_search_layout;
+
+    private ViewSpotEntity entity;
+    private int pageSize=10;
+    private int pageIndex=1;
+    private ViewSpotAdapter adapter;
+
+
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected ViewSpotContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_viewspot);
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+        initSpringView();
+        recycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
+        bochat_topbar.setReturnBtVisible(true);
+    }
+
+    private void initSpringView(){
+        springView.setListener(this);
+        springView.setHeader(new DefaultHeader(this));
+        springView.setFooter(new DefaultFooter(this));
+    }
+
+    @Override
+    public void getInfomationListSuccess(ViewSpotEntity entity) {
+        springView.onFinishFreshAndLoad();
+        if(entity!=null&&entity.getItem()!=null){
+            this.entity=entity;
+            if(adapter==null){
+                adapter=new ViewSpotAdapter(entity.getItem().getItems(),this);
+                adapter.setOnItemClickListenner(this);
+                recycler.setAdapter(adapter);
+            }else{
+                if(pageIndex==1){
+                    adapter.refreshData(entity.getItem().getItems());
+                }else{
+                    adapter.loadMore(entity.getItem().getItems());
+                }
+            }
+        }else{
+            if(pageIndex==1){
+                adapter.refreshData(new LinkedList<ViewSpotItemEntity>());
+            }
+        }
+    }
+
+    @OnClick({R.id.bochat_search_layout})
+    public void onClick(View view){
+        ARouter.getInstance().build(DYNAMIC_MAIN_VIEW_SPOT_SEARCH).navigation();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        onRefresh();
+    }
+
+    @Override
+    public void Onclick(int position, ViewSpotItemEntity entity) {
+        if(this.entity!=null){
+            ARouter.getInstance().build(DYNAMIC_MAIN).withString(WEB_TITLE,entity.getTitle()).withString(WEB_LINK,this.entity.getUrl()+"?id="+entity.getId()).navigation();
+        }
+    }
+
+    @Override
+    public void onRefresh() {
+        pageIndex=1;
+        presenter.getInfomationList(pageIndex,pageSize,"");
+    }
+
+    @Override
+    public void onLoadmore() {
+        pageIndex++;
+        presenter.getInfomationList(pageIndex,pageSize,"");
+    }
+}

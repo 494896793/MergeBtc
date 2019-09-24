@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F2F2F2"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_hasBackBtn="true"
+        app:top_titleText="账单"
+        app:top_background="#F2F2F2"/>
+    
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        android:background="#FFFFFF"
+        android:gravity="center_vertical">
+        <TextView
+            android:id="@+id/mine_bill_token_type_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/dp_16"
+            android:layout_marginLeft="@dimen/dp_15"
+            android:textColor="#181818"
+            android:text="资产类型"/>
+        <LinearLayout
+            android:layout_toRightOf="@id/mine_bill_token_type_title"
+            android:id="@+id/mine_bill_token_type_btn"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="@dimen/dp_20">
+
+            <TextView
+                android:id="@+id/mine_bill_token_type_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="#FE695E"
+                android:textSize="@dimen/dp_16"/>
+            <ImageView
+                android:layout_width="@dimen/dp_18"
+                android:layout_height="@dimen/dp_18"
+                android:textSize="@dimen/dp_16"
+                android:layout_marginLeft="@dimen/dp_5"
+                android:src="@mipmap/ic_arrow_down_gray24"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/dp_16"
+            android:layout_marginRight="@dimen/dp_22"
+            android:layout_toLeftOf="@id/mine_bill_charge_type_btn"
+            android:textColor="#181818"
+            android:text="交易类型"/>
+
+        <LinearLayout
+            android:layout_alignParentRight="true"
+            android:id="@+id/mine_bill_charge_type_btn"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_marginRight="@dimen/dp_20">
+            <TextView
+                android:id="@+id/mine_bill_charge_type_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/dp_16"
+                android:textColor="#FE695E"
+                android:text="所有"/>
+            <ImageView
+                android:layout_width="@dimen/dp_18"
+                android:layout_height="@dimen/dp_18"
+                android:textSize="@dimen/dp_16"
+                android:layout_marginLeft="@dimen/dp_5"
+                android:src="@mipmap/ic_arrow_down_gray24"/>
+        </LinearLayout>
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:layout_height="@dimen/dp_44">
+        <TextView
+            android:id="@+id/mine_bill_receive_amount"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:textColor="#666666"
+            android:textSize="@dimen/dp_14"
+            android:gravity="center"
+            android:text="收 入：￥2134.66"/>
+        <TextView
+            android:id="@+id/mine_bill_send_amount"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:textColor="#666666"
+            android:textSize="@dimen/dp_14"
+            android:gravity="center"
+            android:text="支 出：￥386.12"/>
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/mine_bill_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</LinearLayout>

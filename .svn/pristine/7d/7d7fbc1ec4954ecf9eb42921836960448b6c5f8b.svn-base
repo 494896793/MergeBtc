@@ -1,0 +1,108 @@
+package com.bochat.app.app.view;
+
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+import com.bochat.app.common.router.Router;
+import com.bochat.app.common.router.RouterDynamicWebView;
+import com.bochat.app.model.bean.ShakyCandyEntity;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+/**
+ * 2019/6/28
+ * Author LDL
+ **/
+public class GoodsRedDialog extends Dialog {
+
+
+    @BindView(R.id.detail_text)
+    TextView detail_text;
+
+    @BindView(R.id.sure_bt)
+    TextView sure_bt;
+
+    @BindView(R.id.coin_close)
+    Button coin_close;
+
+    @BindView(R.id.money_label)
+    TextView money_label;
+
+    @BindView(R.id.money_unit)
+    TextView money_unit;
+
+    @BindView(R.id.notice_text)
+    TextView notice_text;
+
+    private ShakyCandyEntity entity;
+
+    public GoodsRedDialog(Context context) {
+        super(context,R.style.TransparentDialog);
+    }
+
+    public GoodsRedDialog(Context context, int themeResId) {
+        super(context,R.style.TransparentDialog);
+    }
+
+    @Override
+    public void show() {
+        super.show();
+    }
+
+    public void setEntity(ShakyCandyEntity entity){
+        this.entity=entity;
+        notice_text.setText(entity.getHint());
+        money_unit.setText(entity.getCurrencyName());
+        money_label.setText(entity.getNum());
+    }
+
+    protected GoodsRedDialog(Context context, boolean cancelable, DialogInterface.OnCancelListener cancelListener) {
+        super(context,R.style.TransparentDialog);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.dialog_goodsred);
+        ButterKnife.bind(this);
+        setStyle();
+    }
+
+    @OnClick({R.id.coin_close,R.id.sure_bt,R.id.detail_text})
+    public void onViewClicked(View view){
+        switch (view.getId()){
+            case R.id.detail_text:
+                Router.navigation(new RouterDynamicWebView(entity.getUrl(),"活动详情"));
+                dismiss();
+                break;
+            case R.id.coin_close:
+                dismiss();
+                break;
+            case R.id.sure_bt:
+                dismiss();
+                break;
+        }
+    }
+
+    /**
+     * 设置样式
+     */
+    private void setStyle() {
+        WindowManager.LayoutParams layoutParams;
+        if (getWindow() != null) {
+            layoutParams = getWindow().getAttributes();
+            layoutParams.gravity = Gravity.CENTER;
+            getWindow().setAttributes(layoutParams);
+        }
+    }
+}

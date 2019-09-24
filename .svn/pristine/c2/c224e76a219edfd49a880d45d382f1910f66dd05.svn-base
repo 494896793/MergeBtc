@@ -1,0 +1,17 @@
+package com.bochat.app.business.main.dynamic;
+
+import com.bochat.app.common.contract.dynamic.KChatContract;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+/**
+ * 2019/6/19
+ * Author LDL
+ **/
+public class KChatPresenter extends BasePresenter<KChatContract.View> implements KChatContract.Presenter {
+
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+}

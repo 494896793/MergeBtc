@@ -1,0 +1,166 @@
+package com.bochat.app.business.main.dynamic;
+
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.dynamic.MarketQuotationBuyAndSellContract;
+import com.bochat.app.common.model.IDynamicModel;
+import com.bochat.app.common.model.IMarketCenterModel;
+import com.bochat.app.common.router.RouterMarketQuotationDetail;
+import com.bochat.app.common.util.ULog;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.ResidueAmountListEntity;
+import com.bochat.app.model.bean.TradingRulesEntity;
+import com.bochat.app.model.bean.UserEntity;
+import com.bochat.app.model.modelImpl.MarketCenter.EntrustListEntity;
+import com.bochat.app.model.modelImpl.MarketCenter.MarketCenterObserver;
+import com.bochat.app.model.modelImpl.MarketCenter.MarketCenterType;
+import com.bochat.app.model.modelImpl.MarketCenter.TransactionEntity;
+import com.bochat.app.model.modelImpl.MarketCenter.WebSocketCommand;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+public class MarketQuotationBuyAndSellPresenter extends BasePresenter<MarketQuotationBuyAndSellContract.View> implements
+        MarketQuotationBuyAndSellContract.Presenter, MarketCenterObserver<EntrustListEntity> {
+
+    @Inject
+    IDynamicModel dynamicModel;
+    @Inject
+    IMarketCenterModel marketCenterModel;
+
+    private TransactionEntity mEntity;
+
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void saleBuying(final long marketId, final String price, final double num, final int type, final long currencyIdL, final long currencyIdR) {
+        Disposable describe = Observable.create(new ObservableOnSubscribe<CodeEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<CodeEntity> emitter) throws Exception {
+                CodeEntity entity = dynamicModel.saleBuying(marketId, price, num, type, currencyIdL, currencyIdR);
+                emitter.onNext(entity);
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<CodeEntity>() {
+            @Override
+            public void accept(CodeEntity entity) throws Exception {
+                if (isActive()) {
+                    if (entity.getMsg().equals("成功")) {
+                        UserEntity userEntity = CachePool.getInstance().user().getLatest();
+                        listResidueAmount(userEntity.getId(), mEntity.getSellerId(), mEntity.getBuyerId());
+                    }
+                    getView().getSaleState(entity);
+
+                }
+            }
+        }, new RxErrorConsumer<Throwable>(this) {
+
+            @Override
+            public void acceptError(Throwable throwable) {
+                getView().hideLoading("");
+            }
+        });
+    }
+
+    @Override
+    public void update(TransactionEntity entity) {
+        RouterMarketQuotationDetail router = getExtra(RouterMarketQuotationDetail.class);
+        mEntity = entity != null ? entity : router.getEntity();
+        UserEntity userEntity = CachePool.getInstance().user().getLatest();
+
+        queryTradingRules(Long.valueOf(mEntity.getMarketId()));
+        listResidueAmount(userEntity.getId(), mEntity.getSellerId(), mEntity.getBuyerId());
+    }
+
+    @Override
+    public void listResidueAmount(final long userId, final String currencyIdL, final String currencyIdR) {
+        ULog.d("userId: %s, currencyIdL:%s, currencyIdR:%s", String.valueOf(userId), currencyIdL, currencyIdR);
+        Disposable describe = Observable.create(new ObservableOnSubscribe<ResidueAmountListEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<ResidueAmountListEntity> emitter) throws Exception {
+                ResidueAmountListEntity entity = dynamicModel.listResidueAmount(userId, currencyIdL, currencyIdR);
+                if (entity != null && entity.getData() != null) {
+                    emitter.onNext(entity);
+                } else {
+                    emitter.onError(new Throwable(""));
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<ResidueAmountListEntity>() {
+            @Override
+            public void accept(ResidueAmountListEntity entity) throws Exception {
+                if (isActive()) {
+                    getView().getResidueAmount(entity);
+                }
+            }
+        }, new RxErrorConsumer<Throwable>(this) {
+
+            @Override
+            public void acceptError(Throwable throwable) {
+                getView().errorResidueAmount();
+                getView().hideLoading("");
+            }
+        });
+    }
+
+    @Override
+    public void queryTradingRules(final long marketId) {
+        Disposable describe = Observable.create(new ObservableOnSubscribe<TradingRulesEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<TradingRulesEntity> emitter) throws Exception {
+                TradingRulesEntity entity = dynamicModel.queryTradingRules(marketId);
+                if (entity != null) {
+                    emitter.onNext(entity);
+                } else {
+                    emitter.onError(new Throwable(""));
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<TradingRulesEntity>() {
+            @Override
+            public void accept(TradingRulesEntity entity) throws Exception {
+                if (isActive()) {
+                    getView().getTradingRulesEntity(entity);
+                }
+            }
+        });
+    }
+
+    /**
+     * @param marketId 市场ID
+     * @param type     {已经不用传递}
+     */
+    @Override
+    public void obtainEntrustList(String marketId, String type) {
+        marketCenterModel.sendCommand(new WebSocketCommand.CommandBuilder(MarketCenterType.ENTRUST)
+                .put("marketId", marketId)
+                .build()
+        );
+    }
+
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        update(null);
+        marketCenterModel.addObserver(EntrustListEntity.class, this);
+    }
+
+    @Override
+    public void onViewInactivation() {
+        super.onViewInactivation();
+        marketCenterModel.removeObserver(EntrustListEntity.class, this);
+    }
+
+    @Override
+    public void onReceive(EntrustListEntity entity) {
+        getView().updateEntrustList(entity);
+    }
+}

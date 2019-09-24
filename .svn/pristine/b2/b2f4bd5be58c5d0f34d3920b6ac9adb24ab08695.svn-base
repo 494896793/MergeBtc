@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    style="@style/default_layout">
+    
+    <com.bochat.app.app.view.BoChatTopBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_titleText="管理群"
+        app:top_hasBackBtn="true"
+        app:top_background="#FFFFFF"/>
+
+    <com.bochat.app.app.view.BoChatItemView
+        android:id="@+id/cv_group_manage_forbidden_all"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_text="全体禁言"
+        app:item_hasRightBtn="false"
+        app:item_hasSwitchBtn="true"
+        android:layout_marginTop="@dimen/dp_10"/>
+    
+    <com.bochat.app.app.view.BoChatItemView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:item_text="群禁言列表"
+        app:item_hasRightBtn="false"
+        android:layout_marginTop="@dimen/dp_10"/>
+
+    <ListView
+        android:layout_marginTop="@dimen/dp_1"
+        android:id="@+id/cv_group_manage_forbidden_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    
+</LinearLayout>

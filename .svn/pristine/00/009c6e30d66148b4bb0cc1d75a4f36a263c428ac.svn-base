@@ -1,0 +1,150 @@
+package com.bochat.app.model.modelImpl.MarketCenter;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/27 13:46
+ * Description :
+ */
+
+public class KLineEntity implements MarketCenterData {
+    private String rate;
+    private String rateToRMB;
+    private String amplitude24H;
+    private String maxPrice24H;
+    private String minPrice24H;
+    private List<KLineItemEntity> kLineItems = new ArrayList<>();
+    private List<TradeItemEntity> tradeItems = new ArrayList<>();
+    
+    @Override
+    public MarketCenterType getType() {
+        return MarketCenterType.KLINE;
+    }
+
+    @Override
+    public boolean parseFromJson(JSONObject json) {
+        try {
+            rate = json.getString("rate");
+            rateToRMB = json.getString("rateToRMB");
+            amplitude24H = json.getString("amplitude24H");
+            maxPrice24H = json.getString("maxPrice24H");
+            minPrice24H = json.getString("minPrice24H");
+
+            JSONArray kLine = json.getJSONArray("kline");
+            for(int i = 0; i < kLine.length(); i++){
+                KLineItemEntity item = new KLineItemEntity(kLine.getJSONObject(i));
+                kLineItems.add(item);
+            }
+
+            JSONArray trade = json.getJSONArray("trade");
+            for(int i = 0; i < trade.length(); i++){
+                TradeItemEntity item = new TradeItemEntity(trade.getJSONObject(i));
+                tradeItems.add(item);
+            }
+
+            return true;
+        } catch (Exception ignore){
+        }
+        return false;
+    }
+
+    public String getRate() {
+        return rate;
+    }
+
+    public String getRateToRMB() {
+        return rateToRMB;
+    }
+
+    public String getAmplitude24H() {
+        return amplitude24H;
+    }
+
+    public String getMaxPrice24H() {
+        return maxPrice24H;
+    }
+
+    public String getMinPrice24H() {
+        return minPrice24H;
+    }
+
+    public List<KLineItemEntity> getKLineItems() {
+        return kLineItems;
+    }
+
+    public List<TradeItemEntity> getTradeItems() {
+        return tradeItems;
+    }
+
+
+    public static class KLineItemEntity{
+        private String start;
+        private String end;
+        private String max;
+        private String min;
+
+        public KLineItemEntity(JSONObject json) {
+            try {
+                start = json.getString("start");
+                end = json.getString("end");
+                max = json.getString("max");
+                min = json.getString("min");
+            } catch (Exception ignore){
+            }
+        }
+
+        public String getStart() {
+            return start;
+        }
+
+        public String getEnd() {
+            return end;
+        }
+
+        public String getMax() {
+            return max;
+        }
+
+        public String getMin() {
+            return min;
+        }
+    }
+
+    public static class TradeItemEntity{
+        private String time;
+        private String type;
+        private String price;
+        private String num;
+
+        public TradeItemEntity(JSONObject json) {
+            try {
+                time = json.getString("time");
+                type = json.getString("type");
+                price = json.getString("price");
+                num = json.getString("num");
+            } catch (Exception ignore){
+            }
+        }
+
+        public String getTime() {
+            return time;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public String getPrice() {
+            return price;
+        }
+
+        public String getNum() {
+            return num;
+        }
+    }
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:background="#FFFFFF"
+              android:orientation="vertical">
+    
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/mine_token_detail_transfer_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_hasBackBtn="true"
+        app:top_titleText="BTC"
+        app:top_background="#FFFFFF"/>
+
+    <com.liaoinstan.springview.widget.SpringView
+        android:id="@+id/springView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ListView
+            android:id="@+id/mine_token_detail_transfer_detail_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null">
+        </ListView>
+    </com.liaoinstan.springview.widget.SpringView>
+</LinearLayout>

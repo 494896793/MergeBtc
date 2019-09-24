@@ -1,0 +1,92 @@
+package com.bochat.app.common.router;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/13 14:34
+ * Description :
+ */
+
+import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+
+public abstract class AbstractRouter implements Serializable {
+
+    public static final String TAG = "ROUTER";
+
+    private Class<? extends AbstractRouter> backRouter;
+
+    public Class<? extends AbstractRouter> getBackRouter() {
+        return backRouter;
+    }
+
+    public void setBackRouter(Class<? extends AbstractRouter> backRouter) {
+        this.backRouter = backRouter;
+    }
+    
+    public String getBackRouterPath(){
+        if(backRouter != null){
+            try {
+                return backRouter.newInstance().getPath();
+            } catch (Exception e){
+            }
+        }
+        return null;
+    }
+    
+    public abstract String getPath();
+
+    public String getTAG(){
+        return TAG;
+    }
+    
+    public boolean back(Object... objects){
+        if(backRouter == null){
+            return false;
+        }
+        try {
+            Constructor<?> constructor = null;
+            Constructor<?>[] declaredConstructors = backRouter.getDeclaredConstructors();
+            for(int i = 0; i < declaredConstructors.length; i++){
+                Constructor<?> c = declaredConstructors[i];
+                Class<?>[] parameterTypes = c.getParameterTypes();
+                if(parameterTypes.length == objects.length){
+                    if(parameterTypes.length == 0) {
+                        constructor = c;
+                        break;
+                    } else {
+                        for(int j = 0; j < parameterTypes.length; j++){
+                            if(parameterTypes[j] != objects[j].getClass()){
+                                Field type = null;
+                                try {
+                                    type = objects[j].getClass().getDeclaredField("TYPE");
+                                } catch (NoSuchFieldException ignored) {
+                                }
+                                if(type == null || (type).get(null) != parameterTypes[j]){
+                                    break;
+                                }
+                            }
+                            if(j == parameterTypes.length -1){
+                                constructor = c;
+                            }
+                        }
+                    }
+                }
+            }
+            if(constructor != null){
+                Router.navigation((AbstractRouter) constructor.newInstance(objects));
+                return true;
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+}

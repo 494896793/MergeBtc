@@ -1,0 +1,80 @@
+package com.bochat.app.business.main.conversation;
+
+import android.content.Intent;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.common.contract.conversation.GroupManageContract;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/26 10:52
+ * Description :
+ */
+
+public class GroupManagePresenter extends BasePresenter<GroupManageContract.View> implements GroupManageContract.Presenter{
+   
+    private GroupEntity groupEntity;
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+    
+    @Override
+    public void onViewRefresh() {
+        super.onViewRefresh();
+        Intent intent = getView().getViewIntent();
+        if(intent.hasExtra(RouteExtra.GroupEntity)){
+            groupEntity = (GroupEntity)intent.getSerializableExtra(RouteExtra.GroupEntity);
+            getView().updateGroupInfo(groupEntity);
+        }
+    }
+
+    @Override
+    public boolean isActive() {
+        return super.isActive() && groupEntity != null;
+    }
+
+    @Override
+    public void onGroupEditClick() {
+        if(isActive()){
+            ARouter.getInstance().build(RouteTable.CONVERSATION_GROUP_MANAGE_EDIT)
+                    .withSerializable(RouteExtra.GroupEntity, groupEntity).navigation();
+        }
+    }
+
+    @Override
+    public void onGroupForbiddenClick() {
+        if(isActive()) {
+            ARouter.getInstance().build(RouteTable.CONVERSATION_GROUP_MANAGE_FORBIDDEN)
+                    .withSerializable(RouteExtra.GroupEntity, groupEntity).navigation();
+        }
+    }
+
+    @Override
+    public void onGroupUpgradeClick() {
+        if(isActive()) {
+            ARouter.getInstance().build(RouteTable.CONVERSATION_GROUP_MANAGE_UPGRADE)
+                    .withSerializable(RouteExtra.GroupEntity, groupEntity).navigation();
+        }
+    }
+
+    @Override
+    public void onGroupManagerSettingClick() {
+        if(isActive()){
+            
+        }
+    }
+
+    @Override
+    public void onGroupJoinFilterClick() {
+        if(isActive()){
+            ARouter.getInstance().build(RouteTable.CONVERSATION_GROUP_MANAGE_JOIN_FILTER)
+                    .withSerializable(RouteExtra.GroupEntity, groupEntity).navigation();
+        }
+    }
+}

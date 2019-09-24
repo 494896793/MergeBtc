@@ -1,0 +1,63 @@
+package com.bochat.app.common.contract.dynamic;
+
+import com.bochat.app.model.bean.ResidueAmountListEntity;
+import com.bochat.app.model.bean.TradingRulesEntity;
+import com.bochat.app.model.modelImpl.MarketCenter.EntrustListEntity;
+import com.bochat.app.model.modelImpl.MarketCenter.TransactionEntity;
+import com.bochat.app.mvp.presenter.IBasePresenter;
+import com.bochat.app.mvp.view.IBaseView;
+
+public interface MarketQuotationBuyAndSellContract {
+
+    interface View extends IBaseView<Presenter> {
+
+        void getResidueAmount(ResidueAmountListEntity entity);
+
+        void updateEntrustList(EntrustListEntity entity);
+
+        void getTradingRulesEntity(TradingRulesEntity entity);
+
+        void getSaleState(String msg);
+    }
+
+    interface Presenter extends IBasePresenter<View> {
+        /**
+         * 交易规则
+         * @param marketId
+         */
+        void queryTradingRules(long marketId);
+
+        /**
+         * 获取推送委托
+         * @param marketId
+         * @param type
+         */
+        void obtainEntrustList(String marketId, String type);
+
+        /**
+         * 获取资产
+         * @param userId
+         * @param currencyIdL
+         * @param currencyIdR
+         */
+        void listResidueAmount(long userId, String currencyIdL, String currencyIdR);
+
+        /**
+         * 买入卖出
+         * @param marketId
+         * @param price
+         * @param num
+         * @param type
+         * @param currencyIdL
+         * @param currencyIdR
+         */
+        void saleBuying(long marketId, String price, double num, int type, long currencyIdL, long currencyIdR);
+
+        /**
+         * 更新UI
+         * @param entity
+         */
+        void update(TransactionEntity entity);
+        
+    }
+}

@@ -1,0 +1,162 @@
+package com.bochat.app.app.fragment.dynamic;
+
+import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.adapter.DynamicAdapter;
+import com.bochat.app.app.view.BoChatTopBar;
+import com.bochat.app.common.contract.dynamic.DynamicContract;
+import com.bochat.app.model.bean.DynamicAdapterEntity;
+import com.bochat.app.model.bean.DynamicBannerEntity;
+import com.bochat.app.model.bean.DynamicTopShopEntity;
+import com.bochat.app.model.bean.GameGoEntity;
+import com.bochat.app.model.bean.ProjectIdentificationEntity;
+import com.bochat.app.model.bean.ViewPagerItemJumpEntity;
+import com.bochat.app.mvp.view.BaseFragment;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+import static com.bochat.app.app.RouteExtra.WEB_LINK;
+import static com.bochat.app.app.RouteExtra.WEB_TITLE;
+import static com.bochat.app.app.RouteTable.DYNAMIC_LIST_APP;
+import static com.bochat.app.app.RouteTable.DYNAMIC_MAIN;
+import static com.bochat.app.app.RouteTable.DYNAMIC_MAIN_FAST_SPEED;
+import static com.bochat.app.app.RouteTable.DYNAMIC_MAIN_NOTICE;
+import static com.bochat.app.app.RouteTable.DYNAMIC_MAIN_PROJECT_IDENTIFICATION;
+import static com.bochat.app.app.RouteTable.DYNAMIC_MAIN_PROJECT_IDENTIFICATION_RESULT;
+import static com.bochat.app.app.RouteTable.DYNAMIC_MAIN_VIEW_SPOT;
+import static com.bochat.app.app.RouteTable.MINE_QUICK_EXCHANGE_HALL;
+
+/**
+ * 2019/5/7
+ * Author LDL
+ **/
+public class DynamicFragment extends BaseFragment<DynamicContract.Presenter> implements DynamicContract.View , DynamicAdapter.OnViewpagerItemClick, DynamicAdapter.OnGridViewItemClick
+        , DynamicAdapter.OnAppTitleClickListenner, DynamicAdapter.OnNoticeClick {
+
+    @Inject
+    DynamicContract.Presenter presenter;
+
+    @BindView(R.id.bochat_topbar)
+    BoChatTopBar bochat_topbar;
+
+    @BindView(R.id.recyclerview)
+    RecyclerView recyclerview;
+
+    DynamicAdapter adapter;
+    ProjectIdentificationEntity projectIdentificationEntity;
+
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected DynamicContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    private GameGoEntity gameGoEntity;
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view=inflater.inflate(R.layout.fragment_dynamic,null);
+        return view;
+    }
+
+    @Override
+    protected void initWidget() {
+        bochat_topbar.setTitleText("动态");
+        bochat_topbar.setRightButtonInvisble(true);
+
+        adapter=new DynamicAdapter(new ArrayList<DynamicAdapterEntity>(),getActivity());
+        adapter.setOnGridViewItemClick(this);
+        adapter.setOnViewpagerItemClick(this);
+        adapter.setOnNoticeClick(this);
+        adapter.setOnAppTitleClickListenner(this);
+        recyclerview.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false));
+        recyclerview.setAdapter(adapter);
+    }
+
+    @Override
+    public void refreshData(List<DynamicAdapterEntity> entity) {
+        adapter.refreshData(entity);
+    }
+
+    @Override
+    public void getProjectStatuSuccess(ProjectIdentificationEntity entity) {
+        projectIdentificationEntity=entity;
+        presenter.loadData(4);
+    }
+
+    @Override
+    public void gameGoLogin(GameGoEntity entity) {
+        gameGoEntity=entity;
+    }
+
+    @Override
+    public void onItemClick(int position, DynamicBannerEntity entity, ViewPagerItemJumpEntity jumpEntity) {
+        if(jumpEntity.linkJump){
+            ARouter.getInstance().build(RouteTable.DYNAMIC_MAIN).withString(WEB_LINK,entity.getLink()).withString(WEB_TITLE,entity.getTitle()).navigation();
+        }else{
+            if(jumpEntity.isJump){
+                ARouter.getInstance().build(MINE_QUICK_EXCHANGE_HALL).navigation();
+            }else{
+                Toast.makeText(getActivity(),"暂未开通",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    public void onItemClick(int position, DynamicTopShopEntity entity) {
+        if(entity.getName().equals(getString(R.string.exchange))){
+            ARouter.getInstance().build(MINE_QUICK_EXCHANGE_HALL).navigation();
+        }else if(entity.getName().equals(getString(R.string.view_look))){
+            ARouter.getInstance().build(DYNAMIC_MAIN_VIEW_SPOT).navigation();
+        }else if(entity.getName().equals(getString(R.string.fast_exchange))){
+            ARouter.getInstance().build(DYNAMIC_MAIN_FAST_SPEED).navigation();
+        }else if(entity.getName().equals(getString(R.string.app_store))){
+            ARouter.getInstance().build(DYNAMIC_LIST_APP).navigation();
+        }else if(entity.getName().equals(getString(R.string.project_apply))){
+            if(projectIdentificationEntity!=null&&projectIdentificationEntity.getCompanyName()!=null){
+                ARouter.getInstance().build(DYNAMIC_MAIN_PROJECT_IDENTIFICATION_RESULT).withSerializable(RouteExtra.ProjectIdentificationEntity,projectIdentificationEntity).navigation();
+            }else{
+                ARouter.getInstance().build(DYNAMIC_MAIN_PROJECT_IDENTIFICATION).navigation();
+            }
+        }else if(entity.getName().equals(getString(R.string.game_hall))){
+            if(gameGoEntity!=null){
+                ARouter.getInstance().build(DYNAMIC_MAIN).withBoolean(RouteExtra.IsShareUrl,false).withString(WEB_LINK,gameGoEntity.getGameUrl()).withString(WEB_TITLE,entity.getName()).navigation();
+            }
+        }else if(entity.getName().equals(getString(R.string.otc_transcation))||entity.getName().equals(getString(R.string.dynamic_quotation))||entity.getName().equals(getString(R.string.dynamic_activity))){
+            showTips("敬请期待");
+        }else if(entity.getName().equals(getString(R.string.icon_zilong))){
+            ARouter.getInstance().build(DYNAMIC_MAIN).withBoolean(RouteExtra.IsShareUrl,false).withString(WEB_LINK,entity.getLink()).withString(WEB_TITLE,entity.getName()).navigation();
+        }else if(entity.getName().equals(getString(R.string.real_register))){
+            ARouter.getInstance().build(DYNAMIC_MAIN).withBoolean(RouteExtra.IsShareUrl,false).withString(WEB_LINK,entity.getLink()).withString(WEB_TITLE,entity.getName()).navigation();
+        }
+    }
+
+    @Override
+    public void onTitleClick() {
+        ARouter.getInstance().build(DYNAMIC_LIST_APP).navigation();
+    }
+
+    @Override
+    public void onNoticeClick() {
+        ARouter.getInstance().build(DYNAMIC_MAIN_NOTICE).navigation();
+    }
+}

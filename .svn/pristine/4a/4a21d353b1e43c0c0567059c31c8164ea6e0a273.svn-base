@@ -1,0 +1,74 @@
+package com.bochat.app;
+
+import android.app.Activity;
+import android.app.Application;
+import android.os.Bundle;
+
+import com.bochat.app.app.view.MessageDialog;
+import com.bochat.app.common.util.ULog;
+
+public class BoChatActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
+
+    public static boolean isDownloading = false;
+    public MessageDialog messageDialog;
+
+    @Override
+    public void onActivityCreated(final Activity activity, Bundle bundle) {
+
+//        if (activity instanceof SplashScreenActivity || activity instanceof AboutUsActivity) 
+//            return;
+//        
+//        
+//        messageDialog = new MessageDialog(activity, "检测到新版本");
+//        messageDialog.setOnChooseListener(new MessageDialog.OnChooseListener() {
+//            @Override
+//            public void onEnter() {
+//                isDownloading = true;
+//                APKUtils.upgrade(activity, new UpgradeModel());
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                isDownloading = false;
+//                System.exit(0);
+//                Process.killProcess(Process.myPid());
+//            }
+//        });
+//        messageDialog.showPopupWindow();
+
+    }
+
+    @Override
+    public void onActivityStarted(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityResumed(Activity activity) {
+        ULog.d("activity=%@", activity);
+        if (messageDialog != null && !isDownloading) {
+            if (!messageDialog.isShowing())
+                messageDialog.showPopupWindow();
+        }
+    }
+
+    @Override
+    public void onActivityPaused(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityStopped(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onActivityDestroyed(Activity activity) {
+
+    }
+}

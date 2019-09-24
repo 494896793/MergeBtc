@@ -1,0 +1,114 @@
+package com.bochat.app.app.activity.bill;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.bochat.app.R;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.app.util.MoneyInputLimit;
+import com.bochat.app.common.contract.bill.PropertyRechargeContract;
+import com.bochat.app.mvp.view.BaseActivity;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/4/26  16:07
+ * Description : 零钱充值
+ */
+@Route(path = RouteTable.MINE_PROPERTY_RECHARGE)
+public class PropertyRechargeActivity extends BaseActivity<PropertyRechargeContract.Presenter> implements PropertyRechargeContract.View {
+    @Inject
+    PropertyRechargeContract.Presenter presenter;
+
+    @BindView(R.id.mine_property_recharge_pay_arrow)
+    ImageView arrow;
+    @BindView(R.id.mine_property_recharge_pay_icon)
+    ImageView icon;
+    @BindView(R.id.mine_property_recharge_pay_name)
+    TextView name;
+    @BindView(R.id.mine_property_recharge_alipay)
+    RelativeLayout alipayLayout;
+    
+    @BindView(R.id.mine_property_recharge_pay_div)
+    View payDiv;
+    @BindView(R.id.mine_property_recharge_wechat_pay)
+    RelativeLayout wechatPayLayout;
+    @BindView(R.id.mine_property_recharge_amount_input)
+    EditText amountInput;
+    
+    private boolean isChoosePayVisible;
+    private int payType = 1;
+    
+    @Override
+    protected void initInjector() {
+        getActivityComponent().inject(this);
+    }
+
+    @Override
+    protected PropertyRechargeContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected void setRootView(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_mine_property_recharge);
+    }
+
+    @OnClick({R.id.mine_property_recharge_wechat_pay,
+            R.id.mine_property_recharge_alipay, R.id.mine_property_recharge_enter_btn})
+    @Override
+    protected void onViewClicked(View view) {
+        super.onViewClicked(view);
+        switch (view.getId()) {
+            case R.id.mine_property_recharge_pay_type_select:
+                isChoosePayVisible = !isChoosePayVisible;
+                arrow.setImageResource(isChoosePayVisible ? R.mipmap.ic_arrow_down_gray24 : R.mipmap.ic_arrow_right_gray24);
+                alipayLayout.setVisibility(isChoosePayVisible ? View.VISIBLE : View.GONE);
+                wechatPayLayout.setVisibility(isChoosePayVisible ? View.VISIBLE : View.GONE);
+                payDiv.setVisibility(isChoosePayVisible ? View.VISIBLE : View.GONE);
+            break;
+            case R.id.mine_property_recharge_alipay:
+                payType = 1;
+                isChoosePayVisible = false;
+                alipayLayout.setVisibility(View.GONE);
+                wechatPayLayout.setVisibility(View.GONE);
+                payDiv.setVisibility(View.GONE);
+                icon.setImageResource(R.mipmap.ic_alipay);
+                name.setText("支付宝");
+                arrow.setImageResource(R.mipmap.ic_arrow_right_gray24);
+                break;
+            case R.id.mine_property_recharge_wechat_pay:
+                payType = 2;
+                isChoosePayVisible = false;
+                alipayLayout.setVisibility(View.GONE);
+                wechatPayLayout.setVisibility(View.GONE);
+                payDiv.setVisibility(View.GONE);
+                icon.setImageResource(R.mipmap.ic_wechat);
+                name.setText("微信");
+                arrow.setImageResource(R.mipmap.ic_arrow_right_gray24);
+            break;
+            case R.id.mine_property_recharge_enter_btn:
+                presenter.onRechargeEnter(payType, amountInput.getText().toString());
+                
+            break;
+        
+            default:
+                break;
+        }
+    }
+    
+    @Override
+    protected void initWidget() {
+        amountInput.addTextChangedListener(new MoneyInputLimit(amountInput).setDigits(2));
+        amountInput.setSelection(amountInput.getText().toString().length());
+    }
+}

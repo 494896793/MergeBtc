@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <com.bochat.app.app.view.BoChatTopBar
+        android:id="@+id/search_message_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:top_titleText="聊天记录"
+        app:top_hasBackBtn="true"
+        android:visibility="gone"
+        />
+
+    <com.bochat.app.app.view.SearchEditText
+        android:id="@+id/search_message_input"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_44"
+        app:searchHint="搜索聊天内容"
+        android:layout_marginTop="@dimen/dp_34"
+        />
+
+    <com.liaoinstan.springview.widget.SpringView
+        android:id="@+id/springView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.liaoinstan.springview.widget.SpringView>
+</LinearLayout>

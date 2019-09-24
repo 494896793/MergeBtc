@@ -1,0 +1,32 @@
+package com.bochat.app.common.router;
+
+import com.bochat.app.model.bean.AmountEntity;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/06/14 17:10
+ * Description :
+ */
+
+public class RouterPropertyCashOut extends AbstractRouter {
+    public static final String PATH ="/path/RouterPropertyCashOut";
+    
+    private AmountEntity amountEntity;
+
+    public RouterPropertyCashOut(AmountEntity amountEntity) {
+        this.amountEntity = amountEntity;
+    }
+
+    public AmountEntity getAmountEntity() {
+        return amountEntity;
+    }
+
+    public void setAmountEntity(AmountEntity amountEntity) {
+        this.amountEntity = amountEntity;
+    }
+
+    @Override
+    public String getPath() {
+        return PATH;
+    }
+}

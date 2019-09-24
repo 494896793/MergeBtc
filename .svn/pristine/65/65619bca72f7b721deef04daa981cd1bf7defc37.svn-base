@@ -1,0 +1,84 @@
+package com.bochat.app.app.view;
+
+import android.content.Context;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.DecelerateInterpolator;
+import com.bochat.app.R;
+
+import razerdp.basepopup.BasePopupWindow;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/12 13:42
+ * Description :
+ */
+
+public class PlusMorePopupWindow extends BasePopupWindow implements View.OnClickListener {
+
+    public PlusMorePopupWindow(Context context) {
+        super(context);
+        setPopupGravity(Gravity.BOTTOM | Gravity.LEFT);
+        setBackground(0);
+        ViewGroup addGroupChatLayout = findViewById(R.id.bochat_create_group_layout);
+        ViewGroup addFriendLayout = findViewById(R.id.bochat_add_friend_layout);
+        addGroupChatLayout.setOnClickListener(this);
+        addFriendLayout.setOnClickListener(this);
+    }
+
+    @Override
+    public View onCreateContentView() {
+        return createPopupById(R.layout.view_plus_more_dialog);
+    }
+
+    @Override
+    protected Animation onCreateShowAnimation() {
+        AnimationSet set = new AnimationSet(true);
+        set.setInterpolator(new DecelerateInterpolator());
+        set.addAnimation(getScaleAnimation(0, 1, 0, 1, Animation.RELATIVE_TO_SELF, 1, Animation.RELATIVE_TO_SELF, 0));
+        set.addAnimation(getDefaultAlphaAnimation());
+        set.setDuration(200);
+        return set;
+    }
+
+    @Override
+    protected Animation onCreateDismissAnimation() {
+        AnimationSet set = new AnimationSet(true);
+        set.setInterpolator(new DecelerateInterpolator());
+        set.addAnimation(getScaleAnimation(1, 0, 1, 0, Animation.RELATIVE_TO_SELF, 1, Animation.RELATIVE_TO_SELF, 0));
+        set.addAnimation(getDefaultAlphaAnimation(false));
+        set.setDuration(200);
+        return set;
+    }
+    
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.bochat_create_group_layout){
+            dismiss();
+            if (mOnPlusMoreItemClickListener != null) {
+                mOnPlusMoreItemClickListener.onCreateGroupChatItemClick(v);
+            }
+        } else {
+            dismiss();
+            if (mOnPlusMoreItemClickListener != null) {
+                mOnPlusMoreItemClickListener.onAddFriendItemClick(v);
+            }
+        }
+    }
+
+    private OnPlusMoreItemClickListener mOnPlusMoreItemClickListener;
+
+    public void setOnPlusMoreItemClickListener(OnPlusMoreItemClickListener listener) {
+        this.mOnPlusMoreItemClickListener = listener;
+    }
+
+    public interface OnPlusMoreItemClickListener {
+        void onCreateGroupChatItemClick(View view);
+
+        void onAddFriendItemClick(View view);
+    }
+}
+

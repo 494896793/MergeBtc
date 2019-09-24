@@ -1,0 +1,48 @@
+package com.bochat.app.business.main.conversation;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.conversation.AddFriendContract;
+import com.bochat.app.model.bean.UserEntity;
+import com.bochat.app.mvp.presenter.BasePresenter;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/18 11:10
+ * Description :
+ */
+
+public class AddFriendPresenter extends BasePresenter<AddFriendContract.View> implements AddFriendContract.Presenter{
+    
+    @Override
+    public void onViewRefresh() {
+        long id = CachePool.getInstance().user().getLatest().getId();
+        getView().updateIdText(String.valueOf(id));
+    }
+
+    @Override
+    public void onSearchClick() {
+        ARouter.getInstance().build(RouteTable.CONVERSATION_SEARCH_FRIEND)
+                .withBoolean(RouteExtra.IsSearchFriend_Boolean, true).navigation();
+    }
+
+    @Override
+    public void onQRScanClick() {
+        ARouter.getInstance().build(RouteTable.SCAN_QR_CODE).withString(RouteExtra.ReturnUrl,
+                RouteTable.BOOK_ADDRESS_FRIEND_DETAIL).navigation();
+    }
+
+    @Override
+    public void onQRCardClick() {
+        UserEntity latest = CachePool.getInstance().user().getLatest();
+        ARouter.getInstance().build(RouteTable.CONVERSATION_QR_CARD)
+                .withSerializable(RouteExtra.UserEntiry, latest).navigation();
+    }
+
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this); 
+    }
+}

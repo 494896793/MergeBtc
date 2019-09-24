@@ -1,0 +1,368 @@
+package com.bochat.app.business.main.conversation;
+
+import android.content.Intent;
+import android.text.TextUtils;
+
+import com.alibaba.android.arouter.launcher.ARouter;
+import com.bochat.app.app.RouteExtra;
+import com.bochat.app.app.RouteTable;
+import com.bochat.app.business.RxErrorConsumer;
+import com.bochat.app.business.RxErrorThrowable;
+import com.bochat.app.business.cache.CachePool;
+import com.bochat.app.common.contract.conversation.GroupDetailContract;
+import com.bochat.app.common.contract.conversation.GroupMemberContract;
+import com.bochat.app.common.model.IGroupModule;
+import com.bochat.app.common.model.IIMModel;
+import com.bochat.app.common.model.IUserLocalModel;
+import com.bochat.app.common.util.ALog;
+import com.bochat.app.model.bean.CodeEntity;
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.model.bean.GroupListEntity;
+import com.bochat.app.model.rong.BoChatMessage;
+import com.bochat.app.mvp.presenter.BasePresenter;
+import com.bochat.app.mvp.view.ResultTipsType;
+
+import javax.inject.Inject;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import io.rong.imkit.RongIM;
+import io.rong.imlib.RongIMClient;
+import io.rong.imlib.model.Conversation;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/16 11:36
+ * Description :
+ */
+
+public class GroupDetailPresenter extends BasePresenter<GroupDetailContract.View> implements GroupDetailContract.Presenter{
+    
+    @Inject
+    IGroupModule groupModule;
+    
+    @Inject
+    IUserLocalModel userModel;
+    
+    @Inject
+    IIMModel iimModel;
+    
+    private GroupEntity group;
+    
+    private boolean isJoin;
+
+    private boolean isApply;
+    
+    private int groupRole;
+
+    private boolean isNotNotification = false;
+    
+    private boolean isTop = false;
+
+    private String groupId;
+    
+    
+    @Override
+    public void initInjector() {
+        getBusinessComponent().inject(this);
+    }
+
+    @Override
+    public void onViewRefresh() {
+        Intent intent = getView().getViewIntent();
+        
+        if(intent.hasExtra(RouteExtra.ConversationId_String)){
+            groupId = getView().getViewIntent().getStringExtra(RouteExtra.ConversationId_String);
+        } else if(intent.hasExtra(RouteExtra.GroupEntity)) {
+            GroupEntity entity = (GroupEntity)intent.getSerializableExtra(RouteExtra.GroupEntity);
+            groupId = String.valueOf(entity.getGroup_id());
+        }
+        if(TextUtils.isEmpty(groupId)){
+            return;
+        }
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<Object[]>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Object[]> emitter) throws Exception {
+                try {
+                    group = CachePool.getInstance().groupDetail().get(Long.valueOf(groupId));
+                    if(group != null){
+                        checkNotificationStatus(emitter);
+                    }
+                    GroupListEntity groupInfo = groupModule.getGroupInfo(Long.valueOf(groupId), "", -1, -1);
+                    if (groupInfo.getRetcode() != 0) {
+                        emitter.onError(new RxErrorThrowable(groupInfo));
+                        return;
+                    }
+                    int memberNum = group == null ? 0 : group.getMember_num();
+                    group = groupInfo.getItems().get(0);
+                    group.setMember_num(memberNum);
+                    CachePool.getInstance().groupDetail().put(group);
+                    checkNotificationStatus(emitter);
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Object[]>() {
+            @Override
+            public void accept(Object[] entity) throws Exception {
+                if(isActive()){
+                    getView().hideLoading("");
+                    groupRole = group.getRole();
+                    isJoin = groupRole != 0;
+                    getView().updateGroupChatDetail(group, isJoin, groupRole == GroupMemberContract.ROLE_OWNER, isNotNotification, isTop);
+                }
+            }
+        }, new RxErrorConsumer<Throwable>(this) {
+
+            @Override
+            public void acceptError(Throwable throwable) {
+                getView().hideLoading("");
+            }
+        });
+        getView().showLoading(subscribe);
+    }
+    
+    private void checkNotificationStatus(final ObservableEmitter<Object[]> emitter){
+        RongIMClient.getInstance().getConversationNotificationStatus(Conversation.ConversationType.GROUP,
+                String.valueOf(group.getGroup_id()),
+                new RongIMClient.ResultCallback<Conversation.ConversationNotificationStatus>() {
+                    @Override
+                    public void onSuccess(Conversation.ConversationNotificationStatus conversationNotificationStatus) {
+                        isNotNotification = conversationNotificationStatus == Conversation.ConversationNotificationStatus.DO_NOT_DISTURB;
+                        checkConversationTop(emitter);
+                    }
+
+                    @Override
+                    public void onError(RongIMClient.ErrorCode errorCode) {
+                        emitter.onNext(new Object[]{});
+                        emitter.onComplete();
+                    }
+                });
+    }
+    
+    private void checkConversationTop(final ObservableEmitter<Object[]> emitter){
+        RongIMClient.getInstance().getConversation(Conversation.ConversationType.GROUP, String.valueOf(group.getGroup_id()), new RongIMClient.ResultCallback<Conversation>() {
+            @Override
+            public void onSuccess(Conversation conversation) {
+                ALog.d("2 success");
+                if(conversation != null){
+                    isTop = conversation.isTop();
+                }
+                emitter.onNext(new Object[]{});
+                emitter.onComplete();
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                ALog.d("2 fail");
+                emitter.onNext(new Object[]{});
+                emitter.onComplete();
+            }
+        });
+    }
+    
+    @Override
+    public boolean isActive() {
+        return super.isActive() && group != null;
+    }
+
+    @Override
+    public void onGroupMemberClick() {
+        if(isJoin){
+            ARouter.getInstance().build(RouteTable.CONVERSATION_GROUP_MEMBER)
+                    .withInt(RouteExtra.GroupRole_Int, groupRole)
+                    .withString(RouteExtra.GroupId_String, groupId)
+                    .withBoolean(RouteExtra.IsNeedUpdate, group.getPeople() != group.getMember_num())
+                    .navigation();
+        }
+    }
+    
+    @Override
+    public void onAddMemberClick() {
+        if(isActive()){
+            ARouter.getInstance().build(RouteTable.CONVERSATION_SELECT_FRIEND)
+                    .withString(RouteExtra.ConversationId_String, String.valueOf(group.getGroup_id()))
+                    .navigation();
+        }
+    }
+
+    @Override
+    public void onGroupManageClick() {
+       if(isActive()){
+           ARouter.getInstance().build(RouteTable.CONVERSATION_GROUP_MANAGE)
+                   .withSerializable(RouteExtra.GroupEntity, group)
+                   .navigation();
+       }
+    }
+
+    @Override
+    public void onSearchHistoryClick() {
+        if(isActive()){
+            ARouter.getInstance().build(RouteTable.CONVERSATION_SEARCH_MESSAGE)
+                    .withString(RouteExtra.GroupId_String, String.valueOf(group.getGroup_id())).navigation();
+        }
+    }
+
+    @Override
+    public void onChangeNotificationClick(boolean isOpen) {
+        RongIMClient.getInstance().setConversationNotificationStatus(Conversation.ConversationType.GROUP, 
+                String.valueOf(group.getGroup_id()),
+                isOpen ? Conversation.ConversationNotificationStatus.DO_NOT_DISTURB : Conversation.ConversationNotificationStatus.NOTIFY, 
+                new RongIMClient.ResultCallback<Conversation.ConversationNotificationStatus>() {
+            @Override
+            public void onSuccess(Conversation.ConversationNotificationStatus conversationNotificationStatus) {
+                
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+                
+            }
+        });
+    }
+
+    @Override
+    public void onConversationTopClick(final boolean isTop) {
+        RongIMClient.getInstance().setConversationToTop(Conversation.ConversationType.GROUP, String.valueOf(group.getGroup_id()), isTop, new RongIMClient.ResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean aBoolean) {
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode errorCode) {
+            }
+        });
+    }
+
+    @Override
+    public void onEnterBtnClick() {
+        if(group == null){
+            getView().showTips(new ResultTipsType("", false));
+            return;
+        }
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<CodeEntity>() {
+            @Override
+            public void subscribe(ObservableEmitter<CodeEntity> emitter) throws Exception {
+                try {
+                    long userId = userModel.getLocalUserInfo().getId();
+                    CodeEntity codeEntity = null;
+                    if(isJoin){
+                        if(groupRole == GroupMemberContract.ROLE_OWNER){
+                            codeEntity = groupModule.dissolutionGroup(group.getGroup_id(), String.valueOf(userId));
+                        } else {
+                            codeEntity = groupModule.quitGroup(group.getGroup_id());
+                        }
+                        CachePool.getInstance().group().remove(group.getGroup_id());
+                        CachePool.getInstance().groupDetail().remove(group.getGroup_id());
+                    } else {
+                        String messge = group.getJoinMethod() == 5 ? "申请加入群聊" : "";
+                        codeEntity = groupModule.joinGroup(String.valueOf(group.getGroup_id()), group.getGroup_name(), messge);
+                    }
+                    if(codeEntity.getRetcode() != 0){
+                        emitter.onError(new RxErrorThrowable(codeEntity));
+                        return;
+                    }
+                    if(group.getJoinMethod() == 5){
+                        isApply = true;
+                        iimModel.sendGroupApply(String.valueOf(group.getManagers().get(0).getGroup_creater()),
+                                "群主您好，申请加入"+group.getGroup_name()+"，谢谢！",
+                                BoChatMessage.SOURCE_TYPE_ACCOUNT);
+                    } else {
+                        isApply = false;
+                        CachePool.getInstance().group().put(group);
+                    }
+                    if(isJoin){
+                        RongIM.getInstance().removeConversation(Conversation.ConversationType.GROUP, String.valueOf(group.getGroup_id()));
+                    }
+                    emitter.onNext(codeEntity);
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<CodeEntity>() {
+            @Override
+            public void accept(CodeEntity entity) throws Exception {
+                if(!isJoin){
+                    if(isApply){
+                        getView().showTips("发送成功，等待管理员审核。");
+                    } else {
+                        getView().showTips("加入群聊成功，去群聊列表发起会话吧！");
+                    }
+                }
+                getView().hideLoading("");
+                ARouter.getInstance().build(RouteTable.MAIN_BOCHAT).withInt(RouteExtra.ChangeTab_Int, 0)
+                        .navigation();
+                getView().finish();
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                getView().hideLoading("");
+            }
+        });
+        getView().showLoading(subscribe);
+    }
+
+    @Override
+    public void onQRCodeClick() {
+        if(group != null){
+            ARouter.getInstance().build(RouteTable.CONVERSATION_QR_CARD).withSerializable(RouteExtra.GroupEntity, group).navigation();
+        }
+    }
+
+    @Override
+    public void onClearHistoryClick() {
+        Disposable subscribe = Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> emitter) throws Exception {
+                try {
+                    RongIMClient.getInstance().cleanHistoryMessages(Conversation.ConversationType.GROUP, String.valueOf(group.getGroup_id()), 0, false, new RongIMClient.OperationCallback() {
+                        @Override
+                        public void onSuccess() {
+                            emitter.onNext(true);
+                            emitter.onComplete();
+                        }
+
+                        @Override
+                        public void onError(RongIMClient.ErrorCode errorCode) {
+                            emitter.onNext(false);
+                            emitter.onComplete();
+                        }
+                    });
+                } catch (Exception e) {
+                    emitter.onError(e);
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean entity) throws Exception {
+                if(isActive()){
+                    getView().hideLoading("");
+                    if(entity){
+                        getView().showTips(new ResultTipsType("成功", true));
+                    } else {
+                        getView().showTips(new ResultTipsType("失败", false));
+                    }
+                }
+            }
+        }, new RxErrorConsumer<Throwable>(this)  {
+            @Override
+            public void acceptError(Throwable object) {
+                if(isActive()){
+                    getView().hideLoading("");
+                    getView().showTips(new ResultTipsType("失败", false));
+                }
+            }
+        });
+        getView().showLoading(subscribe);
+    }
+}

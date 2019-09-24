@@ -1,0 +1,30 @@
+package com.bochat.app.common.contract.conversation;
+
+import com.bochat.app.model.bean.GroupEntity;
+import com.bochat.app.mvp.presenter.IBasePresenter;
+import com.bochat.app.mvp.view.IBaseView;
+
+import java.util.List;
+
+/**
+ * Author      : FJ
+ * CreateDate  : 2019/04/16 09:20
+ * Description : 原型 1.6 查找群聊
+ *               点击 {@link Presenter#onCreateBtnClick 跳转 {@link SelectFriendContract }}
+ *               点击 {@link Presenter#onSearchItemClick 跳转 {@link GroupDetailContract }}
+ *               点击 {@link Presenter#onRecommendItemClick 跳转 {@link GroupDetailContract }}
+ */  
+
+public interface AddGroupChatContract {
+    interface View extends IBaseView<AddGroupChatContract.Presenter> {
+        public void updateRecommendList(List<GroupEntity> list);
+        public void updateSearchList(List<GroupEntity> list);
+    }
+
+    interface Presenter extends IBasePresenter<AddGroupChatContract.View> {
+        public void onCreateBtnClick();
+        public void onRecommendItemClick(GroupEntity item);
+        public void onSearchItemClick(GroupEntity item);
+        public void onSearchTextUpdate(String text);
+    }
+}

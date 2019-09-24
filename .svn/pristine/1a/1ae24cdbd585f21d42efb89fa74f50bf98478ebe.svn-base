@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/optional_operation_group"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#FBFAFA"
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/dp_15"
+    android:paddingTop="@dimen/dp_9"
+    android:paddingEnd="@dimen/dp_15"
+    android:paddingBottom="@dimen/dp_9">
+
+
+    <me.shihao.library.XRadioGroup
+        android:id="@+id/group_radio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <RadioButton
+                android:id="@+id/default_sort_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:checked="true"
+                android:text="默认排序"
+                android:textColor="@drawable/market_quotation_text_color_selector" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <RadioButton
+                android:id="@+id/price_sort_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableEnd="@drawable/market_quotation_optional_operation_selector"
+                android:drawablePadding="@dimen/dp_6"
+                android:layout_marginStart="@dimen/dp_15"
+                android:text="最新价"
+                android:textColor="@drawable/market_quotation_text_color_selector" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center|end"
+            android:layout_weight="1">
+
+            <RadioButton
+                android:id="@+id/gain_sort_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableEnd="@drawable/market_quotation_optional_operation_selector"
+                android:drawablePadding="6dp"
+                android:layout_marginEnd="@dimen/dp_30"
+                android:text="涨跌幅"
+                android:textColor="@drawable/market_quotation_text_color_selector" />
+        </LinearLayout>
+    </me.shihao.library.XRadioGroup>
+
+    <!--<LinearLayout-->
+    <!--android:id="@+id/dynamic_mk_header_default_sort"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_weight="1"-->
+    <!--android:gravity="center_vertical|start">-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/dynamic_mk_header_default_sort_text"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="默认排序"-->
+    <!--android:textColor="@color/color_0084FF"-->
+    <!--android:textSize="@dimen/dp_12" />-->
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+    <!--android:id="@+id/dynamic_mk_header_new_price"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginStart="@dimen/dp_15"-->
+    <!--android:layout_weight="1">-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/dynamic_mk_header_new_price_text"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:drawablePadding="@dimen/dp_6"-->
+    <!--android:drawableEnd="@mipmap/ic_quotation_lower"-->
+    <!--android:text="最新价"-->
+    <!--android:textColor="@color/color_999999"-->
+    <!--android:textSize="@dimen/dp_12" />-->
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+    <!--android:id="@+id/dynamic_mk_header_stock_index"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_weight="1"-->
+    <!--android:gravity="center">-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/dynamic_mk_header_stock_index_text"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:drawablePadding="@dimen/dp_6"-->
+    <!--android:drawableEnd="@drawable/market_quotation_optional_operation_selector"-->
+    <!--android:text="涨跌幅"-->
+    <!--android:textColor="@color/color_999999"-->
+    <!--android:textSize="@dimen/dp_12" />-->
+    <!--</LinearLayout>-->
+</LinearLayout>

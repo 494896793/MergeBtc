@@ -1,0 +1,129 @@
+package com.bochat.app.app.fragment.dynamic;
+
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.bochat.app.R;
+import com.bochat.app.app.adapter.MarketQuotationOptionalAdapter;
+import com.bochat.app.common.router.Router;
+import com.bochat.app.common.router.RouterMarketQuotationDetail;
+import com.bochat.app.common.util.ULog;
+import com.bochat.app.model.bean.DynamicMQEntity;
+import com.bochat.app.model.bean.MarketInfoEntity;
+import com.bochat.app.model.bean.MarketInfoListEntity;
+import com.bochat.app.mvp.view.BaseFragment;
+import com.bochat.app.common.contract.dynamic.MarketQuotationOptionalContract;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+
+public class MarketQuotationOptionalFragment extends BaseFragment<MarketQuotationOptionalContract.Presenter> implements MarketQuotationOptionalContract.View,
+        MarketQuotationOptionalAdapter.OnMarketQuotationHeaderClickListener,
+        MarketQuotationOptionalAdapter.OnMarketQuotationItemClickListener {
+
+    @Inject
+    MarketQuotationOptionalContract.Presenter presenter;
+
+    @BindView(R.id.quotation_optional_list)
+    RecyclerView mOptionalListView;
+
+    @BindView(R.id.quotation_no_data)
+    ImageView mOptionalNotData;
+
+    private MarketQuotationOptionalAdapter mAdapter;
+
+    boolean isNotData = false;
+    private int mType;
+    private View lastSortClickView;
+
+    @Override
+    protected void initInjector() {
+        getFragmentComponent().inject(this);
+    }
+
+    @Override
+    protected MarketQuotationOptionalContract.Presenter initPresenter() {
+        return presenter;
+    }
+
+    @Override
+    protected View getRootView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_market_quotation_optional, container, false);
+    }
+
+    public void setType(int type) {
+        mType = type;
+    }
+
+    public int getType() {
+        return mType;
+    }
+
+    @Override
+    protected void initWidget() {
+        super.initWidget();
+
+        mOptionalListView.setLayoutManager(new LinearLayoutManager(getViewContext()));
+        mOptionalListView.setItemAnimator(new DefaultItemAnimator());
+
+        mAdapter = new MarketQuotationOptionalAdapter(getViewContext());
+        mOptionalListView.setAdapter(mAdapter);
+
+        mAdapter.setMarketQuotationHeaderClickListener(this);
+        mAdapter.setOnMarketQuotationItemClickListener(this);
+
+        if (isNotData) {
+            View headerView = LayoutInflater.from(getViewContext()).inflate(R.layout.market_quotation_optional_header_view, null);
+            mAdapter.setHeaderView(headerView);
+            ULog.d("Id:%d", getId());
+            presenter.getMarketInfo(String.valueOf(getType()), "defaul");
+        }
+        mOptionalNotData.setVisibility(mAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+
+    }
+
+    public void setNoData(boolean noData) {
+        isNotData = noData;
+    }
+
+    @Override
+    public void onItemClick(View view, MarketInfoEntity entity) {
+        RouterMarketQuotationDetail router = new RouterMarketQuotationDetail();
+        router.setEntity(entity);
+        Router.navigation(router);
+    }
+
+    @Override
+    public void obtainMarketInfo(MarketInfoListEntity entity) {
+        if (mAdapter != null)
+            mAdapter.notifyData(entity.getList());
+    }
+
+    @Override
+    public void onClickSort() {
+        presenter.getMarketInfo(String.valueOf(getId()), "default");
+    }
+
+    @Override
+    public void onClickNewPrice() {
+        presenter.getMarketInfo(String.valueOf(getType()), "priceDesc");
+    }
+
+    @Override
+    public void onClickUpAndDown() {
+        presenter.getMarketInfo(String.valueOf(getType()), "upAndLowDesc");
+    }
+}
